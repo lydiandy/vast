@@ -176,7 +176,7 @@ pub fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 			return t.goto_stmt(it)
 		}
 		// ast.Lambda {
-		// 	return lambda(it)
+		// 	return t.lambda(it)
 		// }
 		ast.AssignStmt {
 			return t.assign_stmt(it)
