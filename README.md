@@ -32,6 +32,7 @@ so you can see the AST of  v source file.
 
   it will parse the demo.v file and generate demo.json, open it ~
 
+  ![](example/json.png)
 
 ## usage
 
