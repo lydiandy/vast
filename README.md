@@ -19,14 +19,15 @@ so you can see the AST of  v source file.
   ln -s your/path ~/.vmodules/vast
   ```
 
-- now you can run the example code in example directory
+  now you can run the example code in example directory
 
   ```
    cd example
    v run ./main.v
   ```
 
-  it will parse the demo.v file and generate demo.json,open it.
+  it will parse the demo.v file and generate demo.json, open it ~
+
 
 ## usage
 
@@ -53,4 +54,4 @@ MIT
 
 ## Contributors
 
-pull request is welcome~
+pull request is welcome ~
