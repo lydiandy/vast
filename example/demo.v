@@ -3,9 +3,8 @@ module demo
 //comment for include
 #inclde abc
 
-import (
-	os
-)
+import os
+import strings
 
 import (
 	time 
@@ -35,8 +34,14 @@ pub enum Color {
 
 //main funciton
 fn main() {
+	add(1,3)
 	println(add(1,2))
 	println('ok') //comment println
+	arr:=[1,3,5,7]
+	for a in arr {
+		println(a)
+		add(1,3)
+	}
 }
 //add function
 fn add(x,y int) int {

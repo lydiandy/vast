@@ -30,6 +30,7 @@ pub fn json(file string) string {
 
 	//root of the tree
 	root:=create_object()
+
 	to_object(root,'path',string_node(ast_file.path))
 	to_object(root,'mod',mod(ast_file.mod))
 	to_object(root,'imports',imports(ast_file.imports))
@@ -55,6 +56,9 @@ pub fn bool_node(val bool) &C.cJSON {
 	} else {
 		return create_false()
 	}
+}
+pub fn null_node() &C.cJSON {
+	return create_null()
 }
 
 //ast.File node
@@ -106,6 +110,12 @@ pub fn stmts(stmts []ast.Stmt) &C.cJSON {
 
 pub fn stmt(node ast.Stmt) &C.cJSON {
 	match node {
+		ast.Module {
+			return mod(it)
+		}
+		ast.Import {
+			return import_(it)
+		}
 		ast.LineComment {
 			return line_comment(it)
 		}
@@ -178,15 +188,25 @@ pub fn stmt(node ast.Stmt) &C.cJSON {
 		ast.UnsafeStmt {
 			return unsafe_stmt(it)
 		}
+		ast.ExprStmt {
+			return expr_stmt(it)
+		}
 
 		
 		else {
-			println('unknown node')
+			println('unknown node:$node')
 			return string_node('unknown node')
 		}
 	}
 }
-
+pub fn import_(it ast.Import) &C.cJSON {
+		obj:=create_object()
+		to_object(obj,'ast_type',string_node('Import'))
+		to_object(obj,'mod',string_node(it.mod))
+		to_object(obj,'alias',string_node(it.alias))
+		to_object(obj,'pos',position(it.pos))
+		return obj
+}
 pub fn position(p token.Position) &C.cJSON {
 	obj:=create_object()
 	to_object(obj,'line_nr',number_node(p.line_nr))
@@ -480,7 +500,12 @@ pub fn unsafe_stmt(it ast.UnsafeStmt) &C.cJSON {
 	to_object(obj,'stmts',stmt_arr)
 	return obj
 }
-
+pub fn expr_stmt(it ast.ExprStmt) &C.cJSON {
+	obj:=create_object()
+	to_object(obj,'typ',number_node(int(it.typ)))
+	to_object(obj,'expr',expr(it.expr))
+	return obj
+}
 //expr 
 pub fn expr(e ast.Expr) &C.cJSON {
 	match e {
@@ -577,8 +602,8 @@ pub fn expr(e ast.Expr) &C.cJSON {
 
 
 		else {
-			println('unknown expr')
-			return string_node('unknown expr')
+			// println('unknown expr')
+			return null_node()
 		}
 	}	
 }
@@ -896,6 +921,7 @@ pub fn to_array(node &C.cJSON,child &C.cJSON) {
 	add_item_to_array(node,child)
 }
 
+//get absolute path for file
 pub fn abs_path(path string) string {
 	if filepath.is_abs(path) {
 		return path
