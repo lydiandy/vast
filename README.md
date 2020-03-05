@@ -52,6 +52,11 @@ fn main() {
 }
 ```
 
+## todo
+
+- make type from id to name
+- make enum from id to name
+
 ## License
 
 MIT
