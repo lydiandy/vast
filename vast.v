@@ -566,15 +566,6 @@ pub fn expr(e ast.Expr) &C.cJSON {
 		ast.Ident {
 			return ident(it)
 		}
-		// ast.IdentInfo {
-		// 	return ident_info(it)
-		// }
-		// ast.IdentVar {
-		// 	return ident_var(it)
-		// }
-		// ast.IdentFunc {
-		// 	return ident_func(it)
-		// }
 		ast.CallExpr {
 			return call_expr(it)
 		}
@@ -763,8 +754,7 @@ pub fn ident(it ast.Ident) &C.cJSON {
 	to_object(obj,'tok_kind',number_node(int(it.tok_kind)))
 	to_object(obj,'pos',position(it.pos))
 	to_object(obj,'kind',number_node(int(it.kind)))
-	// to_object(obj,'info',ident_info(it.info))
-	to_object(obj,'info',string_node('todo!!'))
+	to_object(obj,'info',ident_info(it.info))
 	return obj	
 }
 pub fn ident_info(info ast.IdentInfo) &C.cJSON {
