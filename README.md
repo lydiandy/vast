@@ -4,6 +4,10 @@ A simple tool for vlang, generate v source file to  AST json file.
 
 so you can see the AST of  v source file.
 
+**NOTE:**
+
+**the vast will follow the newest version of V, If you meet error,please update the V source code from:https://github.com/vlang/v**
+
 ## Installation
 
 - via vpm
