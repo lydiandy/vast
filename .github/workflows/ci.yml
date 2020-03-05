@@ -1,0 +1,64 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build V
+      run: |
+        git clone --depth 1 https://github.com/vlang/v ../v
+        cd ../v
+        make
+    - name: Build example
+      run: |
+        cp -rf ../vast ../v/vlib/vast
+        cd example/        
+        time ../../v/v run main.v
+    - name: Results
+      run: ls -lart example/*
+    - name: demo.json
+      run: cat example/demo.json
+
+  macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build V
+      run: |
+        git clone --depth 1 https://github.com/vlang/v ../v
+        cd ../v
+        make
+    - name: Build example
+      run: |
+        cp -rf ../vast ../v/vlib/vast
+        cd example
+        time ../../v/v run main.v
+    - name: Results
+      run: ls -lart example/*
+    - name: demo.json
+      run: cat example/demo.json
+
+  windows-msvc:
+    runs-on: windows-latest
+    env:
+        VFLAGS: -cc msvc
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build V
+      run: |
+        git clone --depth 1 https://github.com/vlang/v ..\v
+        cd ..\v
+        .\make.bat -msvc
+    - name: Build example
+      run: |
+        xcopy ..\vast ..\v\vlib\vast /e /i /h
+        cd example
+        ..\..\v\v.exe run main.v
+    - name: Results
+      run: dir example\
+    - name: demo.json
+      run: type example/demo.json
+

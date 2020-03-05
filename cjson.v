@@ -2,6 +2,9 @@ module vast
 
 import json
 
+struct UseJson { x int }
+fn suppress_json_warning(){ json.encode(UseJson{}) }
+
 // struct C.cJSON {}
 
 fn C.cJSON_CreateObject() &C.cJSON
