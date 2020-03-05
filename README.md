@@ -1,0 +1,1 @@
+vast generate V AST to json
