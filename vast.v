@@ -11,7 +11,7 @@ import (
 
 //generate json file with the same file name
 pub fn json_file(file string) {
-	ast_json:=ast.json(file)
+	ast_json:=json(file)
 
 	filename:=filepath.filename(file)
 	json_file:=filename[0..filename.len-2]+'.json'
