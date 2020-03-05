@@ -910,33 +910,34 @@ pub fn match_expr(it ast.MatchExpr) &C.cJSON {
 	to_object(obj,'tok_kind',number_node(int(it.tok_kind)))
 	to_object(obj,'cond',expr(it.cond))
 
-	// m_arr:=create_array()
-	// for b in it.branches {
-	// 	to_array(m_arr,match_branch(b))
-	// }
-	// to_object(obj,'branches',m_arr)
+	m_arr:=create_array()
+	for b in it.branches {
+		to_array(m_arr,match_branch(b))
+	}
+	to_object(obj,'branches',m_arr)
+	to_object(obj,'expr_type',number_node(int(it.expr_type)))
+	to_object(obj,'pos',position(it.pos))
+
+	return obj	
+}
+pub fn match_branch(it ast.MatchBranch) &C.cJSON {
+	obj:=create_object()
+
+	expr_arr:=create_array()
+	for e in it.exprs {
+		to_array(expr_arr,expr(e))
+	}
+	to_object(obj,'exprs',expr_arr)
+
+	stmt_arr:=create_array()
+	for s in it.stmts {
+		to_array(stmt_arr,stmt(s))
+	}
+	to_object(obj,'stmts',stmt_arr)
 
 	to_object(obj,'pos',position(it.pos))
 	return obj	
 }
-// pub fn match_branch(it ast.MatchBranch) &C.cJSON {
-// 	obj:=create_object()
-
-// 	expr_arr:=create_array()
-// 	for e in it.exprs {
-// 		to_array(expr_arr,expr(e))
-// 	}
-// 	to_object(obj,'exprs',expr_arr)
-
-// 	stmt_arr:=create_array()
-// 	for s in it.stmts {
-// 		to_array(stmt_arr,stmt(s))
-// 	}
-// 	to_object(obj,'stmts',stmt_arr)
-
-// 	to_object(obj,'pos',position(it.pos))
-// 	return obj	
-// }
 
 [inline]
 pub fn to_object(node &C.cJSON,key string,child &C.cJSON) {
