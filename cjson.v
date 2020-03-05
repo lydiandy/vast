@@ -2,6 +2,8 @@ module vast
 
 import json
 
+// struct C.cJSON {}
+
 fn C.cJSON_CreateObject() &C.cJSON
 fn C.cJSON_CreateArray() &C.cJSON
 // fn C.cJSON_CreateBool(bool) &C.cJSON

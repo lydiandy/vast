@@ -31,7 +31,7 @@ so you can see the AST of  v source file.
 
 ## usage
 
-```
+```v
 module main
 
 import vast
