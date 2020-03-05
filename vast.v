@@ -391,7 +391,7 @@ pub fn lambda(it ast.Lambda) &C.cJSON {
 	to_object(obj,'name',string_node(it.name))
 	return obj
 }
-//todo
+
 pub fn assign_stmt(it ast.AssignStmt) &C.cJSON {
 	obj:=create_object()
 	i_arr:=create_array()
@@ -566,6 +566,15 @@ pub fn expr(e ast.Expr) &C.cJSON {
 		ast.Ident {
 			return ident(it)
 		}
+		// ast.IdentInfo {
+		// 	return ident_info(it)
+		// }
+		// ast.IdentVar {
+		// 	return ident_var(it)
+		// }
+		// ast.IdentFunc {
+		// 	return ident_func(it)
+		// }
 		ast.CallExpr {
 			return call_expr(it)
 		}
@@ -754,9 +763,36 @@ pub fn ident(it ast.Ident) &C.cJSON {
 	to_object(obj,'tok_kind',number_node(int(it.tok_kind)))
 	to_object(obj,'pos',position(it.pos))
 	to_object(obj,'kind',number_node(int(it.kind)))
+	// to_object(obj,'info',ident_info(it.info))
 	to_object(obj,'info',string_node('todo!!'))
 	return obj	
 }
+pub fn ident_info(info ast.IdentInfo) &C.cJSON {
+	match info {
+		ast.IdentVar {
+			return ident_var(it)
+		}
+		ast.IdentFunc {
+			return ident_func(it)
+		}
+		else {
+			return string_node('unknown node')
+		}
+	}
+}
+pub fn ident_var(it ast.IdentVar) &C.cJSON {
+	obj:=create_object()
+	to_object(obj,'typ',number_node(int(it.typ)))
+	to_object(obj,'is_mut',bool_node(it.is_mut))
+	to_object(obj,'is_static',bool_node(it.is_static))
+	return obj	
+}
+pub fn ident_func(it ast.IdentFunc) &C.cJSON {
+	obj:=create_object()
+	to_object(obj,'return_type',number_node(int(it.return_type)))
+	return obj	
+}
+
 pub fn call_expr(it ast.CallExpr) &C.cJSON {
 	obj:=create_object()
 	to_object(obj,'name',string_node(it.name))
