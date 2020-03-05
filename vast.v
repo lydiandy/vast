@@ -596,9 +596,9 @@ pub fn expr(e ast.Expr) &C.cJSON {
 		ast.MatchExpr {
 			return match_expr(it)
 		}
-		// ast.MatchBranch {
-		// 	return match_branch(it)
-		// }
+		ast.ConcatExpr {
+			return concat_expr(it)
+		}
 
 
 		else {
@@ -936,6 +936,16 @@ pub fn match_branch(it ast.MatchBranch) &C.cJSON {
 	to_object(obj,'stmts',stmt_arr)
 
 	to_object(obj,'pos',position(it.pos))
+	return obj	
+}
+pub fn concat_expr(it ast.ConcatExpr) &C.cJSON {
+	obj:=create_object()
+
+	expr_arr:=create_array()
+	for e in it.vals {
+		to_array(expr_arr,expr(e))
+	}
+	to_object(obj,'vals',expr_arr)
 	return obj	
 }
 
