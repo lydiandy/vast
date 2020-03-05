@@ -73,7 +73,7 @@ pub fn (t Tree) typ_node(typ table.Type) &C.cJSON {
 		// type_str:=t.table.get_type_symbol(typ)
 		type_str:=t.table.type_to_str(typ)
 		println(type_str)
-		return create_string(type_str.name)
+		return create_string(type_str)
 	}
 }
 
