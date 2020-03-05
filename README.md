@@ -1,14 +1,10 @@
 ## vast
 
----
-
 A simple tool for vlang, generate v source file to  AST json file.
 
 so you can see the AST of  v source file.
 
----
-
-### Installation
+## Installation
 
 - via vpm
 
@@ -32,9 +28,7 @@ so you can see the AST of  v source file.
 
   it will parse the demo.v file and generate demo.json,open it.
 
----
-
-### usage
+## usage
 
 ```
 module main
@@ -53,14 +47,10 @@ fn main() {
 }
 ```
 
----
-
-### License
+## License
 
 MIT
 
----
-
-### Contributors
+## Contributors
 
 pull request is welcome~
