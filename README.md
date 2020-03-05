@@ -6,7 +6,7 @@ so you can see the AST of  v source file.
 
 **NOTE:**
 
-**the vast will follow the newest version of V, If you meet error,please update the V source code from:https://github.com/vlang/v**
+**vast will follow the newest version of V. If you run into an error, please update your version of V by running `v up`.**
 
 ## Installation
 
@@ -20,7 +20,7 @@ so you can see the AST of  v source file.
 
   ```
   git clone git@github.com:lydiandy/vast.git
-  ln -s your/path ~/.vmodules/vast
+  ln -s `pwd`/vast ~/.vmodules/vast
   ```
 
   now you can run the example code in example directory
@@ -42,12 +42,12 @@ module main
 import vast
 
 fn main() {
-	file:='./demo.v'
+	file := './demo.v'
 
-	//generate json file with the same name
+	// generate json file with the same name
 	vast.json_file(file)
 
-	//or generate ast string
+	// or generate ast string
 	ast_str:=vast.json(file)
 	println(ast_str)
 }
