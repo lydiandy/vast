@@ -536,6 +536,9 @@ pub fn expr(e ast.Expr) &C.cJSON {
 		ast.AsCast {
 			return as_cast(it)
 		}
+		ast.Type {
+			return type_expr(it)
+		}
 		ast.SizeOf {
 			return size_of(it)
 		}
@@ -663,6 +666,11 @@ pub fn cast_expr(it ast.CastExpr) &C.cJSON {
 	return obj
 }
 pub fn as_cast(it ast.AsCast) &C.cJSON {
+	obj:=create_object()
+	to_object(obj,'typ',number_node(int(it.typ)))
+	return obj
+}
+pub fn type_expr(it ast.Type) &C.cJSON {
 	obj:=create_object()
 	to_object(obj,'typ',number_node(int(it.typ)))
 	return obj
