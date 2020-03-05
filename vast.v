@@ -84,11 +84,12 @@ pub fn imports(imports []ast.Import) &C.cJSON {
 
 pub fn scope(scope ast.Scope) &C.cJSON {
 	obj:=create_object()
-	to_object(obj,'parent',number_node(int(scope.parent)))
+	to_object(obj,'parent',string_node(ptr_str(scope.parent)))
 	children_arr:=create_array()
 	for s in scope.children {
 		children_obj:=create_object()
-		to_object(children_obj,'parent',number_node(int(s.parent)))
+		println(scope.parent)
+		to_object(children_obj,'parent',string_node(ptr_str(s.parent)))
 		to_object(children_obj,'start_pos',number_node(s.start_pos))
 		to_object(children_obj,'end_pos',number_node(s.end_pos))
 		to_array(children_arr,children_obj)
