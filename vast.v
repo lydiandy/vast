@@ -1,4 +1,4 @@
-module ast
+module vast
 
 import (
 	v.token
