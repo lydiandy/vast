@@ -18,8 +18,9 @@ jobs:
         cd example/        
         time ../../v/v run main.v
     - name: Results
-      run: |
-        ls -lart example/*
+      run: ls -lart example/*
+    - name: demo.json
+      run: cat example/demo.json
 
   macos:
     runs-on: macos-latest
@@ -36,8 +37,9 @@ jobs:
         cd example
         time ../../v/v run main.v
     - name: Results
-      run: |        
-        ls -lart example/*
+      run: ls -lart example/*
+    - name: demo.json
+      run: cat example/demo.json
 
   windows-msvc:
     runs-on: windows-latest
@@ -56,6 +58,7 @@ jobs:
         cd example
         ..\..\v\v.exe run main.v
     - name: Results
-      run: |
-        dir example\
+      run: dir example\
+    - name: demo.json
+      run: type example/demo.json
 
