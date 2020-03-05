@@ -425,7 +425,6 @@ pub fn var_decl(it ast.VarDecl) &C.cJSON {
 }
 pub fn return_stmt(it ast.Return) &C.cJSON {
 	obj:=create_object()
-	to_object(obj,'expected_type',number_node(int(it.expected_type)))
 
 	e_arr:=create_array()
 	for e in it.exprs {

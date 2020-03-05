@@ -1,7 +1,7 @@
 //this is comment
 module demo
 //comment for include
-#inclde abc
+#include abc
 
 import os
 import strings

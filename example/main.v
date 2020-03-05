@@ -9,6 +9,6 @@ fn main() {
 	vast.json_file(file)
 
 	//or generate ast string
-	ast_str:=vast.json(file)
-	println(ast_str)
+	// ast_str:=vast.json(file)
+	// println(ast_str)
 }
