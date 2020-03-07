@@ -371,13 +371,43 @@ pub fn (t Tree) defer_stmt(it ast.DeferStmt) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) type_decl(it ast.TypeDecl) &C.cJSON {
+pub fn (t Tree) type_decl(node ast.TypeDecl) &C.cJSON {
+	match node {
+		ast.AliasTypeDecl {
+			return t.alias_type_decl(it)
+		}
+		ast.SumTypeDecl {
+			return t.sum_type_decl(it)
+		}
+		else {
+			return t.string_node('unknown node')
+		}
+	}
+}
+pub fn (t Tree) alias_type_decl(it ast.AliasTypeDecl) &C.cJSON {
 	obj:=create_object()
-	to_object(obj,'ast_type',t.string_node('TypeDecl'))
+	to_object(obj,'ast_type',t.string_node('AliasTypeDecl'))
 	to_object(obj,'name',t.string_node(it.name))
 	to_object(obj,'is_pub',t.bool_node(it.is_pub))
+	to_object(obj,'parent_type',t.number_node(int(it.parent_type)))
+
 	return obj
 }
+pub fn (t Tree) sum_type_decl(it ast.SumTypeDecl) &C.cJSON {
+	obj:=create_object()
+	to_object(obj,'ast_type',t.string_node('SumTypeDecl'))
+	to_object(obj,'name',t.string_node(it.name))
+	to_object(obj,'is_pub',t.bool_node(it.is_pub))
+
+	t_arr:=create_array()
+	for s in it.sub_types {
+		to_array(t_arr,t.number_node(int(s)))
+	}
+	to_object(obj,'sub_types',t_arr)
+	
+	return obj
+}
+
 //todo
 pub fn (t Tree) field(it ast.Field) &C.cJSON {
 	obj:=create_object()
