@@ -31,6 +31,9 @@ pub enum Color {
 	green
 	blue	
 }
+type Myint int
+
+type MySumType = int | string | bool
 
 //main funciton
 fn main() {
