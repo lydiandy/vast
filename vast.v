@@ -6,7 +6,6 @@ import (
 	v.table
 	v.ast
 	os
-	filepath
 )
 
 pub struct Tree {
@@ -18,14 +17,14 @@ pub struct Tree {
 pub fn json_file(file string) {
 	ast_json:=json(file)
 
-	filename:=filepath.filename(file)
+	filename:=os.filename(file)
 	json_file:=filename[0..filename.len-2]+'.json'
 	os.write_file(json_file,ast_json)
 }
 
 //generate json string
 pub fn json(file string) string {
-	if filepath.ext(file)≠'.v' {
+	if os.ext(file)≠'.v' {
 		panic('the file must be v file')
 	}
 	apath:=abs_path(file)
@@ -1015,11 +1014,11 @@ pub fn to_array(node &C.cJSON,child &C.cJSON) {
 
 //get absolute path for file
 pub fn abs_path(path string) string {
-	if filepath.is_abs(path) {
+	if os.is_abs(path) {
 		return path
-	} else if path.starts_with(filepath.separator) {
-		return filepath.join(os.getwd(),path[2..])
+	} else if path.starts_with(os.path_separator) {
+		return os.join(os.getwd(),path[2..])
 	} else {
-		return filepath.join(os.getwd(),path)
+		return os.join(os.getwd(),path)
 	}
 }
