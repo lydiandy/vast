@@ -1017,8 +1017,8 @@ pub fn abs_path(path string) string {
 	if os.is_abs(path) {
 		return path
 	} else if path.starts_with(os.path_separator) {
-		return os.join(os.getwd(),path[2..])
+		return os.join_path(os.getwd(),path[2..])
 	} else {
-		return os.join(os.getwd(),path)
+		return os.join_path(os.getwd(),path)
 	}
 }
