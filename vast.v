@@ -1028,7 +1028,7 @@ pub fn to_array(node &C.cJSON,child &C.cJSON) {
 
 //get absolute path for file
 pub fn abs_path(path string) string {
-	if os.is_abs(path) {
+	if os.is_abs_path(path) {
 		return path
 	} else if path.starts_with(os.path_separator) {
 		return os.join_path(os.getwd(),path[2..])
