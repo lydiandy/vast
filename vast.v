@@ -1,4 +1,4 @@
-module vast
+module main
 
 import (
 	v.token
@@ -7,6 +7,22 @@ import (
 	v.ast
 	os
 )
+
+const (
+	version='0.0.1'
+)
+
+pub fn main() {
+	if os.args.len≠2 {
+		panic("unknown args,Usage:vast demo.v")
+	}
+	file:=os.args[1]
+	if os.ext(file)≠'.v' {
+		panic('the file must be v file')
+	}
+	apath:=abs_path(file)
+	json_file(apath)
+}
 
 pub struct Tree {
 	root &C.cJSON //the root of tree
@@ -17,23 +33,17 @@ pub struct Tree {
 pub fn json_file(file string) {
 	ast_json:=json(file)
 
-	filename:=os.filename(file)
-	json_file:=filename[0..filename.len-2]+'.json'
+	json_file:=file[0..file.len-2]+'.json'
 	os.write_file(json_file,ast_json)
 }
 
 //generate json string
 pub fn json(file string) string {
-	if os.ext(file)≠'.v' {
-		panic('the file must be v file')
-	}
-	apath:=abs_path(file)
-
 	t:=Tree {
 		root:create_object()
 		table:&table.Table{}
 	}
-	ast_file:=parser.parse_file(apath,t.table,.parse_comments)
+	ast_file:=parser.parse_file(file,t.table,.parse_comments)
 
 	to_object(t.root,'path',t.string_node(ast_file.path))
 	to_object(t.root,'mod',t.mod(ast_file.mod))

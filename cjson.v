@@ -1,4 +1,4 @@
-module vast
+module main
 
 import json
 

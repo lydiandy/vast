@@ -12,46 +12,33 @@ so you can see the AST of  v source file.
 
 - via vpm
 
-  ```
-  v install lydiandy.vast
-  ```
+```shell
+v install lydiandy.vast
+```
 
 - via source
 
-  ```
-  git clone git@github.com:lydiandy/vast.git
-  ln -s `pwd`/vast ~/.vmodules/vast
-  ```
+```shell
+git clone git@github.com:lydiandy/vast.git
+ln -s `pwd`/vast ~/.vmodules/vast
+```
 
-  now you can run the example code in example directory
+## build
 
-  ```
-   cd example
-   v run ./main.v
-  ```
-
-  it will parse the demo.v file and generate demo.json, open it ~
-
-  ![](example/json.png)
+```shell
+cd vast
+v .
+```
 
 ## usage
 
-```v
-module main
-
-import vast
-
-fn main() {
-	file := './demo.v'
-
-	// generate json file with the same name
-	vast.json_file(file)
-
-	// or generate ast string
-	ast_str:=vast.json(file)
-	println(ast_str)
-}
+```shell
+./vast ./example/demo
 ```
+
+ it will parse the demo.v file and generate demo.json, open it ~
+
+![](example/json.png)
 
 ## todo
 

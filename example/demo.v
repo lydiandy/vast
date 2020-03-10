@@ -10,7 +10,7 @@ import (
 	time 
 	term
 )
-const (
+pub const (
 	a=1
 	b=3
 	c='c'
