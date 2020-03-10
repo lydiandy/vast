@@ -196,9 +196,9 @@ pub fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		ast.AssignStmt {
 			return t.assign_stmt(it)
 		}
-		ast.VarDecl {
-			return t.var_decl(it)
-		}
+		// ast.Var {
+		// 	return t.var_decl(it)
+		// }
 		ast.Return {
 			return t.return_stmt(it)
 		}
@@ -474,10 +474,9 @@ pub fn (t Tree) assign_stmt(it ast.AssignStmt) &C.cJSON {
 
 	return obj
 }
-pub fn (t Tree) var_decl(it ast.VarDecl) &C.cJSON {
+pub fn (t Tree) var_decl(it ast.Var) &C.cJSON {
 	obj:=create_object()
 	to_object(obj,'name',t.string_node(it.name))
-	to_object(obj,'name2',t.string_node(it.name2))
 	to_object(obj,'expr',t.expr(it.expr))
 	to_object(obj,'is_mut',t.bool_node(it.is_mut))
 	to_object(obj,'typ',t.number_node(int(it.typ)))
@@ -892,7 +891,6 @@ pub fn (t Tree) method_call_expr(it ast.MethodCallExpr) &C.cJSON {
 
 	to_object(obj,'or_block',t.or_expr(it.or_block))
 
-	to_object(obj,'typ',t.number_node(int(it.typ)))
 	return obj	
 }
 pub fn (t Tree) or_expr(it ast.OrExpr) &C.cJSON {
