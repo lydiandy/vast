@@ -14,11 +14,17 @@ const (
 
 pub fn main() {
 	if os.args.len≠2 {
-		panic("unknown args,Usage:vast demo.v")
+		println("unknown args,Usage:vast demo.v")
+		return
 	}
 	file:=os.args[1]
 	if os.ext(file)≠'.v' {
-		panic('the file must be v file')
+		println('the file must be v file')
+		return
+	}
+	if !os.exists(file) {
+		println('the v file does not exist')
+		return
 	}
 	apath:=abs_path(file)
 	json_file(apath)
@@ -32,7 +38,7 @@ pub struct Tree {
 //generate json file with the same file name
 pub fn json_file(file string) {
 	ast_json:=json(file)
-
+	
 	json_file:=file[0..file.len-2]+'.json'
 	os.write_file(json_file,ast_json)
 }
