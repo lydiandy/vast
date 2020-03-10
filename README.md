@@ -33,7 +33,7 @@ v .
 ## usage
 
 ```shell
-./vast ./example/demo
+./vast ./example/demo.v
 ```
 
  it will parse the demo.v file and generate demo.json, open it ~
