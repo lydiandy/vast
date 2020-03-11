@@ -292,7 +292,7 @@ pub fn (t Tree) fn_decl(it ast.FnDecl) &C.cJSON {
 	}
 	to_object(obj,'args',arg_arr)
 	
-	to_object(obj,'typ',t.number_node(int(it.typ)))
+	to_object(obj,'return_type',t.number_node(int(it.return_type)))
 
 	stmt_arr:=create_array()
 	for s in it.stmts {
@@ -393,6 +393,9 @@ pub fn (t Tree) type_decl(node ast.TypeDecl) &C.cJSON {
 		ast.SumTypeDecl {
 			return t.sum_type_decl(it)
 		}
+		ast.FnTypeDecl {
+			return t.fn_type_decl(it)
+		}
 		else {
 			return t.string_node('unknown node')
 		}
@@ -419,6 +422,15 @@ pub fn (t Tree) sum_type_decl(it ast.SumTypeDecl) &C.cJSON {
 	}
 	to_object(obj,'sub_types',t_arr)
 	
+	return obj
+}
+pub fn (t Tree) fn_type_decl(it ast.FnTypeDecl) &C.cJSON {
+	obj:=create_object()
+	to_object(obj,'ast_type',t.string_node('FnTypeDecl'))
+	to_object(obj,'name',t.string_node(it.name))
+	to_object(obj,'is_pub',t.bool_node(it.is_pub))
+	to_object(obj,'typ',t.number_node(int(it.typ)))
+
 	return obj
 }
 
@@ -830,8 +842,8 @@ pub fn (t Tree) ident_info(info ast.IdentInfo) &C.cJSON {
 		ast.IdentVar {
 			return t.ident_var(it)
 		}
-		ast.IdentFunc {
-			return t.ident_func(it)
+		ast.IdentFn {
+			return t.ident_fn(it)
 		}
 		else {
 			return t.string_node('unknown node')
@@ -845,9 +857,9 @@ pub fn (t Tree) ident_var(it ast.IdentVar) &C.cJSON {
 	to_object(obj,'is_static',t.bool_node(it.is_static))
 	return obj	
 }
-pub fn (t Tree) ident_func(it ast.IdentFunc) &C.cJSON {
+pub fn (t Tree) ident_fn(it ast.IdentFn) &C.cJSON {
 	obj:=create_object()
-	to_object(obj,'return_type',t.number_node(int(it.return_type)))
+	to_object(obj,'typ',t.number_node(int(it.typ)))
 	return obj	
 }
 

@@ -35,6 +35,8 @@ type Myint int
 
 type MySumType = int | string | bool
 
+type Myfn fn(int) int
+
 //main funciton
 fn main() {
 	add(1,3)
