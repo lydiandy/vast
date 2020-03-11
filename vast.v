@@ -447,6 +447,7 @@ pub fn (t Tree) arg(it ast.Arg) &C.cJSON {
 	obj:=create_object()
 	to_object(obj,'name',t.string_node(it.name))
 	to_object(obj,'typ',t.number_node(int(it.typ)))
+	to_object(obj,'is_mut',t.bool_node(it.is_mut))
 	return obj
 }
 
