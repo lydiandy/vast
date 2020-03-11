@@ -869,7 +869,7 @@ pub fn (t Tree) call_expr(it ast.CallExpr) &C.cJSON {
 	to_object(obj,'muts',b_arr)
 
 	to_object(obj,'or_block',t.or_expr(it.or_block))
-
+	to_object(obj,'return_type',t.number_node(int(it.return_type)))
 	return obj	
 }
 pub fn (t Tree) method_call_expr(it ast.MethodCallExpr) &C.cJSON {
@@ -890,7 +890,7 @@ pub fn (t Tree) method_call_expr(it ast.MethodCallExpr) &C.cJSON {
 	to_object(obj,'muts',b_arr)
 
 	to_object(obj,'or_block',t.or_expr(it.or_block))
-
+	to_object(obj,'return_type',t.number_node(int(it.return_type)))
 	return obj	
 }
 pub fn (t Tree) or_expr(it ast.OrExpr) &C.cJSON {
