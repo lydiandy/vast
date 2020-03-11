@@ -119,7 +119,6 @@ pub fn (t Tree) scope(scope ast.Scope) &C.cJSON {
 	children_arr:=create_array()
 	for s in scope.children {
 		children_obj:=create_object()
-		println(scope.parent)
 		to_object(children_obj,'parent',t.string_node(ptr_str(s.parent)))
 		to_object(children_obj,'start_pos',t.number_node(s.start_pos))
 		to_object(children_obj,'end_pos',t.number_node(s.end_pos))
