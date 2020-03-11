@@ -733,8 +733,11 @@ pub fn (t Tree) assoc(it ast.Assoc) &C.cJSON {
 }
 pub fn (t Tree) cast_expr(it ast.CastExpr) &C.cJSON {
 	obj:=create_object()
-	to_object(obj,'typ',t.number_node(int(it.typ)))
 	to_object(obj,'expr',t.expr(it.expr))
+	to_object(obj,'arg',t.expr(it.arg))
+	to_object(obj,'typ',t.number_node(int(it.typ)))
+	to_object(obj,'expr_type',t.number_node(int(it.expr_type)))
+	to_object(obj,'has_arg',t.bool_node(it.has_arg))
 	return obj
 }
 pub fn (t Tree) as_cast(it ast.AsCast) &C.cJSON {
