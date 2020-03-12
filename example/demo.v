@@ -1,8 +1,9 @@
-//this is comment
+//comment for module
 module demo
 //comment for include
 #include abc
 
+//comment for import
 import os
 import strings
 
@@ -36,6 +37,11 @@ type Myint int
 type MySumType = int | string | bool
 
 type Myfn fn(int) int
+
+// pub interface Myinterfacer {
+// 	add(int,int) int
+// 	sub(int,int) int
+// }
 
 //main funciton
 fn main() {
