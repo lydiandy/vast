@@ -312,6 +312,7 @@ pub fn (t Tree) struct_decl(it ast.StructDecl) &C.cJSON {
 	to_object(obj,'mut_pos',t.number_node(it.mut_pos))
 	to_object(obj,'pub_pos',t.number_node(it.pub_pos))
 	to_object(obj,'pub_mut_pos',t.number_node(it.pub_mut_pos))
+	to_object(obj,'is_c',t.bool_node(it.is_c))
 	f_arr:=create_array()
 	for f in it.fields {
 		to_array(f_arr,t.field(f))
@@ -768,6 +769,7 @@ pub fn (t Tree) assign_expr(it ast.AssignExpr) &C.cJSON {
 	to_object(obj,'pos',t.position(it.pos))
 	to_object(obj,'left',t.expr(it.left))
 	to_object(obj,'val',t.expr(it.val))
+	to_object(obj,'left_type',t.number_node(int(it.left_type)))
 	return obj	
 }
 pub fn (t Tree) infix_expr(it ast.InfixExpr) &C.cJSON {
@@ -996,6 +998,7 @@ pub fn (t Tree) map_init(it ast.MapInit) &C.cJSON {
 pub fn (t Tree) none_expr(it ast.None) &C.cJSON {
 	obj:=create_object()	
 	//todo
+	to_object(obj,'foo',t.number_node(it.foo))
 	return obj	
 }
 pub fn (t Tree) par_expr(it ast.ParExpr) &C.cJSON {
