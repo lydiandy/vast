@@ -861,6 +861,7 @@ pub fn (t Tree) ident_var(it ast.IdentVar) &C.cJSON {
 	to_object(obj,'typ',t.number_node(int(it.typ)))
 	to_object(obj,'is_mut',t.bool_node(it.is_mut))
 	to_object(obj,'is_static',t.bool_node(it.is_static))
+	to_object(obj,'is_optional',t.bool_node(it.is_optional))
 	return obj	
 }
 pub fn (t Tree) ident_fn(it ast.IdentFn) &C.cJSON {
@@ -871,13 +872,14 @@ pub fn (t Tree) ident_fn(it ast.IdentFn) &C.cJSON {
 
 pub fn (t Tree) call_expr(it ast.CallExpr) &C.cJSON {
 	obj:=create_object()
+	to_object(obj,'pos',t.position(it.pos))
 	to_object(obj,'name',t.string_node(it.name))
 	to_object(obj,'is_c',t.bool_node(it.is_c))
-	expr_arr:=create_array()
+	arg_arr:=create_array()
 	for e in it.args {
-		to_array(expr_arr,t.expr(e))
+		to_array(arg_arr,t.call_arg(e))
 	}
-	to_object(obj,'args',expr_arr)
+	to_object(obj,'args',arg_arr)
 
 	b_arr:=create_array()
 	for b in it.muts {
@@ -887,48 +889,31 @@ pub fn (t Tree) call_expr(it ast.CallExpr) &C.cJSON {
 
 	to_object(obj,'or_block',t.or_expr(it.or_block))
 	to_object(obj,'return_type',t.number_node(int(it.return_type)))
-
-	e_arr:=create_array()
-	for e in it.expr_types {
-		to_array(e_arr,t.number_node(int(e)))
-	}
-	to_object(obj,'expr_types',e_arr)	
 
 	return obj	
 }
 pub fn (t Tree) method_call_expr(it ast.MethodCallExpr) &C.cJSON {
 	obj:=create_object()
-	to_object(obj,'name',t.string_node(it.name))
 	to_object(obj,'pos',t.position(it.pos))
+	to_object(obj,'name',t.string_node(it.name))
 	to_object(obj,'expr',t.expr(it.expr))
-	expr_arr:=create_array()
+	arg_arr:=create_array()
 	for e in it.args {
-		to_array(expr_arr,t.expr(e))
+		to_array(arg_arr,t.call_arg(e))
 	}
-	to_object(obj,'args',expr_arr)
-
-	b_arr:=create_array()
-	for b in it.muts {
-		to_array(b_arr,t.bool_node(b))
-	}
-	to_object(obj,'muts',b_arr)
-
+	to_object(obj,'args',arg_arr)
 	to_object(obj,'or_block',t.or_expr(it.or_block))
+	to_object(obj,'expr_type',t.number_node(int(it.expr_type)))
+	to_object(obj,'receiver_type',t.number_node(int(it.receiver_type)))
 	to_object(obj,'return_type',t.number_node(int(it.return_type)))
-	
-	a_arr:=create_array()
-	for a in it.arg_types {
-		to_array(a_arr,t.number_node(int(a)))
-	}
-	to_object(obj,'arg_types',a_arr)
-
-	e_arr:=create_array()
-	for e in it.expr_types {
-		to_array(e_arr,t.number_node(int(e)))
-	}
-	to_object(obj,'expr_types',e_arr)	
-
-
+	return obj	
+}
+pub fn (t Tree) call_arg(it ast.CallArg) &C.cJSON {
+	obj:=create_object()
+	to_object(obj,'is_mut',t.bool_node(it.is_mut))
+	to_object(obj,'expr',t.expr(it.expr))
+	to_object(obj,'typ',t.number_node(int(it.typ)))
+	to_object(obj,'expected_type',t.number_node(int(it.expected_type)))
 	return obj	
 }
 pub fn (t Tree) or_expr(it ast.OrExpr) &C.cJSON {
