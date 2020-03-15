@@ -53,6 +53,8 @@ fn main() {
 		println(a)
 		add(1,3)
 	}
+	color:=Color.red
+	println(color)
 }
 //add function
 fn add(x,y int) int {
