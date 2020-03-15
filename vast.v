@@ -444,7 +444,7 @@ pub fn (t Tree) field(it ast.Field) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) arg(it ast.Arg) &C.cJSON {
+pub fn (t Tree) arg(it table.Arg) &C.cJSON {
 	obj:=create_object()
 	to_object(obj,'name',t.string_node(it.name))
 	to_object(obj,'typ',t.number_node(int(it.typ)))
@@ -713,8 +713,10 @@ pub fn (t Tree) bool_literal(it ast.BoolLiteral) &C.cJSON {
 pub fn (t Tree) enum_val(it ast.EnumVal) &C.cJSON {
 	obj:=create_object()
 	to_object(obj,'enum_name',t.string_node(it.enum_name))
+	to_object(obj,'mod',t.string_node(it.mod))
 	to_object(obj,'val',t.string_node(it.val))
 	to_object(obj,'pos',t.position(it.pos))
+	to_object(obj,'typ',t.number_node(int(it.typ)))
 	return obj		
 }
 pub fn (t Tree) assoc(it ast.Assoc) &C.cJSON {
