@@ -1011,6 +1011,7 @@ pub fn (t Tree) match_expr(it ast.MatchExpr) &C.cJSON {
 	to_object(obj,'branches',m_arr)
 	to_object(obj,'expr_type',t.number_node(int(it.expr_type)))
 	to_object(obj,'pos',t.position(it.pos))
+	to_object(obj,'is_sum_type',t.bool_node(it.is_sum_type))
 
 	return obj	
 }
