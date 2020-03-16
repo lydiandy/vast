@@ -222,6 +222,9 @@ pub fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		ast.ExprStmt {
 			return t.expr_stmt(it)
 		}
+		ast.GoStmt {
+			return t.go_stmt(it)
+		}
 
 		
 		else {
@@ -591,6 +594,11 @@ pub fn (t Tree) unsafe_stmt(it ast.UnsafeStmt) &C.cJSON {
 		to_array(stmt_arr,t.stmt(s))
 	}
 	to_object(obj,'stmts',stmt_arr)
+	return obj
+}
+pub fn (t Tree) go_stmt(it ast.GoStmt) &C.cJSON {
+	obj:=create_object()
+	to_object(obj,'expr',t.expr(it.expr))
 	return obj
 }
 pub fn (t Tree) expr_stmt(it ast.ExprStmt) &C.cJSON {
