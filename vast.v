@@ -485,6 +485,18 @@ pub fn (t Tree) assign_stmt(it ast.AssignStmt) &C.cJSON {
 	to_object(obj,'op',t.number_node(int(it.op)))
 	to_object(obj,'pos',t.position(it.pos))
 
+	lt_arr:=create_array()
+	for s in it.left_types {
+		to_array(lt_arr,t.number_node(int(s)))
+	}
+	to_object(obj,'left_types',lt_arr)
+
+	rt_arr:=create_array()
+	for s in it.left_types {
+		to_array(rt_arr,t.number_node(int(s)))
+	}
+	to_object(obj,'right_types',rt_arr)
+
 	return obj
 }
 pub fn (t Tree) var_decl(it ast.Var) &C.cJSON {
@@ -507,6 +519,13 @@ pub fn (t Tree) return_stmt(it ast.Return) &C.cJSON {
 	to_object(obj,'exprs',e_arr)
 
 	to_object(obj,'pos',t.position(it.pos))
+
+	t_arr:=create_array()
+	for s in it.types {
+		to_array(t_arr,t.number_node(int(s)))
+	}
+	to_object(obj,'types',t_arr)
+
 	return obj
 }
 pub fn (t Tree) for_c_stmt(it ast.ForCStmt) &C.cJSON {
@@ -772,6 +791,7 @@ pub fn (t Tree) assign_expr(it ast.AssignExpr) &C.cJSON {
 	to_object(obj,'left',t.expr(it.left))
 	to_object(obj,'val',t.expr(it.val))
 	to_object(obj,'left_type',t.number_node(int(it.left_type)))
+	to_object(obj,'right_type',t.number_node(int(it.right_type)))
 	return obj	
 }
 pub fn (t Tree) infix_expr(it ast.InfixExpr) &C.cJSON {
