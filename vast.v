@@ -714,7 +714,7 @@ pub fn (t Tree) expr(e ast.Expr) &C.cJSON {
 
 pub fn (t Tree) integer_literal(it ast.IntegerLiteral) &C.cJSON {
 	obj:=create_object()
-	to_object(obj,'val',t.number_node(it.val))
+	to_object(obj,'val',t.string_node(it.val))
 	return obj	
 }
 pub fn (t Tree) float_literal(it ast.FloatLiteral) &C.cJSON {
@@ -784,6 +784,7 @@ pub fn (t Tree) type_expr(it ast.Type) &C.cJSON {
 pub fn (t Tree) size_of(it ast.SizeOf) &C.cJSON {
 	obj:=create_object()
 	to_object(obj,'type_name',t.string_node(it.type_name))
+	to_object(obj,'typ',t.number_node(int(it.typ)))
 	return obj
 }
 pub fn (t Tree) prefix_expr(it ast.PrefixExpr) &C.cJSON {
@@ -860,6 +861,7 @@ pub fn (t Tree) if_expr(it ast.IfExpr) &C.cJSON {
 	to_object(obj,'pos',t.position(it.pos))
 	to_object(obj,'typ',t.number_node(int(it.typ)))
 	to_object(obj,'has_else',t.bool_node(it.has_else))
+	to_object(obj,'is_expr',t.bool_node(it.is_expr))
 	return obj	
 }
 pub fn (t Tree) ident(it ast.Ident) &C.cJSON {
@@ -1038,6 +1040,7 @@ pub fn (t Tree) match_expr(it ast.MatchExpr) &C.cJSON {
 	}
 	to_object(obj,'branches',m_arr)
 	to_object(obj,'expr_type',t.number_node(int(it.expr_type)))
+	to_object(obj,'return_type',t.number_node(int(it.return_type)))
 	to_object(obj,'pos',t.position(it.pos))
 	to_object(obj,'is_sum_type',t.bool_node(it.is_sum_type))
 	to_object(obj,'is_expr',t.bool_node(it.is_expr))
