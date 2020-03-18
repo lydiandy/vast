@@ -199,8 +199,11 @@ pub fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		// 	return t.var_decl(it)
 		// }
 		ast.Return {
-			return t.return_stmt(it)
+			return t.return_(it)
 		}
+		// ast.ReturnStmt {
+		// 	return t.return_stmt(it)
+		// }
 		ast.ForCStmt {
 			return t.for_c_stmt(it)
 		}
@@ -225,8 +228,6 @@ pub fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		ast.GoStmt {
 			return t.go_stmt(it)
 		}
-
-		
 		else {
 			println('unknown node:$node')
 			return t.string_node('unknown node')
@@ -512,7 +513,7 @@ pub fn (t Tree) var_decl(it ast.Var) &C.cJSON {
 
 	return obj
 }
-pub fn (t Tree) return_stmt(it ast.Return) &C.cJSON {
+pub fn (t Tree) return_(it ast.Return) &C.cJSON {
 	obj:=create_object()
 
 	e_arr:=create_array()
@@ -531,11 +532,25 @@ pub fn (t Tree) return_stmt(it ast.Return) &C.cJSON {
 
 	return obj
 }
+pub fn (t Tree) return_stmt(it ast.ReturnStmt) &C.cJSON {
+	obj:=create_object()
+	to_object(obj,'tok_kind',t.number_node(int(it.tok_kind)))
+	to_object(obj,'pos',t.position(it.pos))
+
+	e_arr:=create_array()
+	for e in it.results {
+		to_array(e_arr,t.expr(e))
+	}
+	to_object(obj,'results',e_arr)
+
+	return obj
+}
 pub fn (t Tree) for_c_stmt(it ast.ForCStmt) &C.cJSON {
 	obj:=create_object()
 	to_object(obj,'init',t.stmt(it.init))
 	to_object(obj,'cond',t.expr(it.cond))
 	to_object(obj,'inc',t.expr(it.inc))
+	to_object(obj,'pos',t.position(it.pos))
 
 	stmt_arr:=create_array()
 	for s in it.stmts {
@@ -776,6 +791,7 @@ pub fn (t Tree) as_cast(it ast.AsCast) &C.cJSON {
 	to_object(obj,'expr',t.expr(it.expr))
 	to_object(obj,'typ',t.number_node(int(it.typ)))
 	to_object(obj,'expr_type',t.number_node(int(it.expr_type)))
+	to_object(obj,'pos',t.position(it.pos))
 	return obj
 }
 pub fn (t Tree) type_expr(it ast.Type) &C.cJSON {
