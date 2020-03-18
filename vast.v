@@ -773,7 +773,9 @@ pub fn (t Tree) cast_expr(it ast.CastExpr) &C.cJSON {
 }
 pub fn (t Tree) as_cast(it ast.AsCast) &C.cJSON {
 	obj:=create_object()
+	to_object(obj,'expr',t.expr(it.expr))
 	to_object(obj,'typ',t.number_node(int(it.typ)))
+	to_object(obj,'expr_type',t.number_node(int(it.expr_type)))
 	return obj
 }
 pub fn (t Tree) type_expr(it ast.Type) &C.cJSON {
