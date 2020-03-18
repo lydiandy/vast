@@ -1039,7 +1039,7 @@ pub fn (t Tree) match_expr(it ast.MatchExpr) &C.cJSON {
 		to_array(m_arr,t.match_branch(b))
 	}
 	to_object(obj,'branches',m_arr)
-	to_object(obj,'expr_type',t.number_node(int(it.expr_type)))
+	to_object(obj,'cond_type',t.number_node(int(it.cond_type)))
 	to_object(obj,'return_type',t.number_node(int(it.return_type)))
 	to_object(obj,'pos',t.position(it.pos))
 	to_object(obj,'is_sum_type',t.bool_node(it.is_sum_type))
