@@ -718,8 +718,9 @@ pub fn (t Tree) expr(e ast.Expr) &C.cJSON {
 		ast.ConcatExpr {
 			return t.concat_expr(it)
 		}
-
-
+		ast.TypeOf {
+			return t.type_of(it)
+		}
 		else {
 			// println('unknown expr')
 			return t.null_node()
@@ -775,6 +776,7 @@ pub fn (t Tree) assoc(it ast.Assoc) &C.cJSON {
 	}
 	to_object(obj,'exprs',e_arr)
 	to_object(obj,'pos',t.position(it.pos))
+	to_object(obj,'typ',t.number_node(int(it.typ)))
 	return obj
 }
 pub fn (t Tree) cast_expr(it ast.CastExpr) &C.cJSON {
@@ -993,6 +995,19 @@ pub fn (t Tree) struct_init(it ast.StructInit) &C.cJSON {
 
 	to_object(obj,'pos',t.position(it.pos))
 
+	expr_types_arr:=create_array()
+	for e in it.expr_types {
+		to_array(expr_types_arr,t.number_node(int(e)))
+	}
+	to_object(obj,'expr_types',expr_types_arr)
+
+	expected_types_arr:=create_array()
+	for e in it.expected_types {
+		to_array(expected_types_arr,t.number_node(int(e)))
+	}
+	to_object(obj,'expected_types',expected_types_arr)
+
+
 	return obj	
 }
 pub fn (t Tree) array_init(it ast.ArrayInit) &C.cJSON {
@@ -1092,6 +1107,11 @@ pub fn (t Tree) concat_expr(it ast.ConcatExpr) &C.cJSON {
 	}
 	to_object(obj,'vals',expr_arr)
 	return obj	
+}
+pub fn (t Tree) type_of(it ast.TypeOf) &C.cJSON {
+	obj:=create_object()
+	to_object(obj,'expr',t.expr(it.expr))
+	return obj
 }
 
 [inline]
