@@ -863,19 +863,11 @@ pub fn (t Tree) range_expr(it ast.RangeExpr) &C.cJSON {
 pub fn (t Tree) if_expr(it ast.IfExpr) &C.cJSON {
 	obj:=create_object()
 	to_object(obj,'tok_kind',t.number_node(int(it.tok_kind)))
-	to_object(obj,'cond',t.expr(it.cond))
-
-	stmt_arr:=create_array()
-	for s in it.stmts {
-		to_array(stmt_arr,t.stmt(s))
+	branch_arr:=create_array()
+	for b in it.branches {
+		to_array(branch_arr,t.if_branch(b))
 	}
-	to_object(obj,'stmts',stmt_arr)
-
-	else_arr:=create_array()
-	for s in it.else_stmts {
-		to_array(else_arr,t.stmt(s))
-	}
-	to_object(obj,'else_stmts',else_arr)	
+	to_object(obj,'branches',branch_arr)	
 
 	to_object(obj,'left',t.expr(it.left))
 	to_object(obj,'pos',t.position(it.pos))
@@ -883,6 +875,17 @@ pub fn (t Tree) if_expr(it ast.IfExpr) &C.cJSON {
 	to_object(obj,'has_else',t.bool_node(it.has_else))
 	to_object(obj,'is_expr',t.bool_node(it.is_expr))
 	return obj	
+}
+pub fn (t Tree) if_branch(it ast.IfBranch) &C.cJSON {
+	obj:=create_object()
+	to_object(obj,'cond',t.expr(it.cond))
+	stmt_arr:=create_array()
+	for s in it.stmts {
+		to_array(stmt_arr,t.stmt(s))
+	}
+	to_object(obj,'stmts',stmt_arr)
+	to_object(obj,'pos',t.position(it.pos))
+	return obj
 }
 pub fn (t Tree) ident(it ast.Ident) &C.cJSON {
 	obj:=create_object()
