@@ -589,6 +589,8 @@ pub fn (t Tree) for_in_stmt(it ast.ForInStmt) &C.cJSON {
 	to_object(obj,'stmts',stmt_arr)
 
 	to_object(obj,'pos',t.position(it.pos))
+	to_object(obj,'element_type',t.number_node(int(it.element_type)))
+	to_object(obj,'kind',t.number_node(int(it.kind)))
 
 	return obj
 }
@@ -639,6 +641,9 @@ pub fn (t Tree) expr(e ast.Expr) &C.cJSON {
 		}
 		ast.BoolLiteral {
 			return t.bool_literal(it)
+		}
+		ast.StringInterLiteral {
+			return t.string_inter_literal(it)
 		}
 		ast.EnumVal {
 			return t.enum_val(it)
@@ -751,6 +756,28 @@ pub fn (t Tree) char_literal(it ast.CharLiteral) &C.cJSON {
 pub fn (t Tree) bool_literal(it ast.BoolLiteral) &C.cJSON {
 	obj:=create_object()
 	to_object(obj,'val',t.bool_node(it.val))
+	return obj	
+}
+pub fn (t Tree) string_inter_literal(it ast.StringInterLiteral) &C.cJSON {
+	obj:=create_object()
+	v_arr:=create_array()
+	for v in it.vals {
+		to_array(v_arr,t.string_node(v))
+	}
+	to_object(obj,'vals',v_arr)
+
+	e_arr:=create_array()
+	for e in it.exprs {
+		to_array(e_arr,t.expr(e))
+	}
+	to_object(obj,'exprs',e_arr)
+
+	et_arr:=create_array()
+	for e in it.expr_types {
+		to_array(et_arr,t.number_node(int(e)))
+	}
+	to_object(obj,'expr_types',et_arr)
+
 	return obj	
 }
 pub fn (t Tree) enum_val(it ast.EnumVal) &C.cJSON {
