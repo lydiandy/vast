@@ -356,7 +356,7 @@ pub fn (t Tree) hash_stmt(it ast.HashStmt) &C.cJSON {
 pub fn (t Tree) comp_if(it ast.CompIf) &C.cJSON {
 	obj:=create_object()
 	to_object(obj,'ast_type',t.string_node('CompIf'))
-	to_object(obj,'cond',t.expr(it.cond))
+	to_object(obj,'val',t.string_node(it.val))
 	stmt_arr:=create_array()
 	for s in it.stmts {
 		to_array(stmt_arr,t.stmt(s))
