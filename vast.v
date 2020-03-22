@@ -303,6 +303,7 @@ pub fn (t Tree) fn_decl(it ast.FnDecl) &C.cJSON {
 		to_array(stmt_arr,t.stmt(s))
 	}
 	to_object(obj,'stmts',stmt_arr)
+	to_object(obj,'pos',t.position(it.pos))
 
 	return obj
 }
@@ -367,6 +368,7 @@ pub fn (t Tree) comp_if(it ast.CompIf) &C.cJSON {
 		to_array(else_stmt_arr,t.stmt(s))
 	}
 	to_object(else_stmt_arr,'else_stmts',else_stmt_arr)
+	to_object(obj,'pos',t.position(it.pos))
 
 	return obj
 }
