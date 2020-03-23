@@ -357,6 +357,7 @@ pub fn (t Tree) comp_if(it ast.CompIf) &C.cJSON {
 	obj:=create_object()
 	to_object(obj,'ast_type',t.string_node('CompIf'))
 	to_object(obj,'val',t.string_node(it.val))
+	to_object(obj,'is_not',t.bool_node(it.is_not))
 	stmt_arr:=create_array()
 	for s in it.stmts {
 		to_array(stmt_arr,t.stmt(s))
@@ -368,6 +369,7 @@ pub fn (t Tree) comp_if(it ast.CompIf) &C.cJSON {
 		to_array(else_stmt_arr,t.stmt(s))
 	}
 	to_object(else_stmt_arr,'else_stmts',else_stmt_arr)
+	to_object(obj,'has_else',t.bool_node(it.has_else))
 	to_object(obj,'pos',t.position(it.pos))
 
 	return obj
