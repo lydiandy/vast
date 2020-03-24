@@ -593,7 +593,9 @@ pub fn (t Tree) for_in_stmt(it ast.ForInStmt) &C.cJSON {
 	to_object(obj,'stmts',stmt_arr)
 
 	to_object(obj,'pos',t.position(it.pos))
-	to_object(obj,'element_type',t.number_node(int(it.element_type)))
+	to_object(obj,'key_type',t.number_node(int(it.key_type)))
+	to_object(obj,'val_type',t.number_node(int(it.val_type)))
+	to_object(obj,'cond_type',t.number_node(int(it.cond_type)))
 	to_object(obj,'kind',t.number_node(int(it.kind)))
 
 	return obj
