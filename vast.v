@@ -228,6 +228,9 @@ pub fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		ast.GoStmt {
 			return t.go_stmt(it)
 		}
+		ast.Block {
+			return t.block(it)
+		}
 		else {
 			println('unknown node:$node')
 			return t.string_node('unknown node')
@@ -624,6 +627,15 @@ pub fn (t Tree) go_stmt(it ast.GoStmt) &C.cJSON {
 	to_object(obj,'expr',t.expr(it.expr))
 	return obj
 }
+pub fn (t Tree) block(it ast.Block) &C.cJSON {
+	obj:=create_object()
+	stmt_arr:=create_array()
+	for s in it.stmts {
+		to_array(stmt_arr,t.stmt(s))
+	}
+	to_object(obj,'stmts',stmt_arr)
+	return obj	
+}
 pub fn (t Tree) expr_stmt(it ast.ExprStmt) &C.cJSON {
 	obj:=create_object()
 	to_object(obj,'typ',t.number_node(int(it.typ)))
@@ -752,6 +764,8 @@ pub fn (t Tree) float_literal(it ast.FloatLiteral) &C.cJSON {
 pub fn (t Tree) string_literal(it ast.StringLiteral) &C.cJSON {
 	obj:=create_object()
 	to_object(obj,'val',t.string_node(it.val))
+	to_object(obj,'is_raw',t.bool_node(it.is_raw))
+	to_object(obj,'is_c',t.bool_node(it.is_c))
 	return obj	
 }
 pub fn (t Tree) char_literal(it ast.CharLiteral) &C.cJSON {
@@ -771,6 +785,12 @@ pub fn (t Tree) string_inter_literal(it ast.StringInterLiteral) &C.cJSON {
 		to_array(v_arr,t.string_node(v))
 	}
 	to_object(obj,'vals',v_arr)
+	
+	s_arr:=create_array()
+	for s in it.expr_fmts {
+		to_array(s_arr,t.string_node(s))
+	}
+	to_object(obj,'expr_fmts',s_arr)
 
 	e_arr:=create_array()
 	for e in it.exprs {
