@@ -18,7 +18,7 @@ pub fn main() {
 		return
 	}
 	file := os.args[1]
-	if os.ext(file) != '.v' {
+	if os.file_ext(file) != '.v' {
 		println('the file must be v file')
 		return
 	}
