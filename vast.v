@@ -392,6 +392,7 @@ pub fn (t Tree) defer_stmt(it ast.DeferStmt) &C.cJSON {
 		to_array(stmt_array, t.stmt(s))
 	}
 	to_object(obj, 'stmts', stmt_array)
+	to_object(obj, 'ifdef', t.string_node(it.ifdef))
 	return obj
 }
 
