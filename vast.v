@@ -5,6 +5,7 @@ import (
 	v.parser
 	v.table
 	v.ast
+	v.pref
 	os
 )
 
@@ -33,6 +34,7 @@ pub fn main() {
 pub struct Tree {
 	root  &C.cJSON // the root of tree
 	table &table.Table
+	pref  &pref.Preferences
 }
 
 // generate json file with the same file name
@@ -47,8 +49,9 @@ pub fn json(file string) string {
 	t := Tree{
 		root: create_object()
 		table: &table.Table{}
+		pref: &pref.Preferences{}
 	}
-	ast_file := parser.parse_file(file, t.table, .parse_comments)
+	ast_file := parser.parse_file(file, t.table, .parse_comments, t.pref)
 	to_object(t.root, 'path', t.string_node(ast_file.path))
 	to_object(t.root, 'mod', t.mod(ast_file.mod))
 	to_object(t.root, 'imports', t.imports(ast_file.imports))
@@ -706,9 +709,6 @@ pub fn (t Tree) expr(e ast.Expr) &C.cJSON {
 		ast.CallExpr {
 			return t.call_expr(it)
 		}
-		ast.MethodCallExpr {
-			return t.method_call_expr(it)
-		}
 		ast.OrExpr {
 			return t.or_expr(it)
 		}
@@ -995,6 +995,8 @@ pub fn (t Tree) ident_fn(it ast.IdentFn) &C.cJSON {
 pub fn (t Tree) call_expr(it ast.CallExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'pos', t.position(it.pos))
+	to_object(obj, 'left', t.expr(it.left))
+	to_object(obj, 'is_method', t.bool_node(it.is_method))
 	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'is_c', t.bool_node(it.is_c))
 	arg_arr := create_array()
@@ -1002,38 +1004,13 @@ pub fn (t Tree) call_expr(it ast.CallExpr) &C.cJSON {
 		to_array(arg_arr, t.call_arg(e))
 	}
 	to_object(obj, 'args', arg_arr)
-	b_arr := create_array()
-	for b in it.muts {
-		to_array(b_arr, t.bool_node(b))
-	}
-	to_object(obj, 'muts', b_arr)
 	t_arr := create_array()
 	for e in it.exp_arg_types {
 		to_array(t_arr, t.number_node(int(e)))
 	}
 	to_object(obj, 'exp_arg_types', t_arr)
 	to_object(obj, 'or_block', t.or_expr(it.or_block))
-	to_object(obj, 'return_type', t.number_node(int(it.return_type)))
-	return obj
-}
-
-pub fn (t Tree) method_call_expr(it ast.MethodCallExpr) &C.cJSON {
-	obj := create_object()
-	to_object(obj, 'pos', t.position(it.pos))
-	to_object(obj, 'name', t.string_node(it.name))
-	to_object(obj, 'expr', t.expr(it.expr))
-	arg_arr := create_array()
-	for e in it.args {
-		to_array(arg_arr, t.call_arg(e))
-	}
-	to_object(obj, 'args', arg_arr)
-	t_arr := create_array()
-	for e in it.exp_arg_types {
-		to_array(t_arr, t.number_node(int(e)))
-	}
-	to_object(obj, 'exp_arg_types', t_arr)
-	to_object(obj, 'or_block', t.or_expr(it.or_block))
-	to_object(obj, 'expr_type', t.number_node(int(it.expr_type)))
+	to_object(obj, 'left_type', t.number_node(int(it.left_type)))
 	to_object(obj, 'receiver_type', t.number_node(int(it.receiver_type)))
 	to_object(obj, 'return_type', t.number_node(int(it.return_type)))
 	return obj
@@ -1180,6 +1157,7 @@ pub fn (t Tree) concat_expr(it ast.ConcatExpr) &C.cJSON {
 pub fn (t Tree) type_of(it ast.TypeOf) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'expr', t.expr(it.expr))
+	to_object(obj, 'expr_type', t.number_node(int(it.expr_type)))
 	return obj
 }
 
