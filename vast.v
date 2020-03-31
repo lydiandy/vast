@@ -170,6 +170,9 @@ pub fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		ast.EnumDecl {
 			return t.enum_decl(it)
 		}
+		ast.InterfaceDecl {
+			return t.interface_decl(it)
+		}
 		ast.Attr {
 			return t.attr(it)
 		}
@@ -342,6 +345,23 @@ pub fn (t Tree) enum_decl(it ast.EnumDecl) &C.cJSON {
 		to_array(str_arr, t.string_node(v))
 	}
 	to_object(obj, 'vals', str_arr)
+	expr_arr := create_array()
+	for e in it.default_exprs {
+		to_array(expr_arr, t.expr(e))
+	}
+	to_object(obj, 'default_exprs', expr_arr)
+	return obj
+}
+
+pub fn (t Tree) interface_decl(it ast.InterfaceDecl) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('InterfaceDecl'))
+	to_object(obj, 'name', t.string_node(it.name))
+	str_arr := create_array()
+	for s in it.field_names {
+		to_array(str_arr, t.string_node(s))
+	}
+	to_object(obj, 'field_names', str_arr)
 	return obj
 }
 
