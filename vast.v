@@ -332,6 +332,13 @@ pub fn (t Tree) struct_decl(it ast.StructDecl) &C.cJSON {
 		to_array(f_arr, t.field(f))
 	}
 	to_object(obj, 'fields', f_arr)
+
+	expr_arr := create_array()
+	for e in it.default_exprs {
+		to_array(expr_arr, t.expr(e))
+	}
+	to_object(obj, 'default_exprs', expr_arr)
+	
 	return obj
 }
 
