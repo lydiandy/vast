@@ -649,7 +649,7 @@ pub fn (t Tree) unsafe_stmt(it ast.UnsafeStmt) &C.cJSON {
 
 pub fn (t Tree) go_stmt(it ast.GoStmt) &C.cJSON {
 	obj := create_object()
-	to_object(obj, 'expr', t.expr(it.expr))
+	to_object(obj, 'call_expr', t.expr(it.call_expr))
 	return obj
 }
 
@@ -1037,10 +1037,10 @@ pub fn (t Tree) call_expr(it ast.CallExpr) &C.cJSON {
 	}
 	to_object(obj, 'args', arg_arr)
 	t_arr := create_array()
-	for e in it.exp_arg_types {
+	for e in it.expected_arg_types {
 		to_array(t_arr, t.number_node(int(e)))
 	}
-	to_object(obj, 'exp_arg_types', t_arr)
+	to_object(obj, 'expected_arg_types', t_arr)
 	to_object(obj, 'or_block', t.or_expr(it.or_block))
 	to_object(obj, 'left_type', t.number_node(int(it.left_type)))
 	to_object(obj, 'receiver_type', t.number_node(int(it.receiver_type)))
