@@ -290,6 +290,7 @@ pub fn (t Tree) const_decl(it ast.ConstDecl) &C.cJSON {
 	}
 	to_object(obj, 'exprs', expr_arr)
 	to_object(obj, 'is_pub', t.bool_node(it.is_pub))
+	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
@@ -480,6 +481,8 @@ pub fn (t Tree) field(it ast.Field) &C.cJSON {
 	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
 	// to_object(obj,'typ',t.typ_node(it.typ))
+	to_object(obj, 'already_reported', t.bool_node(it.already_reported))
+	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
@@ -924,6 +927,8 @@ pub fn (t Tree) index_expr(it ast.IndexExpr) &C.cJSON {
 	to_object(obj, 'pos', t.position(it.pos))
 	to_object(obj, 'left', t.expr(it.left))
 	to_object(obj, 'index', t.expr(it.index))
+	to_object(obj, 'left_type', t.number_node(int(it.left_type)))
+	to_object(obj, 'is_setter', t.bool_node(it.is_setter))
 	return obj
 }
 
