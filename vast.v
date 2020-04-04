@@ -1038,6 +1038,7 @@ pub fn (t Tree) call_expr(it ast.CallExpr) &C.cJSON {
 	to_object(obj, 'pos', t.position(it.pos))
 	to_object(obj, 'left', t.expr(it.left))
 	to_object(obj, 'is_method', t.bool_node(it.is_method))
+	to_object(obj, 'mod', t.string_node(it.mod))
 	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'is_c', t.bool_node(it.is_c))
 	arg_arr := create_array()
