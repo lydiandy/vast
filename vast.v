@@ -35,6 +35,7 @@ pub struct Tree {
 	root  &C.cJSON // the root of tree
 	table &table.Table
 	pref  &pref.Preferences
+	global_scope &ast.Scope
 }
 
 // generate json file with the same file name
@@ -50,8 +51,9 @@ pub fn json(file string) string {
 		root: create_object()
 		table: &table.Table{}
 		pref: &pref.Preferences{}
+		global_scope: &ast.Scope{start_pos: 0,parent: 0}
 	}
-	ast_file := parser.parse_file(file, t.table, .parse_comments, t.pref)
+	ast_file := parser.parse_file(file, t.table, .parse_comments, t.pref,t.global_scope)
 	to_object(t.root, 'path', t.string_node(ast_file.path))
 	to_object(t.root, 'mod', t.mod(ast_file.mod))
 	to_object(t.root, 'imports', t.imports(ast_file.imports))
@@ -279,18 +281,25 @@ pub fn (t Tree) multi_line_comment(it ast.MultiLineComment) &C.cJSON {
 pub fn (t Tree) const_decl(it ast.ConstDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ConstDecl'))
+
 	field_arr := create_array()
 	for f in it.fields {
-		to_array(field_arr, t.field(f))
+		to_array(field_arr, t.const_field(f))
 	}
 	to_object(obj, 'fields', field_arr)
-	expr_arr := create_array()
-	for e in it.exprs {
-		to_array(expr_arr, t.expr(e))
-	}
-	to_object(obj, 'exprs', expr_arr)
+
 	to_object(obj, 'is_pub', t.bool_node(it.is_pub))
 	to_object(obj, 'pos', t.position(it.pos))
+	return obj
+}
+
+pub fn (t Tree) const_field(it ast.ConstField) &C.cJSON {
+	obj:=create_object()
+	to_object(obj,'name',t.string_node(it.name))
+	to_object(obj, 'expr', t.expr(it.expr))
+	to_object(obj, 'is_pub', t.bool_node(it.is_pub))
+	to_object(obj, 'pos', t.position(it.pos))
+	to_object(obj,'typ',t.number_node(int(it.typ)))
 	return obj
 }
 
