@@ -154,12 +154,10 @@ pub fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		ast.Import {
 			return t.import_(it)
 		}
-		ast.LineComment {
-			return t.line_comment(it)
+		ast.Comment {
+			return t.comment(it)
 		}
-		ast.MultiLineComment {
-			return t.multi_line_comment(it)
-		}
+
 		ast.ConstDecl {
 			return t.const_decl(it)
 		}
@@ -264,17 +262,11 @@ pub fn (t Tree) position(p token.Position) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) line_comment(it ast.LineComment) &C.cJSON {
+pub fn (t Tree) comment(it ast.Comment) &C.cJSON {
 	obj := create_object()
-	to_object(obj, 'ast_type', t.string_node('LineComment'))
 	to_object(obj, 'text', t.string_node(it.text))
-	return obj
-}
-
-pub fn (t Tree) multi_line_comment(it ast.MultiLineComment) &C.cJSON {
-	obj := create_object()
-	to_object(obj, 'ast_type', t.string_node('MultiLineComment'))
-	to_object(obj, 'text', t.string_node(it.text))
+	to_object(obj, 'is_multi', t.bool_node(it.is_multi))
+	to_object(obj,'line_nr',t.number_node(it.line_nr))
 	return obj
 }
 
@@ -330,6 +322,7 @@ pub fn (t Tree) fn_decl(it ast.FnDecl) &C.cJSON {
 pub fn (t Tree) struct_decl(it ast.StructDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('StructDecl'))
+	to_object(obj, 'pos', t.position(it.pos))
 	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'is_pub', t.bool_node(it.is_pub))
 	to_object(obj, 'pos', t.position(it.pos))
@@ -339,15 +332,9 @@ pub fn (t Tree) struct_decl(it ast.StructDecl) &C.cJSON {
 	to_object(obj, 'is_c', t.bool_node(it.is_c))
 	f_arr := create_array()
 	for f in it.fields {
-		to_array(f_arr, t.field(f))
+		to_array(f_arr, t.struct_field(f))
 	}
 	to_object(obj, 'fields', f_arr)
-
-	expr_arr := create_array()
-	for e in it.default_exprs {
-		to_array(expr_arr, t.expr(e))
-	}
-	to_object(obj, 'default_exprs', expr_arr)
 	
 	return obj
 }
@@ -484,13 +471,20 @@ pub fn (t Tree) fn_type_decl(it ast.FnTypeDecl) &C.cJSON {
 	return obj
 }
 
-// todo
+pub fn (t Tree) struct_field(it ast.StructField) &C.cJSON {
+	obj:=create_object()
+	to_object(obj, 'name', t.string_node(it.name))
+	to_object(obj, 'pos', t.position(it.pos))
+	to_object(obj,'comment',t.comment(it.comment))
+	to_object(obj,'default_expr',t.expr(it.default_expr))
+	to_object(obj,'typ',t.number_node(int(it.typ)))
+	return obj
+}
+
 pub fn (t Tree) field(it ast.Field) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
-	// to_object(obj,'typ',t.typ_node(it.typ))
-	to_object(obj, 'already_reported', t.bool_node(it.already_reported))
 	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
