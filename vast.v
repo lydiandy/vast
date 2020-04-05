@@ -266,7 +266,8 @@ pub fn (t Tree) comment(it ast.Comment) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'text', t.string_node(it.text))
 	to_object(obj, 'is_multi', t.bool_node(it.is_multi))
-	to_object(obj,'line_nr',t.number_node(it.line_nr))
+	to_object(obj, 'line_nr',t.number_node(it.line_nr))
+	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
