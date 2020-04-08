@@ -1,5 +1,3 @@
-module main
-
 import (
 	v.token
 	v.parser
@@ -32,9 +30,9 @@ pub fn main() {
 }
 
 pub struct Tree {
-	root  &C.cJSON // the root of tree
-	table &table.Table
-	pref  &pref.Preferences
+	root         &C.cJSON // the root of tree
+	table        &table.Table
+	pref         &pref.Preferences
 	global_scope &ast.Scope
 }
 
@@ -51,9 +49,12 @@ pub fn json(file string) string {
 		root: create_object()
 		table: &table.Table{}
 		pref: &pref.Preferences{}
-		global_scope: &ast.Scope{start_pos: 0,parent: 0}
+		global_scope: &ast.Scope{
+			start_pos: 0
+			parent: 0
+		}
 	}
-	ast_file := parser.parse_file(file, t.table, .parse_comments, t.pref,t.global_scope)
+	ast_file := parser.parse_file(file, t.table, .parse_comments, t.pref, t.global_scope)
 	to_object(t.root, 'path', t.string_node(ast_file.path))
 	to_object(t.root, 'mod', t.mod(ast_file.mod))
 	to_object(t.root, 'imports', t.imports(ast_file.imports))
@@ -76,8 +77,7 @@ pub fn (t Tree) number_node(val int) &C.cJSON {
 pub fn (t Tree) bool_node(val bool) &C.cJSON {
 	if val {
 		return create_true()
-	}
-	else {
+	} else {
 		return create_false()
 	}
 }
@@ -90,8 +90,7 @@ pub fn (t Tree) null_node() &C.cJSON {
 pub fn (t Tree) typ_node(typ table.Type) &C.cJSON {
 	if typ == 0 {
 		return create_string('')
-	}
-	else {
+	} else {
 		// type_str:=t.table.get_type_symbol(typ)
 		type_str := t.table.type_to_str(typ)
 		println(type_str)
@@ -157,7 +156,6 @@ pub fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		ast.Comment {
 			return t.comment(it)
 		}
-
 		ast.ConstDecl {
 			return t.const_decl(it)
 		}
@@ -197,21 +195,12 @@ pub fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		ast.GotoStmt {
 			return t.goto_stmt(it)
 		}
-		// ast.Lambda {
-		// return t.lambda(it)
-		// }
 		ast.AssignStmt {
 			return t.assign_stmt(it)
 		}
-		// ast.Var {
-		// return t.var_decl(it)
-		// }
 		ast.Return {
 			return t.return_(it)
 		}
-		// ast.ReturnStmt {
-		// return t.return_stmt(it)
-		// }
 		ast.ForCStmt {
 			return t.for_c_stmt(it)
 		}
@@ -266,7 +255,7 @@ pub fn (t Tree) comment(it ast.Comment) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'text', t.string_node(it.text))
 	to_object(obj, 'is_multi', t.bool_node(it.is_multi))
-	to_object(obj, 'line_nr',t.number_node(it.line_nr))
+	to_object(obj, 'line_nr', t.number_node(it.line_nr))
 	to_object(obj, 'pos', t.position(it.pos))
 	// to_object(obj, 'same_line', t.bool_node(it.same_line))
 	return obj
@@ -275,25 +264,23 @@ pub fn (t Tree) comment(it ast.Comment) &C.cJSON {
 pub fn (t Tree) const_decl(it ast.ConstDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ConstDecl'))
-
 	field_arr := create_array()
 	for f in it.fields {
 		to_array(field_arr, t.const_field(f))
 	}
 	to_object(obj, 'fields', field_arr)
-
 	to_object(obj, 'is_pub', t.bool_node(it.is_pub))
 	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
 pub fn (t Tree) const_field(it ast.ConstField) &C.cJSON {
-	obj:=create_object()
-	to_object(obj,'name',t.string_node(it.name))
+	obj := create_object()
+	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'expr', t.expr(it.expr))
 	to_object(obj, 'is_pub', t.bool_node(it.is_pub))
 	to_object(obj, 'pos', t.position(it.pos))
-	to_object(obj,'typ',t.number_node(int(it.typ)))
+	to_object(obj, 'typ', t.number_node(int(it.typ)))
 	return obj
 }
 
@@ -333,12 +320,11 @@ pub fn (t Tree) struct_decl(it ast.StructDecl) &C.cJSON {
 	to_object(obj, 'pub_mut_pos', t.number_node(it.pub_mut_pos))
 	to_object(obj, 'is_c', t.bool_node(it.is_c))
 	to_object(obj, 'is_union', t.bool_node(it.is_union))
-	f_arr := create_array()	
+	f_arr := create_array()
 	for f in it.fields {
 		to_array(f_arr, t.struct_field(f))
 	}
 	to_object(obj, 'fields', f_arr)
-	
 	return obj
 }
 
@@ -476,12 +462,12 @@ pub fn (t Tree) fn_type_decl(it ast.FnTypeDecl) &C.cJSON {
 }
 
 pub fn (t Tree) struct_field(it ast.StructField) &C.cJSON {
-	obj:=create_object()
+	obj := create_object()
 	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'pos', t.position(it.pos))
-	to_object(obj,'comment',t.comment(it.comment))
-	to_object(obj,'default_expr',t.string_node(it.default_expr))
-	to_object(obj,'typ',t.number_node(int(it.typ)))
+	to_object(obj, 'comment', t.comment(it.comment))
+	to_object(obj, 'default_expr', t.string_node(it.default_expr))
+	to_object(obj, 'typ', t.number_node(int(it.typ)))
 	return obj
 }
 
@@ -989,7 +975,7 @@ pub fn (t Tree) if_branch(it ast.IfBranch) &C.cJSON {
 	}
 	to_object(obj, 'stmts', stmt_arr)
 	to_object(obj, 'pos', t.position(it.pos))
-	to_object(obj,'comment',t.comment(it.comment))
+	to_object(obj, 'comment', t.comment(it.comment))
 	return obj
 }
 
@@ -1186,7 +1172,7 @@ pub fn (t Tree) match_branch(it ast.MatchBranch) &C.cJSON {
 	}
 	to_object(obj, 'stmts', stmt_arr)
 	to_object(obj, 'pos', t.position(it.pos))
-	to_object(obj,'comment',t.comment(it.comment))
+	to_object(obj, 'comment', t.comment(it.comment))
 	return obj
 }
 
@@ -1213,7 +1199,7 @@ pub fn to_object(node &C.cJSON, key string, child &C.cJSON) {
 }
 
 [inline]
-pub fn to_array(node &C.cJSON, child &C.cJSON) {
+pub fn to_array(node, child &C.cJSON) {
 	add_item_to_array(node, child)
 }
 
@@ -1221,11 +1207,9 @@ pub fn to_array(node &C.cJSON, child &C.cJSON) {
 pub fn abs_path(path string) string {
 	if os.is_abs_path(path) {
 		return path
-	}
-	else if path.starts_with(os.path_separator) {
-		return os.join_path(os.getwd(),path[2..])
-	}
-	else {
-		return os.join_path(os.getwd(),path)
+	} else if path.starts_with(os.path_separator) {
+		return os.join_path(os.getwd(), path[2..])
+	} else {
+		return os.join_path(os.getwd(), path)
 	}
 }
