@@ -345,11 +345,8 @@ pub fn (t Tree) enum_field(it ast.EnumField) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'pos', t.position(it.pos))
-	expr_arr := create_array()
-	for e in it.exprs {
-		to_array(expr_arr, t.expr(e))
-	}
-	to_object(obj, 'exprs', expr_arr)
+	to_object(obj, 'has_expr', t.bool_node(it.has_expr))
+	to_object(obj, 'expr', t.expr(it.expr))
 	return obj
 }
 
@@ -585,7 +582,6 @@ pub fn (t Tree) for_c_stmt(it ast.ForCStmt) &C.cJSON {
 	to_object(obj, 'has_cond', t.bool_node(it.has_cond))
 	to_object(obj, 'inc', t.expr(it.inc))
 	to_object(obj, 'has_inc', t.bool_node(it.has_inc))
-	
 	stmt_arr := create_array()
 	for s in it.stmts {
 		to_array(stmt_arr, t.stmt(s))
