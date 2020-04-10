@@ -795,6 +795,7 @@ pub fn (t Tree) string_literal(it ast.StringLiteral) &C.cJSON {
 	to_object(obj, 'val', t.string_node(it.val))
 	to_object(obj, 'is_raw', t.bool_node(it.is_raw))
 	to_object(obj, 'is_c', t.bool_node(it.is_c))
+	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
@@ -832,6 +833,7 @@ pub fn (t Tree) string_inter_literal(it ast.StringInterLiteral) &C.cJSON {
 		to_array(et_arr, t.number_node(int(e)))
 	}
 	to_object(obj, 'expr_types', et_arr)
+	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
