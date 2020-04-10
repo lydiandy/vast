@@ -1114,6 +1114,8 @@ pub fn (t Tree) array_init(it ast.ArrayInit) &C.cJSON {
 	}
 	to_object(obj, 'exprs', expr_arr)
 	to_object(obj, 'pos', t.position(it.pos))
+	to_object(obj, 'is_fixed', t.bool_node(it.is_fixed))
+	to_object(obj, 'mod', t.string_node(it.mod))
 	return obj
 }
 
