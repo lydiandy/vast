@@ -292,6 +292,9 @@ pub fn (t Tree) fn_decl(it ast.FnDecl) &C.cJSON {
 	to_object(obj, 'is_variadic', t.bool_node(it.is_variadic))
 	to_object(obj, 'is_method', t.bool_node(it.is_method))
 	to_object(obj, 'rec_mut', t.bool_node(it.rec_mut))
+	to_object(obj, 'is_c', t.bool_node(it.is_c))
+	to_object(obj, 'no_body', t.bool_node(it.no_body))
+	to_object(obj, 'is_builtin', t.bool_node(it.is_builtin))
 	to_object(obj, 'receiver', t.field(it.receiver))
 	arg_arr := create_array()
 	for a in it.args {
