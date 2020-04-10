@@ -580,14 +580,18 @@ pub fn (t Tree) return_stmt(it ast.ReturnStmt) &C.cJSON {
 pub fn (t Tree) for_c_stmt(it ast.ForCStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'init', t.stmt(it.init))
+	to_object(obj, 'has_init', t.bool_node(it.has_init))
 	to_object(obj, 'cond', t.expr(it.cond))
+	to_object(obj, 'has_cond', t.bool_node(it.has_cond))
 	to_object(obj, 'inc', t.expr(it.inc))
-	to_object(obj, 'pos', t.position(it.pos))
+	to_object(obj, 'has_inc', t.bool_node(it.has_inc))
+	
 	stmt_arr := create_array()
 	for s in it.stmts {
 		to_array(stmt_arr, t.stmt(s))
 	}
 	to_object(obj, 'stmts', stmt_arr)
+	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
