@@ -333,16 +333,23 @@ pub fn (t Tree) enum_decl(it ast.EnumDecl) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('EnumDecl'))
 	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'is_pub', t.bool_node(it.is_pub))
-	str_arr := create_array()
-	for v in it.vals {
-		to_array(str_arr, t.string_node(v))
+	f_arr := create_array()
+	for f in it.fields {
+		to_array(f_arr, t.enum_field(f))
 	}
-	to_object(obj, 'vals', str_arr)
+	to_object(obj, 'fields', f_arr)
+	return obj
+}
+
+pub fn (t Tree) enum_field(it ast.EnumField) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'name', t.string_node(it.name))
+	to_object(obj, 'pos', t.position(it.pos))
 	expr_arr := create_array()
-	for e in it.default_exprs {
+	for e in it.exprs {
 		to_array(expr_arr, t.expr(e))
 	}
-	to_object(obj, 'default_exprs', expr_arr)
+	to_object(obj, 'exprs', expr_arr)
 	return obj
 }
 
@@ -773,6 +780,7 @@ pub fn (t Tree) expr(e ast.Expr) &C.cJSON {
 pub fn (t Tree) integer_literal(it ast.IntegerLiteral) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'val', t.string_node(it.val))
+	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
