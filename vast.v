@@ -1,3 +1,5 @@
+module vast
+
 import (
 	v.token
 	v.parser
@@ -104,6 +106,7 @@ pub fn (t Tree) mod(mod ast.Module) &C.cJSON {
 	to_object(obj, 'name', t.string_node(mod.name))
 	to_object(obj, 'path', t.string_node(mod.path))
 	to_object(obj, 'expr', t.expr(mod.expr))
+	to_object(obj, 'is_skipped', t.bool_node(mod.is_skipped))
 	return obj
 }
 
@@ -475,6 +478,7 @@ pub fn (t Tree) struct_field(it ast.StructField) &C.cJSON {
 	to_object(obj, 'comment', t.comment(it.comment))
 	to_object(obj, 'default_expr', t.string_node(it.default_expr))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
+	to_object(obj, 'attr', t.string_node(it.attr))
 	return obj
 }
 
@@ -997,6 +1001,7 @@ pub fn (t Tree) ident(it ast.Ident) &C.cJSON {
 	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'value', t.string_node(it.value))
 	to_object(obj, 'is_c', t.bool_node(it.is_c))
+	to_object(obj, 'is_mut', t.bool_node(it.is_mut))
 	to_object(obj, 'tok_kind', t.number_node(int(it.tok_kind)))
 	to_object(obj, 'pos', t.position(it.pos))
 	to_object(obj, 'kind', t.number_node(int(it.kind)))
