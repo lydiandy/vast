@@ -476,7 +476,7 @@ pub fn (t Tree) struct_field(it ast.StructField) &C.cJSON {
 	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'pos', t.position(it.pos))
 	to_object(obj, 'comment', t.comment(it.comment))
-	to_object(obj, 'default_expr', t.string_node(it.default_expr))
+	to_object(obj, 'default_expr', t.expr(it.default_expr))
 	to_object(obj, 'has_default_expr', t.bool_node(it.has_default_expr))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
 	to_object(obj, 'attr', t.string_node(it.attr))
