@@ -1194,6 +1194,7 @@ pub fn (t Tree) match_branch(it ast.MatchBranch) &C.cJSON {
 	to_object(obj, 'stmts', stmt_arr)
 	to_object(obj, 'pos', t.position(it.pos))
 	to_object(obj, 'comment', t.comment(it.comment))
+	to_object(obj, 'is_else', t.bool_node(it.is_else))
 	return obj
 }
 
