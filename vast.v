@@ -1,13 +1,11 @@
 module vast
 
-import (
-	v.token
-	v.parser
-	v.table
-	v.ast
-	v.pref
-	os
-)
+import v.token
+import v.parser
+import v.table
+import v.ast
+import v.pref
+import os
 
 const (
 	version = '0.0.1'
@@ -379,6 +377,7 @@ pub fn (t Tree) hash_stmt(it ast.HashStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('HashStmt'))
 	to_object(obj, 'val', t.string_node(it.val))
+	to_object(obj, 'mod', t.string_node(it.mod))
 	return obj
 }
 
@@ -1086,28 +1085,24 @@ pub fn (t Tree) or_expr(it ast.OrExpr) &C.cJSON {
 
 pub fn (t Tree) struct_init(it ast.StructInit) &C.cJSON {
 	obj := create_object()
+	to_object(obj, 'pos', t.position(it.pos))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
+	to_object(obj, 'is_short', t.bool_node(it.is_short))
 	s_arr := create_array()
 	for f in it.fields {
-		to_array(s_arr, t.string_node(f))
+		to_array(s_arr, t.struct_init_field(f))
 	}
 	to_object(obj, 'fields', s_arr)
-	expr_arr := create_array()
-	for e in it.exprs {
-		to_array(expr_arr, t.expr(e))
-	}
-	to_object(obj, 'exprs', expr_arr)
-	to_object(obj, 'pos', t.position(it.pos))
-	expr_types_arr := create_array()
-	for e in it.expr_types {
-		to_array(expr_types_arr, t.number_node(int(e)))
-	}
-	to_object(obj, 'expr_types', expr_types_arr)
-	expected_types_arr := create_array()
-	for e in it.expected_types {
-		to_array(expected_types_arr, t.number_node(int(e)))
-	}
-	to_object(obj, 'expected_types', expected_types_arr)
+	return obj
+}
+
+pub fn (t Tree) struct_init_field(it ast.StructInitField) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'name', it.string_node(it.name))
+	to_object(obj, 'expr', it.expr(it.expr))
+	to_object(obj, 'pos', it.position(it.pos))
+	to_object(obj, 'typ', it.number_node(int(it.typ)))
+	to_object(obj, 'expected_type', it.number_node(int(it.expected_type)))
 	return obj
 }
 
