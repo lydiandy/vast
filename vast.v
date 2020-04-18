@@ -294,6 +294,7 @@ pub fn (t Tree) fn_decl(it ast.FnDecl) &C.cJSON {
 	to_object(obj, 'is_method', t.bool_node(it.is_method))
 	to_object(obj, 'rec_mut', t.bool_node(it.rec_mut))
 	to_object(obj, 'is_c', t.bool_node(it.is_c))
+	to_object(obj, 'is_anon', t.bool_node(it.is_anon))
 	to_object(obj, 'no_body', t.bool_node(it.no_body))
 	to_object(obj, 'is_builtin', t.bool_node(it.is_builtin))
 	to_object(obj, 'receiver', t.field(it.receiver))
@@ -309,6 +310,13 @@ pub fn (t Tree) fn_decl(it ast.FnDecl) &C.cJSON {
 	}
 	to_object(obj, 'stmts', stmt_arr)
 	to_object(obj, 'pos', t.position(it.pos))
+	return obj
+}
+
+pub fn (t Tree) anon_fn(it ast.AnonFn) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'decl', t.fn_decl(it.decl))
+	to_object(obj, 'typ', t.number_node(int(it.typ)))
 	return obj
 }
 
@@ -424,18 +432,10 @@ pub fn (t Tree) defer_stmt(it ast.DeferStmt) &C.cJSON {
 
 pub fn (t Tree) type_decl(node ast.TypeDecl) &C.cJSON {
 	match node {
-		ast.AliasTypeDecl {
-			return t.alias_type_decl(it)
-		}
-		ast.SumTypeDecl {
-			return t.sum_type_decl(it)
-		}
-		ast.FnTypeDecl {
-			return t.fn_type_decl(it)
-		}
-		else {
-			return t.string_node('unknown node')
-		}
+		ast.AliasTypeDecl { return t.alias_type_decl(it) }
+		ast.SumTypeDecl { return t.sum_type_decl(it) }
+		ast.FnTypeDecl { return t.fn_type_decl(it) }
+		else { return t.string_node('unknown node') }
 	}
 }
 
@@ -1012,15 +1012,9 @@ pub fn (t Tree) ident(it ast.Ident) &C.cJSON {
 
 pub fn (t Tree) ident_info(info ast.IdentInfo) &C.cJSON {
 	match info {
-		ast.IdentVar {
-			return t.ident_var(it)
-		}
-		ast.IdentFn {
-			return t.ident_fn(it)
-		}
-		else {
-			return t.string_node('unknown node')
-		}
+		ast.IdentVar { return t.ident_var(it) }
+		ast.IdentFn { return t.ident_fn(it) }
+		else { return t.string_node('unknown node') }
 	}
 }
 
@@ -1098,11 +1092,11 @@ pub fn (t Tree) struct_init(it ast.StructInit) &C.cJSON {
 
 pub fn (t Tree) struct_init_field(it ast.StructInitField) &C.cJSON {
 	obj := create_object()
-	to_object(obj, 'name', it.string_node(it.name))
-	to_object(obj, 'expr', it.expr(it.expr))
-	to_object(obj, 'pos', it.position(it.pos))
-	to_object(obj, 'typ', it.number_node(int(it.typ)))
-	to_object(obj, 'expected_type', it.number_node(int(it.expected_type)))
+	to_object(obj, 'name', t.string_node(it.name))
+	to_object(obj, 'expr', t.expr(it.expr))
+	to_object(obj, 'pos', t.position(it.pos))
+	to_object(obj, 'typ', t.number_node(int(it.typ)))
+	to_object(obj, 'expected_type', t.number_node(int(it.expected_type)))
 	return obj
 }
 
