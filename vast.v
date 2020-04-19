@@ -345,6 +345,7 @@ pub fn (t Tree) enum_decl(it ast.EnumDecl) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('EnumDecl'))
 	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'is_pub', t.bool_node(it.is_pub))
+	to_object(obj, 'pos', t.position(it.pos))
 	f_arr := create_array()
 	for f in it.fields {
 		to_array(f_arr, t.enum_field(f))
@@ -445,6 +446,7 @@ pub fn (t Tree) alias_type_decl(it ast.AliasTypeDecl) &C.cJSON {
 	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'is_pub', t.bool_node(it.is_pub))
 	to_object(obj, 'parent_type', t.number_node(int(it.parent_type)))
+	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
@@ -458,6 +460,7 @@ pub fn (t Tree) sum_type_decl(it ast.SumTypeDecl) &C.cJSON {
 		to_array(t_arr, t.number_node(int(s)))
 	}
 	to_object(obj, 'sub_types', t_arr)
+	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
@@ -467,6 +470,7 @@ pub fn (t Tree) fn_type_decl(it ast.FnTypeDecl) &C.cJSON {
 	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'is_pub', t.bool_node(it.is_pub))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
+	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
