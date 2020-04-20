@@ -1,16 +1,11 @@
 //comment for module
-module demo
-//comment for include
-#include abc
+module main
 
 //comment for import
 import os
 import strings
+import time 
 
-import (
-	time 
-	term
-)
 pub const (
 	a=1
 	b=3
