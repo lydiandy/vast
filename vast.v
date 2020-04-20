@@ -1,4 +1,4 @@
-module vast
+module main
 
 import v.token
 import v.parser
@@ -11,7 +11,7 @@ const (
 	version = '0.0.1'
 )
 
-pub fn main() {
+fn main() {
 	if os.args.len != 2 {
 		println('unknown args,Usage:vast demo.v')
 		return
