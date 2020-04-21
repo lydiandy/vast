@@ -798,6 +798,7 @@ pub fn (t Tree) integer_literal(it ast.IntegerLiteral) &C.cJSON {
 pub fn (t Tree) float_literal(it ast.FloatLiteral) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'val', t.string_node(it.val))
+	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
@@ -814,12 +815,14 @@ pub fn (t Tree) string_literal(it ast.StringLiteral) &C.cJSON {
 pub fn (t Tree) char_literal(it ast.CharLiteral) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'val', t.string_node(it.val))
+	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
 pub fn (t Tree) bool_literal(it ast.BoolLiteral) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'val', t.bool_node(it.val))
+	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
