@@ -40,6 +40,10 @@ v .
 
 ![](example/json.png)
 
+## AST struct diagram
+
+![](./ast_struct_diagram.jpg)
+
 ## todo
 
 - make type from id to name
