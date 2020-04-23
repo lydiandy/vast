@@ -54,6 +54,6 @@ fn main() {
 }
 
 // add function
-// fn abc(x, y int) int {
+// fn add(x, y int) int {
 // 	return x + y
 // }

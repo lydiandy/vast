@@ -12,12 +12,12 @@ const (
 )
 
 fn main() {
-	if os.args.len != 2 {
-	println('unknown args,Usage:vast demo.v')
-	return
-	}
-	file := os.args[1]
-	// file := './example/demo.v'
+	// if os.args.len != 2 {
+	// println('unknown args,Usage:vast demo.v')
+	// return
+	// }
+	// file := os.args[1]
+	file := './example/demo.v'
 	if os.file_ext(file) != '.v' {
 		println('the file must be v file')
 		return
@@ -61,6 +61,7 @@ pub fn json(file string) string {
 	to_object(t.root, 'mod', t.mod(ast_file.mod))
 	to_object(t.root, 'imports', t.imports(ast_file.imports))
 	to_object(t.root, 'scope', t.scope(ast_file.scope))
+	to_object(t.root, 'global_scope', t.scope(ast_file.global_scope))
 	to_object(t.root, 'stmts', t.stmts(ast_file.stmts))
 	// generate the ast string
 	s := json_print(t.root)
@@ -138,6 +139,63 @@ pub fn (t Tree) scope(scope ast.Scope) &C.cJSON {
 	to_object(obj, 'children', children_arr)
 	to_object(obj, 'start_pos', t.number_node(scope.start_pos))
 	to_object(obj, 'end_pos', t.number_node(scope.end_pos))
+	to_object(obj, 'unused_vars', t.unused_vars(scope.unused_vars))
+	to_object(obj, 'objects', t.objects(scope.objects))
+	return obj
+}
+
+pub fn (t Tree) unused_vars(m map[string]ast.UnusedVar) &C.cJSON {
+	obj := create_object()
+	for key, val in m {
+		to_object(obj, key, t.unused_var(val))
+	}
+	return obj
+}
+
+pub fn (t Tree) unused_var(it ast.UnusedVar) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('UnusedVar'))
+	to_object(obj, 'name', t.string_node(it.name))
+	to_object(obj, 'pos', t.position(it.pos))
+	return obj
+}
+
+pub fn (t Tree) objects(so map[string]ast.ScopeObject) &C.cJSON {
+	obj := create_object()
+	for key, val in so {
+		to_object(obj, key, t.scope_object(val))
+	}
+	return obj
+}
+
+pub fn (t Tree) scope_object(node ast.ScopeObject) &C.cJSON {
+	obj := create_object()
+	match node {
+		ast.ConstField {
+			t.const_field(it)
+		}
+		ast.GlobalDecl {
+			t.global_decl(it)
+		}
+		ast.Var {
+			t.var_(it)
+		}
+		else {
+			println('ScopeObject unknown node:$node')
+			return t.string_node('ScopeObject unknown node')
+		}
+	}
+	return obj
+}
+
+pub fn (t Tree) var_(it ast.Var) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('Var'))
+	to_object(obj, 'name', t.string_node(it.name))
+	to_object(obj, 'expr', t.expr(it.expr))
+	to_object(obj, 'is_mut', t.bool_node(it.is_mut))
+	to_object(obj, 'typ', t.number_node(int(it.typ)))
+	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
