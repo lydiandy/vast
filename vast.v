@@ -372,6 +372,11 @@ pub fn (t Tree) interface_decl(it ast.InterfaceDecl) &C.cJSON {
 		to_array(str_arr, t.string_node(s))
 	}
 	to_object(obj, 'field_names', str_arr)
+	m_arr := create_array()
+	for m in it.methods {
+		to_array(m_arr, t.fn_decl(m))
+	}
+	to_object(obj, 'methods', m_arr)
 	return obj
 }
 
