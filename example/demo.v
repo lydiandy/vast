@@ -27,7 +27,7 @@ pub enum Color {
 	green
 	blue	
 }
-type Myint int
+type Myint= int
 
 type MySumType = int | string | bool
 
@@ -52,6 +52,6 @@ fn main() {
 	println(color)
 }
 //add function
-fn add(x,y int) int {
-	return x+y
-}
+// fn abc(x,y int) int {
+// 	return x+y
+// }

@@ -289,27 +289,29 @@ pub fn (t Tree) fn_decl(it ast.FnDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('FnDecl'))
 	to_object(obj, 'name', t.string_node(it.name))
+	to_object(obj, 'return_type', t.number_node(int(it.return_type)))
+	to_object(obj, 'is_deprecated', t.bool_node(it.is_deprecated))
 	to_object(obj, 'is_pub', t.bool_node(it.is_pub))
 	to_object(obj, 'is_variadic', t.bool_node(it.is_variadic))
+	to_object(obj, 'is_anon', t.bool_node(it.is_anon))
+	to_object(obj, 'receiver', t.field(it.receiver))
 	to_object(obj, 'is_method', t.bool_node(it.is_method))
 	to_object(obj, 'rec_mut', t.bool_node(it.rec_mut))
 	to_object(obj, 'is_c', t.bool_node(it.is_c))
-	to_object(obj, 'is_anon', t.bool_node(it.is_anon))
+	to_object(obj, 'is_js', t.bool_node(it.is_js))
 	to_object(obj, 'no_body', t.bool_node(it.no_body))
 	to_object(obj, 'is_builtin', t.bool_node(it.is_builtin))
-	to_object(obj, 'receiver', t.field(it.receiver))
+	to_object(obj, 'pos', t.position(it.pos))
 	arg_arr := create_array()
 	for a in it.args {
 		to_array(arg_arr, t.arg(a))
 	}
 	to_object(obj, 'args', arg_arr)
-	to_object(obj, 'return_type', t.number_node(int(it.return_type)))
 	stmt_arr := create_array()
 	for s in it.stmts {
 		to_array(stmt_arr, t.stmt(s))
 	}
 	to_object(obj, 'stmts', stmt_arr)
-	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
@@ -323,7 +325,6 @@ pub fn (t Tree) anon_fn(it ast.AnonFn) &C.cJSON {
 pub fn (t Tree) struct_decl(it ast.StructDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('StructDecl'))
-	to_object(obj, 'pos', t.position(it.pos))
 	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'is_pub', t.bool_node(it.is_pub))
 	to_object(obj, 'pos', t.position(it.pos))
