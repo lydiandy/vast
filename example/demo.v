@@ -54,6 +54,6 @@ fn main() {
 }
 
 // add function
-// fn add(x, y int) int {
-// 	return x + y
-// }
+fn add(x, y int) int {
+	return x + y
+}

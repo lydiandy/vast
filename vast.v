@@ -17,7 +17,6 @@ fn main() {
 	return
 	}
 	file := os.args[1]
-	// file := './example/demo.v'
 	if os.file_ext(file) != '.v' {
 		println('the file must be v file')
 		return
@@ -129,13 +128,15 @@ pub fn (t Tree) scope(scope ast.Scope) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('Scope'))
 	to_object(obj, 'parent', t.string_node(ptr_str(scope.parent)))
 	children_arr := create_array()
-	for s in scope.children {
-		children_obj := create_object()
-		to_object(children_obj, 'parent', t.string_node(ptr_str(s.parent)))
-		to_object(children_obj, 'start_pos', t.number_node(s.start_pos))
-		to_object(children_obj, 'end_pos', t.number_node(s.end_pos))
-		to_array(children_arr, children_obj)
-	}
+	// mut children_obj := create_object()
+	// for s in scope.children {
+	// 	println('$s')
+	// 	to_object(children_obj, 'parent', t.string_node(ptr_str(s.parent)))
+	// 	to_object(children_obj, 'start_pos', t.number_node(s.start_pos))
+	// 	to_object(children_obj, 'end_pos', t.number_node(s.end_pos))
+	// 	to_array(children_arr, children_obj)
+	// 	children_obj=create_object()
+	// }
 	to_object(obj, 'children', children_arr)
 	to_object(obj, 'start_pos', t.number_node(scope.start_pos))
 	to_object(obj, 'end_pos', t.number_node(scope.end_pos))
@@ -1135,7 +1136,7 @@ pub fn (t Tree) ident_info(info ast.IdentInfo) &C.cJSON {
 	match info {
 		ast.IdentVar { return t.ident_var(it) }
 		ast.IdentFn { return t.ident_fn(it) }
-		else { return t.string_node('unknown node') }
+		else { return t.string_node('IdentInfo unknown node') }
 	}
 }
 
