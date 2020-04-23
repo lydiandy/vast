@@ -1,20 +1,20 @@
-//comment for module
+// comment for module
 module main
 
-//comment for import
+// comment for import
 import os
 import strings
-import time 
+import time
 
 pub const (
-	a=1
-	b=3
-	c='c'
+	a = 1
+	b = 3
+	c = 'c'
 )
 
 pub struct Point {
 	x int
-mut: 
+mut:
 	y string
 pub:
 	z f32
@@ -25,33 +25,35 @@ pub mut:
 pub enum Color {
 	red
 	green
-	blue	
+	blue
 }
-type Myint= int
+
+type Myint = int
 
 type MySumType = int | string | bool
 
-type Myfn fn(int) int
+type Myfn = fn(int) int
+
 
 // pub interface Myinterfacer {
-// 	add(int,int) int
-// 	sub(int,int) int
+// add(int,int) int
+// sub(int,int) int
 // }
-
-//main funciton
+// main funciton
 fn main() {
-	add(1,3)
-	println(add(1,2))
-	println('ok') //comment println
-	arr:=[1,3,5,7]
+	add(1, 3)
+	println(add(1, 2))
+	println('ok') // comment println
+	arr := [1, 3, 5, 7]
 	for a in arr {
 		println(a)
-		add(1,3)
+		add(1, 3)
 	}
-	color:=Color.red
+	color := Color.red
 	println(color)
 }
-//add function
-// fn abc(x,y int) int {
-// 	return x+y
+
+// add function
+// fn abc(x, y int) int {
+// 	return x + y
 // }
