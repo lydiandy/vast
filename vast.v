@@ -140,24 +140,7 @@ pub fn (t Tree) scope(scope ast.Scope) &C.cJSON {
 	to_object(obj, 'children', children_arr)
 	to_object(obj, 'start_pos', t.number_node(scope.start_pos))
 	to_object(obj, 'end_pos', t.number_node(scope.end_pos))
-	to_object(obj, 'unused_vars', t.unused_vars(scope.unused_vars))
 	to_object(obj, 'objects', t.objects(scope.objects))
-	return obj
-}
-
-pub fn (t Tree) unused_vars(m map[string]ast.UnusedVar) &C.cJSON {
-	obj := create_object()
-	for key, val in m {
-		to_object(obj, key, t.unused_var(val))
-	}
-	return obj
-}
-
-pub fn (t Tree) unused_var(it ast.UnusedVar) &C.cJSON {
-	obj := create_object()
-	to_object(obj, 'ast_type', t.string_node('UnusedVar'))
-	to_object(obj, 'name', t.string_node(it.name))
-	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
@@ -181,10 +164,10 @@ pub fn (t Tree) scope_object(node ast.ScopeObject) &C.cJSON {
 		ast.Var {
 			t.var_(it)
 		}
-		else {
-			println('ScopeObject unknown node:$node')
-			return t.string_node('ScopeObject unknown node')
-		}
+		// else {
+		// 	println('ScopeObject unknown node:$node')
+		// 	return t.string_node('ScopeObject unknown node')
+		// }
 	}
 	return obj
 }
@@ -197,6 +180,7 @@ pub fn (t Tree) var_(it ast.Var) &C.cJSON {
 	to_object(obj, 'is_mut', t.bool_node(it.is_mut))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
 	to_object(obj, 'pos', t.position(it.pos))
+	to_object(obj, 'is_used', t.bool_node(it.is_used))
 	return obj
 }
 
@@ -292,10 +276,10 @@ pub fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		ast.Block {
 			return t.block(it)
 		}
-		else {
-			println('unknown node:$node')
-			return t.string_node('unknown node')
-		}
+		// else {
+		// 	println('unknown node:$node')
+		// 	return t.string_node('unknown node')
+		// }
 	}
 }
 
@@ -510,7 +494,7 @@ pub fn (t Tree) type_decl(node ast.TypeDecl) &C.cJSON {
 		ast.AliasTypeDecl { return t.alias_type_decl(it) }
 		ast.SumTypeDecl { return t.sum_type_decl(it) }
 		ast.FnTypeDecl { return t.fn_type_decl(it) }
-		else { return t.string_node('unknown node') }
+		// else { return t.string_node('unknown node') }
 	}
 }
 
@@ -1136,7 +1120,7 @@ pub fn (t Tree) ident_info(info ast.IdentInfo) &C.cJSON {
 	match info {
 		ast.IdentVar { return t.ident_var(it) }
 		ast.IdentFn { return t.ident_fn(it) }
-		else { return t.string_node('IdentInfo unknown node') }
+		// else { return t.string_node('IdentInfo unknown node') }
 	}
 }
 
@@ -1242,6 +1226,10 @@ pub fn (t Tree) array_init(it ast.ArrayInit) &C.cJSON {
 	to_object(obj, 'pos', t.position(it.pos))
 	to_object(obj, 'is_fixed', t.bool_node(it.is_fixed))
 	to_object(obj, 'mod', t.string_node(it.mod))
+	to_object(obj, 'len_expr', t.expr(it.len_expr))
+	to_object(obj, 'cap_expr', t.expr(it.cap_expr))
+	to_object(obj, 'has_len', t.bool_node(it.has_len))
+	to_object(obj, 'has_cap', t.bool_node(it.has_cap))
 	return obj
 }
 
