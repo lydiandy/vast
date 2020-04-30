@@ -13,8 +13,8 @@ const (
 
 fn main() {
 	if os.args.len != 2 {
-	println('unknown args,Usage:vast demo.v')
-	return
+		println('unknown args,Usage:vast demo.v')
+		return
 	}
 	file := os.args[1]
 	if os.file_ext(file) != '.v' {
@@ -29,7 +29,7 @@ fn main() {
 	json_file(apath)
 }
 
-pub struct Tree {
+struct Tree {
 	root         &C.cJSON // the root of tree
 	table        &table.Table
 	pref         &pref.Preferences
@@ -37,14 +37,14 @@ pub struct Tree {
 }
 
 // generate json file with the same file name
-pub fn json_file(file string) {
+fn json_file(file string) {
 	ast_json := json(file)
 	json_file := file[0..file.len - 2] + '.json'
 	os.write_file(json_file, ast_json)
 }
 
 // generate json string
-pub fn json(file string) string {
+fn json(file string) string {
 	t := Tree{
 		root: create_object()
 		table: &table.Table{}
@@ -68,15 +68,15 @@ pub fn json(file string) string {
 }
 
 // basic type node
-pub fn (t Tree) string_node(val string) &C.cJSON {
+fn (t Tree) string_node(val string) &C.cJSON {
 	return create_string(val)
 }
 
-pub fn (t Tree) number_node(val int) &C.cJSON {
+fn (t Tree) number_node(val int) &C.cJSON {
 	return create_number(val)
 }
 
-pub fn (t Tree) bool_node(val bool) &C.cJSON {
+fn (t Tree) bool_node(val bool) &C.cJSON {
 	if val {
 		return create_true()
 	} else {
@@ -84,12 +84,12 @@ pub fn (t Tree) bool_node(val bool) &C.cJSON {
 	}
 }
 
-pub fn (t Tree) null_node() &C.cJSON {
+fn (t Tree) null_node() &C.cJSON {
 	return create_null()
 }
 
 // todo
-pub fn (t Tree) typ_node(typ table.Type) &C.cJSON {
+fn (t Tree) typ_node(typ table.Type) &C.cJSON {
 	if typ == 0 {
 		return create_string('')
 	} else {
@@ -101,7 +101,7 @@ pub fn (t Tree) typ_node(typ table.Type) &C.cJSON {
 }
 
 // ast.File node
-pub fn (t Tree) mod(mod ast.Module) &C.cJSON {
+fn (t Tree) mod(mod ast.Module) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Module'))
 	to_object(obj, 'name', t.string_node(mod.name))
@@ -111,7 +111,7 @@ pub fn (t Tree) mod(mod ast.Module) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) imports(imports []ast.Import) &C.cJSON {
+fn (t Tree) imports(imports []ast.Import) &C.cJSON {
 	imps := create_array()
 	for imp in imports {
 		obj := create_object()
@@ -123,19 +123,19 @@ pub fn (t Tree) imports(imports []ast.Import) &C.cJSON {
 	return imps
 }
 
-pub fn (t Tree) scope(scope ast.Scope) &C.cJSON {
+fn (t Tree) scope(scope ast.Scope) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Scope'))
 	to_object(obj, 'parent', t.string_node(ptr_str(scope.parent)))
 	children_arr := create_array()
 	// mut children_obj := create_object()
 	// for s in scope.children {
-	// 	println('$s')
-	// 	to_object(children_obj, 'parent', t.string_node(ptr_str(s.parent)))
-	// 	to_object(children_obj, 'start_pos', t.number_node(s.start_pos))
-	// 	to_object(children_obj, 'end_pos', t.number_node(s.end_pos))
-	// 	to_array(children_arr, children_obj)
-	// 	children_obj=create_object()
+	// println('$s')
+	// to_object(children_obj, 'parent', t.string_node(ptr_str(s.parent)))
+	// to_object(children_obj, 'start_pos', t.number_node(s.start_pos))
+	// to_object(children_obj, 'end_pos', t.number_node(s.end_pos))
+	// to_array(children_arr, children_obj)
+	// children_obj=create_object()
 	// }
 	to_object(obj, 'children', children_arr)
 	to_object(obj, 'start_pos', t.number_node(scope.start_pos))
@@ -144,7 +144,7 @@ pub fn (t Tree) scope(scope ast.Scope) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) objects(so map[string]ast.ScopeObject) &C.cJSON {
+fn (t Tree) objects(so map[string]ast.ScopeObject) &C.cJSON {
 	obj := create_object()
 	for key, val in so {
 		to_object(obj, key, t.scope_object(val))
@@ -152,27 +152,17 @@ pub fn (t Tree) objects(so map[string]ast.ScopeObject) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) scope_object(node ast.ScopeObject) &C.cJSON {
+fn (t Tree) scope_object(node ast.ScopeObject) &C.cJSON {
 	obj := create_object()
 	match node {
-		ast.ConstField {
-			t.const_field(it)
-		}
-		ast.GlobalDecl {
-			t.global_decl(it)
-		}
-		ast.Var {
-			t.var_(it)
-		}
-		// else {
-		// 	println('ScopeObject unknown node:$node')
-		// 	return t.string_node('ScopeObject unknown node')
-		// }
+		ast.ConstField { t.const_field(it) }
+		ast.GlobalDecl { t.global_decl(it) }
+		ast.Var { t.var_(it) }
 	}
 	return obj
 }
 
-pub fn (t Tree) var_(it ast.Var) &C.cJSON {
+fn (t Tree) var_(it ast.Var) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Var'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -185,7 +175,7 @@ pub fn (t Tree) var_(it ast.Var) &C.cJSON {
 }
 
 // stmt node
-pub fn (t Tree) stmts(stmts []ast.Stmt) &C.cJSON {
+fn (t Tree) stmts(stmts []ast.Stmt) &C.cJSON {
 	stmt_array := create_array()
 	for s in stmts {
 		to_array(stmt_array, t.stmt(s))
@@ -193,97 +183,39 @@ pub fn (t Tree) stmts(stmts []ast.Stmt) &C.cJSON {
 	return stmt_array
 }
 
-pub fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
+fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 	match node {
-		ast.Module {
-			return t.mod(it)
-		}
-		ast.Import {
-			return t.import_(it)
-		}
-		ast.Comment {
-			return t.comment(it)
-		}
-		ast.ConstDecl {
-			return t.const_decl(it)
-		}
-		ast.FnDecl {
-			return t.fn_decl(it)
-		}
-		ast.StructDecl {
-			return t.struct_decl(it)
-		}
-		ast.EnumDecl {
-			return t.enum_decl(it)
-		}
-		ast.InterfaceDecl {
-			return t.interface_decl(it)
-		}
-		ast.Attr {
-			return t.attr(it)
-		}
-		ast.HashStmt {
-			return t.hash_stmt(it)
-		}
-		ast.CompIf {
-			return t.comp_if(it)
-		}
-		ast.GlobalDecl {
-			return t.global_decl(it)
-		}
-		ast.DeferStmt {
-			return t.defer_stmt(it)
-		}
-		ast.TypeDecl {
-			return t.type_decl(it)
-		}
-		ast.GotoLabel {
-			return t.goto_label(it)
-		}
-		ast.GotoStmt {
-			return t.goto_stmt(it)
-		}
-		ast.AssignStmt {
-			return t.assign_stmt(it)
-		}
-		ast.Return {
-			return t.return_(it)
-		}
-		ast.ForCStmt {
-			return t.for_c_stmt(it)
-		}
-		ast.ForStmt {
-			return t.for_stmt(it)
-		}
-		ast.ForInStmt {
-			return t.for_in_stmt(it)
-		}
-		ast.BranchStmt {
-			return t.branch_stmt(it)
-		}
-		ast.AssertStmt {
-			return t.assert_stmt(it)
-		}
-		ast.UnsafeStmt {
-			return t.unsafe_stmt(it)
-		}
-		ast.ExprStmt {
-			return t.expr_stmt(it)
-		}
-		ast.GoStmt {
-			return t.go_stmt(it)
-		}
-		ast.Block {
-			return t.block(it)
-		}
-		// else {
-		// 	println('unknown node:$node')
-		// 	return t.string_node('unknown node')
-		// }
+		ast.Module { return t.mod(it) }
+		ast.Import { return t.import_(it) }
+		ast.Comment { return t.comment(it) }
+		ast.ConstDecl { return t.const_decl(it) }
+		ast.FnDecl { return t.fn_decl(it) }
+		ast.StructDecl { return t.struct_decl(it) }
+		ast.EnumDecl { return t.enum_decl(it) }
+		ast.InterfaceDecl { return t.interface_decl(it) }
+		ast.Attr { return t.attr(it) }
+		ast.HashStmt { return t.hash_stmt(it) }
+		ast.CompIf { return t.comp_if(it) }
+		ast.GlobalDecl { return t.global_decl(it) }
+		ast.DeferStmt { return t.defer_stmt(it) }
+		ast.TypeDecl { return t.type_decl(it) }
+		ast.GotoLabel { return t.goto_label(it) }
+		ast.GotoStmt { return t.goto_stmt(it) }
+		ast.AssignStmt { return t.assign_stmt(it) }
+		ast.Return { return t.return_(it) }
+		ast.ForCStmt { return t.for_c_stmt(it) }
+		ast.ForStmt { return t.for_stmt(it) }
+		ast.ForInStmt { return t.for_in_stmt(it) }
+		ast.BranchStmt { return t.branch_stmt(it) }
+		ast.AssertStmt { return t.assert_stmt(it) }
+		ast.UnsafeStmt { return t.unsafe_stmt(it) }
+		ast.ExprStmt { return t.expr_stmt(it) }
+		ast.GoStmt { return t.go_stmt(it) }
+		ast.Block { return t.block(it) }
 	}
 }
 
-pub fn (t Tree) import_(it ast.Import) &C.cJSON {
+fn (t Tree) import_(it ast.Import) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Import'))
 	to_object(obj, 'mod', t.string_node(it.mod))
@@ -292,14 +224,14 @@ pub fn (t Tree) import_(it ast.Import) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) position(p token.Position) &C.cJSON {
+fn (t Tree) position(p token.Position) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'line_nr', t.number_node(p.line_nr))
 	to_object(obj, 'pos', t.number_node(p.pos))
 	return obj
 }
 
-pub fn (t Tree) comment(it ast.Comment) &C.cJSON {
+fn (t Tree) comment(it ast.Comment) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Comment'))
 	to_object(obj, 'text', t.string_node(it.text))
@@ -310,7 +242,7 @@ pub fn (t Tree) comment(it ast.Comment) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) const_decl(it ast.ConstDecl) &C.cJSON {
+fn (t Tree) const_decl(it ast.ConstDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ConstDecl'))
 	field_arr := create_array()
@@ -323,7 +255,7 @@ pub fn (t Tree) const_decl(it ast.ConstDecl) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) const_field(it ast.ConstField) &C.cJSON {
+fn (t Tree) const_field(it ast.ConstField) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ConstField'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -334,7 +266,7 @@ pub fn (t Tree) const_field(it ast.ConstField) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) fn_decl(it ast.FnDecl) &C.cJSON {
+fn (t Tree) fn_decl(it ast.FnDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('FnDecl'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -364,7 +296,7 @@ pub fn (t Tree) fn_decl(it ast.FnDecl) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) anon_fn(it ast.AnonFn) &C.cJSON {
+fn (t Tree) anon_fn(it ast.AnonFn) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('AnonFn'))
 	to_object(obj, 'decl', t.fn_decl(it.decl))
@@ -372,7 +304,7 @@ pub fn (t Tree) anon_fn(it ast.AnonFn) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) struct_decl(it ast.StructDecl) &C.cJSON {
+fn (t Tree) struct_decl(it ast.StructDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('StructDecl'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -391,7 +323,7 @@ pub fn (t Tree) struct_decl(it ast.StructDecl) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) enum_decl(it ast.EnumDecl) &C.cJSON {
+fn (t Tree) enum_decl(it ast.EnumDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('EnumDecl'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -405,7 +337,7 @@ pub fn (t Tree) enum_decl(it ast.EnumDecl) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) enum_field(it ast.EnumField) &C.cJSON {
+fn (t Tree) enum_field(it ast.EnumField) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('EnumField'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -415,7 +347,7 @@ pub fn (t Tree) enum_field(it ast.EnumField) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) interface_decl(it ast.InterfaceDecl) &C.cJSON {
+fn (t Tree) interface_decl(it ast.InterfaceDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('InterfaceDecl'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -432,14 +364,14 @@ pub fn (t Tree) interface_decl(it ast.InterfaceDecl) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) attr(it ast.Attr) &C.cJSON {
+fn (t Tree) attr(it ast.Attr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Attr'))
 	to_object(obj, 'name', t.string_node(it.name))
 	return obj
 }
 
-pub fn (t Tree) hash_stmt(it ast.HashStmt) &C.cJSON {
+fn (t Tree) hash_stmt(it ast.HashStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('HashStmt'))
 	to_object(obj, 'val', t.string_node(it.val))
@@ -447,7 +379,7 @@ pub fn (t Tree) hash_stmt(it ast.HashStmt) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) comp_if(it ast.CompIf) &C.cJSON {
+fn (t Tree) comp_if(it ast.CompIf) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('CompIf'))
 	to_object(obj, 'val', t.string_node(it.val))
@@ -467,7 +399,7 @@ pub fn (t Tree) comp_if(it ast.CompIf) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) global_decl(it ast.GlobalDecl) &C.cJSON {
+fn (t Tree) global_decl(it ast.GlobalDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('GlobalDecl'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -477,7 +409,7 @@ pub fn (t Tree) global_decl(it ast.GlobalDecl) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) defer_stmt(it ast.DeferStmt) &C.cJSON {
+fn (t Tree) defer_stmt(it ast.DeferStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('DeferStmt'))
 	stmt_array := create_array()
@@ -489,16 +421,15 @@ pub fn (t Tree) defer_stmt(it ast.DeferStmt) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) type_decl(node ast.TypeDecl) &C.cJSON {
+fn (t Tree) type_decl(node ast.TypeDecl) &C.cJSON {
 	match node {
 		ast.AliasTypeDecl { return t.alias_type_decl(it) }
 		ast.SumTypeDecl { return t.sum_type_decl(it) }
 		ast.FnTypeDecl { return t.fn_type_decl(it) }
-		// else { return t.string_node('unknown node') }
 	}
 }
 
-pub fn (t Tree) alias_type_decl(it ast.AliasTypeDecl) &C.cJSON {
+fn (t Tree) alias_type_decl(it ast.AliasTypeDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('AliasTypeDecl'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -508,7 +439,7 @@ pub fn (t Tree) alias_type_decl(it ast.AliasTypeDecl) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) sum_type_decl(it ast.SumTypeDecl) &C.cJSON {
+fn (t Tree) sum_type_decl(it ast.SumTypeDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('SumTypeDecl'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -522,7 +453,7 @@ pub fn (t Tree) sum_type_decl(it ast.SumTypeDecl) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) fn_type_decl(it ast.FnTypeDecl) &C.cJSON {
+fn (t Tree) fn_type_decl(it ast.FnTypeDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('FnTypeDecl'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -532,7 +463,7 @@ pub fn (t Tree) fn_type_decl(it ast.FnTypeDecl) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) struct_field(it ast.StructField) &C.cJSON {
+fn (t Tree) struct_field(it ast.StructField) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('StructField'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -545,7 +476,7 @@ pub fn (t Tree) struct_field(it ast.StructField) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) field(it ast.Field) &C.cJSON {
+fn (t Tree) field(it ast.Field) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Field'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -554,7 +485,7 @@ pub fn (t Tree) field(it ast.Field) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) arg(it table.Arg) &C.cJSON {
+fn (t Tree) arg(it table.Arg) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Arg'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -563,28 +494,28 @@ pub fn (t Tree) arg(it table.Arg) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) goto_label(it ast.GotoLabel) &C.cJSON {
+fn (t Tree) goto_label(it ast.GotoLabel) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('GotoLabel'))
 	to_object(obj, 'name', t.string_node(it.name))
 	return obj
 }
 
-pub fn (t Tree) goto_stmt(it ast.GotoStmt) &C.cJSON {
+fn (t Tree) goto_stmt(it ast.GotoStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('GotoStmt'))
 	to_object(obj, 'name', t.string_node(it.name))
 	return obj
 }
 
-pub fn (t Tree) lambda(it ast.Lambda) &C.cJSON {
+fn (t Tree) lambda(it ast.Lambda) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Lambda'))
 	to_object(obj, 'name', t.string_node(it.name))
 	return obj
 }
 
-pub fn (t Tree) assign_stmt(it ast.AssignStmt) &C.cJSON {
+fn (t Tree) assign_stmt(it ast.AssignStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('AssignStmt'))
 	i_arr := create_array()
@@ -612,7 +543,7 @@ pub fn (t Tree) assign_stmt(it ast.AssignStmt) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) var_decl(it ast.Var) &C.cJSON {
+fn (t Tree) var_decl(it ast.Var) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Var'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -623,7 +554,7 @@ pub fn (t Tree) var_decl(it ast.Var) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) return_(it ast.Return) &C.cJSON {
+fn (t Tree) return_(it ast.Return) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Return'))
 	e_arr := create_array()
@@ -640,7 +571,7 @@ pub fn (t Tree) return_(it ast.Return) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) return_stmt(it ast.ReturnStmt) &C.cJSON {
+fn (t Tree) return_stmt(it ast.ReturnStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ReturnStmt'))
 	to_object(obj, 'tok_kind', t.number_node(int(it.tok_kind)))
@@ -653,7 +584,7 @@ pub fn (t Tree) return_stmt(it ast.ReturnStmt) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) for_c_stmt(it ast.ForCStmt) &C.cJSON {
+fn (t Tree) for_c_stmt(it ast.ForCStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ForCStmt'))
 	to_object(obj, 'init', t.stmt(it.init))
@@ -671,7 +602,7 @@ pub fn (t Tree) for_c_stmt(it ast.ForCStmt) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) for_stmt(it ast.ForStmt) &C.cJSON {
+fn (t Tree) for_stmt(it ast.ForStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ForStmt'))
 	to_object(obj, 'cond', t.expr(it.cond))
@@ -685,7 +616,7 @@ pub fn (t Tree) for_stmt(it ast.ForStmt) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) for_in_stmt(it ast.ForInStmt) &C.cJSON {
+fn (t Tree) for_in_stmt(it ast.ForInStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ForInStmt'))
 	to_object(obj, 'key_var', t.string_node(it.key_var))
@@ -706,14 +637,14 @@ pub fn (t Tree) for_in_stmt(it ast.ForInStmt) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) branch_stmt(it ast.BranchStmt) &C.cJSON {
+fn (t Tree) branch_stmt(it ast.BranchStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('BranchStmt'))
 	to_object(obj, 'tok', t.number_node(int(&it.tok)))
 	return obj
 }
 
-pub fn (t Tree) assert_stmt(it ast.AssertStmt) &C.cJSON {
+fn (t Tree) assert_stmt(it ast.AssertStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('AssertStmt'))
 	to_object(obj, 'expr', t.expr(it.expr))
@@ -721,7 +652,7 @@ pub fn (t Tree) assert_stmt(it ast.AssertStmt) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) unsafe_stmt(it ast.UnsafeStmt) &C.cJSON {
+fn (t Tree) unsafe_stmt(it ast.UnsafeStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('UnsafeStmt'))
 	stmt_arr := create_array()
@@ -732,14 +663,14 @@ pub fn (t Tree) unsafe_stmt(it ast.UnsafeStmt) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) go_stmt(it ast.GoStmt) &C.cJSON {
+fn (t Tree) go_stmt(it ast.GoStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('GoStmt'))
 	to_object(obj, 'call_expr', t.expr(it.call_expr))
 	return obj
 }
 
-pub fn (t Tree) block(it ast.Block) &C.cJSON {
+fn (t Tree) block(it ast.Block) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Block'))
 	stmt_arr := create_array()
@@ -750,7 +681,7 @@ pub fn (t Tree) block(it ast.Block) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) expr_stmt(it ast.ExprStmt) &C.cJSON {
+fn (t Tree) expr_stmt(it ast.ExprStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ExprStmt'))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
@@ -760,7 +691,7 @@ pub fn (t Tree) expr_stmt(it ast.ExprStmt) &C.cJSON {
 }
 
 // expr
-pub fn (t Tree) expr(e ast.Expr) &C.cJSON {
+fn (t Tree) expr(e ast.Expr) &C.cJSON {
 	match e {
 		ast.IntegerLiteral {
 			return t.integer_literal(it)
@@ -865,7 +796,7 @@ pub fn (t Tree) expr(e ast.Expr) &C.cJSON {
 	}
 }
 
-pub fn (t Tree) integer_literal(it ast.IntegerLiteral) &C.cJSON {
+fn (t Tree) integer_literal(it ast.IntegerLiteral) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('IntegerLiteral'))
 	to_object(obj, 'val', t.string_node(it.val))
@@ -873,7 +804,7 @@ pub fn (t Tree) integer_literal(it ast.IntegerLiteral) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) float_literal(it ast.FloatLiteral) &C.cJSON {
+fn (t Tree) float_literal(it ast.FloatLiteral) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('FloatLiteral'))
 	to_object(obj, 'val', t.string_node(it.val))
@@ -881,7 +812,7 @@ pub fn (t Tree) float_literal(it ast.FloatLiteral) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) string_literal(it ast.StringLiteral) &C.cJSON {
+fn (t Tree) string_literal(it ast.StringLiteral) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('StringLiteral'))
 	to_object(obj, 'val', t.string_node(it.val))
@@ -892,7 +823,7 @@ pub fn (t Tree) string_literal(it ast.StringLiteral) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) char_literal(it ast.CharLiteral) &C.cJSON {
+fn (t Tree) char_literal(it ast.CharLiteral) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('CharLiteral'))
 	to_object(obj, 'val', t.string_node(it.val))
@@ -900,7 +831,7 @@ pub fn (t Tree) char_literal(it ast.CharLiteral) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) bool_literal(it ast.BoolLiteral) &C.cJSON {
+fn (t Tree) bool_literal(it ast.BoolLiteral) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('BoolLiteral'))
 	to_object(obj, 'val', t.bool_node(it.val))
@@ -908,7 +839,7 @@ pub fn (t Tree) bool_literal(it ast.BoolLiteral) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) string_inter_literal(it ast.StringInterLiteral) &C.cJSON {
+fn (t Tree) string_inter_literal(it ast.StringInterLiteral) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('StringInterLiteral'))
 	v_arr := create_array()
@@ -935,7 +866,7 @@ pub fn (t Tree) string_inter_literal(it ast.StringInterLiteral) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) enum_val(it ast.EnumVal) &C.cJSON {
+fn (t Tree) enum_val(it ast.EnumVal) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('EnumVal'))
 	to_object(obj, 'enum_name', t.string_node(it.enum_name))
@@ -946,7 +877,7 @@ pub fn (t Tree) enum_val(it ast.EnumVal) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) assoc(it ast.Assoc) &C.cJSON {
+fn (t Tree) assoc(it ast.Assoc) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Assoc'))
 	to_object(obj, 'var_name', t.string_node(it.var_name))
@@ -965,7 +896,7 @@ pub fn (t Tree) assoc(it ast.Assoc) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) cast_expr(it ast.CastExpr) &C.cJSON {
+fn (t Tree) cast_expr(it ast.CastExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('CastExpr'))
 	to_object(obj, 'expr', t.expr(it.expr))
@@ -977,7 +908,7 @@ pub fn (t Tree) cast_expr(it ast.CastExpr) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) as_cast(it ast.AsCast) &C.cJSON {
+fn (t Tree) as_cast(it ast.AsCast) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('AsCast'))
 	to_object(obj, 'expr', t.expr(it.expr))
@@ -987,14 +918,14 @@ pub fn (t Tree) as_cast(it ast.AsCast) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) type_expr(it ast.Type) &C.cJSON {
+fn (t Tree) type_expr(it ast.Type) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Type'))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
 	return obj
 }
 
-pub fn (t Tree) size_of(it ast.SizeOf) &C.cJSON {
+fn (t Tree) size_of(it ast.SizeOf) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('SizeOf'))
 	to_object(obj, 'type_name', t.string_node(it.type_name))
@@ -1002,7 +933,7 @@ pub fn (t Tree) size_of(it ast.SizeOf) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) prefix_expr(it ast.PrefixExpr) &C.cJSON {
+fn (t Tree) prefix_expr(it ast.PrefixExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('PrefixExpr'))
 	to_object(obj, 'op', t.number_node(int(it.op)))
@@ -1010,7 +941,7 @@ pub fn (t Tree) prefix_expr(it ast.PrefixExpr) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) assign_expr(it ast.AssignExpr) &C.cJSON {
+fn (t Tree) assign_expr(it ast.AssignExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('AssignExpr'))
 	to_object(obj, 'op', t.number_node(int(it.op)))
@@ -1022,7 +953,7 @@ pub fn (t Tree) assign_expr(it ast.AssignExpr) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) infix_expr(it ast.InfixExpr) &C.cJSON {
+fn (t Tree) infix_expr(it ast.InfixExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('InfixExpr'))
 	to_object(obj, 'op', t.number_node(int(it.op)))
@@ -1034,7 +965,7 @@ pub fn (t Tree) infix_expr(it ast.InfixExpr) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) index_expr(it ast.IndexExpr) &C.cJSON {
+fn (t Tree) index_expr(it ast.IndexExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('IndexExpr'))
 	to_object(obj, 'pos', t.position(it.pos))
@@ -1045,7 +976,7 @@ pub fn (t Tree) index_expr(it ast.IndexExpr) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) postfix_expr(it ast.PostfixExpr) &C.cJSON {
+fn (t Tree) postfix_expr(it ast.PostfixExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('PostfixExpr'))
 	to_object(obj, 'op', t.number_node(int(it.op)))
@@ -1054,7 +985,7 @@ pub fn (t Tree) postfix_expr(it ast.PostfixExpr) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) selector_expr(it ast.SelectorExpr) &C.cJSON {
+fn (t Tree) selector_expr(it ast.SelectorExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('SelectorExpr'))
 	to_object(obj, 'pos', t.position(it.pos))
@@ -1063,7 +994,7 @@ pub fn (t Tree) selector_expr(it ast.SelectorExpr) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) range_expr(it ast.RangeExpr) &C.cJSON {
+fn (t Tree) range_expr(it ast.RangeExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('RangeExpr'))
 	to_object(obj, 'low', t.expr(it.low))
@@ -1071,7 +1002,7 @@ pub fn (t Tree) range_expr(it ast.RangeExpr) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) if_expr(it ast.IfExpr) &C.cJSON {
+fn (t Tree) if_expr(it ast.IfExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('IfExpr'))
 	to_object(obj, 'tok_kind', t.number_node(int(it.tok_kind)))
@@ -1088,7 +1019,7 @@ pub fn (t Tree) if_expr(it ast.IfExpr) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) if_branch(it ast.IfBranch) &C.cJSON {
+fn (t Tree) if_branch(it ast.IfBranch) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('IfBranch'))
 	to_object(obj, 'cond', t.expr(it.cond))
@@ -1102,7 +1033,7 @@ pub fn (t Tree) if_branch(it ast.IfBranch) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) ident(it ast.Ident) &C.cJSON {
+fn (t Tree) ident(it ast.Ident) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Ident'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -1116,15 +1047,14 @@ pub fn (t Tree) ident(it ast.Ident) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) ident_info(info ast.IdentInfo) &C.cJSON {
+fn (t Tree) ident_info(info ast.IdentInfo) &C.cJSON {
 	match info {
 		ast.IdentVar { return t.ident_var(it) }
 		ast.IdentFn { return t.ident_fn(it) }
-		// else { return t.string_node('IdentInfo unknown node') }
 	}
 }
 
-pub fn (t Tree) ident_var(it ast.IdentVar) &C.cJSON {
+fn (t Tree) ident_var(it ast.IdentVar) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('IdentVar'))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
@@ -1134,14 +1064,14 @@ pub fn (t Tree) ident_var(it ast.IdentVar) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) ident_fn(it ast.IdentFn) &C.cJSON {
+fn (t Tree) ident_fn(it ast.IdentFn) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('IdentFn'))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
 	return obj
 }
 
-pub fn (t Tree) call_expr(it ast.CallExpr) &C.cJSON {
+fn (t Tree) call_expr(it ast.CallExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('CallExpr'))
 	to_object(obj, 'pos', t.position(it.pos))
@@ -1167,7 +1097,7 @@ pub fn (t Tree) call_expr(it ast.CallExpr) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) call_arg(it ast.CallArg) &C.cJSON {
+fn (t Tree) call_arg(it ast.CallArg) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('CallArg'))
 	to_object(obj, 'is_mut', t.bool_node(it.is_mut))
@@ -1176,7 +1106,7 @@ pub fn (t Tree) call_arg(it ast.CallArg) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) or_expr(it ast.OrExpr) &C.cJSON {
+fn (t Tree) or_expr(it ast.OrExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('OrExpr'))
 	stmt_arr := create_array()
@@ -1188,7 +1118,7 @@ pub fn (t Tree) or_expr(it ast.OrExpr) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) struct_init(it ast.StructInit) &C.cJSON {
+fn (t Tree) struct_init(it ast.StructInit) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('StructInit'))
 	to_object(obj, 'pos', t.position(it.pos))
@@ -1202,7 +1132,7 @@ pub fn (t Tree) struct_init(it ast.StructInit) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) struct_init_field(it ast.StructInitField) &C.cJSON {
+fn (t Tree) struct_init_field(it ast.StructInitField) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('StructInitField'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -1213,7 +1143,7 @@ pub fn (t Tree) struct_init_field(it ast.StructInitField) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) array_init(it ast.ArrayInit) &C.cJSON {
+fn (t Tree) array_init(it ast.ArrayInit) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ArrayInit'))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
@@ -1233,7 +1163,7 @@ pub fn (t Tree) array_init(it ast.ArrayInit) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) map_init(it ast.MapInit) &C.cJSON {
+fn (t Tree) map_init(it ast.MapInit) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('MapInit'))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
@@ -1251,7 +1181,7 @@ pub fn (t Tree) map_init(it ast.MapInit) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) none_expr(it ast.None) &C.cJSON {
+fn (t Tree) none_expr(it ast.None) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('None'))
 	// todo
@@ -1259,14 +1189,14 @@ pub fn (t Tree) none_expr(it ast.None) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) par_expr(it ast.ParExpr) &C.cJSON {
+fn (t Tree) par_expr(it ast.ParExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ParExpr'))
 	to_object(obj, 'expr', t.expr(it.expr))
 	return obj
 }
 
-pub fn (t Tree) if_guard_expr(it ast.IfGuardExpr) &C.cJSON {
+fn (t Tree) if_guard_expr(it ast.IfGuardExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('IfGuardExpr'))
 	to_object(obj, 'var_name', t.string_node(it.var_name))
@@ -1274,7 +1204,7 @@ pub fn (t Tree) if_guard_expr(it ast.IfGuardExpr) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) match_expr(it ast.MatchExpr) &C.cJSON {
+fn (t Tree) match_expr(it ast.MatchExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('MatchExpr'))
 	to_object(obj, 'tok_kind', t.number_node(int(it.tok_kind)))
@@ -1293,7 +1223,7 @@ pub fn (t Tree) match_expr(it ast.MatchExpr) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) match_branch(it ast.MatchBranch) &C.cJSON {
+fn (t Tree) match_branch(it ast.MatchBranch) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('MatchBranch'))
 	expr_arr := create_array()
@@ -1312,7 +1242,7 @@ pub fn (t Tree) match_branch(it ast.MatchBranch) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) concat_expr(it ast.ConcatExpr) &C.cJSON {
+fn (t Tree) concat_expr(it ast.ConcatExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ConcatExpr'))
 	expr_arr := create_array()
@@ -1323,7 +1253,7 @@ pub fn (t Tree) concat_expr(it ast.ConcatExpr) &C.cJSON {
 	return obj
 }
 
-pub fn (t Tree) type_of(it ast.TypeOf) &C.cJSON {
+fn (t Tree) type_of(it ast.TypeOf) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('TypeOf'))
 	to_object(obj, 'expr', t.expr(it.expr))
@@ -1332,17 +1262,17 @@ pub fn (t Tree) type_of(it ast.TypeOf) &C.cJSON {
 }
 
 [inline]
-pub fn to_object(node &C.cJSON, key string, child &C.cJSON) {
+fn to_object(node &C.cJSON, key string, child &C.cJSON) {
 	add_item_to_object(node, key, child)
 }
 
 [inline]
-pub fn to_array(node, child &C.cJSON) {
+fn to_array(node, child &C.cJSON) {
 	add_item_to_array(node, child)
 }
 
 // get absolute path for file
-pub fn abs_path(path string) string {
+fn abs_path(path string) string {
 	if os.is_abs_path(path) {
 		return path
 	} else if path.starts_with(os.path_separator) {
