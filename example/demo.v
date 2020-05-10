@@ -1,7 +1,6 @@
 // comment for module
 module main
 
-// comment for import
 import os
 import strings
 import time

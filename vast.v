@@ -276,6 +276,7 @@ fn (t Tree) fn_decl(it ast.FnDecl) &C.cJSON {
 	to_object(obj, 'is_variadic', t.bool_node(it.is_variadic))
 	to_object(obj, 'is_anon', t.bool_node(it.is_anon))
 	to_object(obj, 'receiver', t.field(it.receiver))
+	to_object(obj, 'receiver_pos', t.position(it.receiver_pos))
 	to_object(obj, 'is_method', t.bool_node(it.is_method))
 	to_object(obj, 'rec_mut', t.bool_node(it.rec_mut))
 	to_object(obj, 'is_c', t.bool_node(it.is_c))
@@ -283,6 +284,8 @@ fn (t Tree) fn_decl(it ast.FnDecl) &C.cJSON {
 	to_object(obj, 'no_body', t.bool_node(it.no_body))
 	to_object(obj, 'is_builtin', t.bool_node(it.is_builtin))
 	to_object(obj, 'pos', t.position(it.pos))
+	to_object(obj, 'body_pos', t.position(it.body_pos))
+	to_object(obj,'file',t.string_node(it.file))
 	arg_arr := create_array()
 	for a in it.args {
 		to_array(arg_arr, t.arg(a))
@@ -315,6 +318,7 @@ fn (t Tree) struct_decl(it ast.StructDecl) &C.cJSON {
 	to_object(obj, 'pub_mut_pos', t.number_node(it.pub_mut_pos))
 	to_object(obj, 'is_c', t.bool_node(it.is_c))
 	to_object(obj, 'is_union', t.bool_node(it.is_union))
+	to_object(obj,'attr',t.string_node(it.attr))
 	f_arr := create_array()
 	for f in it.fields {
 		to_array(f_arr, t.struct_field(f))
@@ -361,6 +365,7 @@ fn (t Tree) interface_decl(it ast.InterfaceDecl) &C.cJSON {
 		to_array(m_arr, t.fn_decl(m))
 	}
 	to_object(obj, 'methods', m_arr)
+	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
@@ -471,8 +476,14 @@ fn (t Tree) struct_field(it ast.StructField) &C.cJSON {
 	to_object(obj, 'comment', t.comment(it.comment))
 	to_object(obj, 'default_expr', t.expr(it.default_expr))
 	to_object(obj, 'has_default_expr', t.bool_node(it.has_default_expr))
+	arr:=create_array()
+	for a in it.attrs {
+		to_array(arr,t.string_node(a))
+	}
+	to_object(obj, 'attrs',arr)
+
+	to_object(obj,'is_public',t.bool_node(it.is_public))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
-	to_object(obj, 'attr', t.string_node(it.attr))
 	return obj
 }
 
@@ -549,8 +560,10 @@ fn (t Tree) var_decl(it ast.Var) &C.cJSON {
 	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'expr', t.expr(it.expr))
 	to_object(obj, 'is_mut', t.bool_node(it.is_mut))
+	to_object(obj, 'is_arg', t.bool_node(it.is_arg))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
 	to_object(obj, 'pos', t.position(it.pos))
+	to_object(obj, 'is_used', t.bool_node(it.is_used))
 	return obj
 }
 
@@ -902,9 +915,10 @@ fn (t Tree) cast_expr(it ast.CastExpr) &C.cJSON {
 	to_object(obj, 'expr', t.expr(it.expr))
 	to_object(obj, 'arg', t.expr(it.arg))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
+	to_object(obj, 'pos', t.position(it.pos))
+	to_object(obj, 'typname', t.string_node(it.typname))
 	to_object(obj, 'expr_type', t.number_node(int(it.expr_type)))
 	to_object(obj, 'has_arg', t.bool_node(it.has_arg))
-	to_object(obj, 'typname', t.string_node(it.typname))
 	return obj
 }
 
@@ -990,7 +1004,8 @@ fn (t Tree) selector_expr(it ast.SelectorExpr) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('SelectorExpr'))
 	to_object(obj, 'pos', t.position(it.pos))
 	to_object(obj, 'expr', t.expr(it.expr))
-	to_object(obj, 'field', t.string_node(it.field))
+	to_object(obj, 'field_name', t.string_node(it.field_name))
+	to_object(obj,'expr_type', t.number_node(int(it.expr_type)))
 	return obj
 }
 
