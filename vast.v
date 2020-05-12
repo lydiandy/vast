@@ -12,11 +12,12 @@ const (
 )
 
 fn main() {
-	if os.args.len != 2 {
-		println('unknown args,Usage:vast demo.v')
-		return
-	}
-	file := os.args[1]
+	// if os.args.len != 2 {
+	// 	println('unknown args,Usage:vast demo.v')
+	// 	return
+	// }
+	// file := os.args[1]
+	file:='./example/demo.v'
 	if os.file_ext(file) != '.v' {
 		println('the file must be v file')
 		return
@@ -125,22 +126,21 @@ fn (t Tree) imports(imports []ast.Import) &C.cJSON {
 
 fn (t Tree) scope(scope ast.Scope) &C.cJSON {
 	obj := create_object()
-	to_object(obj, 'ast_type', t.string_node('Scope'))
-	to_object(obj, 'parent', t.string_node(ptr_str(scope.parent)))
-	children_arr := create_array()
+	// to_object(obj, 'ast_type', t.string_node('Scope'))
+	// // to_object(obj, 'parent', t.string_node(ptr_str(scope.parent)))
+	// children_arr := create_array()
 	// mut children_obj := create_object()
 	// for s in scope.children {
-	// println('$s')
-	// to_object(children_obj, 'parent', t.string_node(ptr_str(s.parent)))
-	// to_object(children_obj, 'start_pos', t.number_node(s.start_pos))
-	// to_object(children_obj, 'end_pos', t.number_node(s.end_pos))
-	// to_array(children_arr, children_obj)
-	// children_obj=create_object()
+	// 	// to_object(children_obj, 'parent', t.string_node(ptr_str(s.parent)))
+	// 	to_object(children_obj, 'start_pos', t.number_node(s.start_pos))
+	// 	to_object(children_obj, 'end_pos', t.number_node(s.end_pos))
+	// 	to_array(children_arr, children_obj)
+	// 	children_obj=create_object()
 	// }
-	to_object(obj, 'children', children_arr)
-	to_object(obj, 'start_pos', t.number_node(scope.start_pos))
-	to_object(obj, 'end_pos', t.number_node(scope.end_pos))
-	to_object(obj, 'objects', t.objects(scope.objects))
+	// // to_object(obj, 'children', children_arr)
+	// to_object(obj, 'start_pos', t.number_node(scope.start_pos))
+	// to_object(obj, 'end_pos', t.number_node(scope.end_pos))
+	// to_object(obj, 'objects', t.objects(scope.objects))
 	return obj
 }
 
@@ -157,12 +157,12 @@ fn (t Tree) scope_object(node ast.ScopeObject) &C.cJSON {
 	match node {
 		ast.ConstField { t.const_field(it) }
 		ast.GlobalDecl { t.global_decl(it) }
-		ast.Var { t.var_(it) }
+		ast.Var { t.var(it) }
 	}
 	return obj
 }
 
-fn (t Tree) var_(it ast.Var) &C.cJSON {
+fn (t Tree) var(it ast.Var) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Var'))
 	to_object(obj, 'name', t.string_node(it.name))
@@ -263,6 +263,7 @@ fn (t Tree) const_field(it ast.ConstField) &C.cJSON {
 	to_object(obj, 'is_pub', t.bool_node(it.is_pub))
 	to_object(obj, 'pos', t.position(it.pos))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
+	to_object(obj,'comment',t.comment(it.comment))
 	return obj
 }
 
@@ -583,18 +584,18 @@ fn (t Tree) return_(it ast.Return) &C.cJSON {
 	return obj
 }
 
-fn (t Tree) return_stmt(it ast.ReturnStmt) &C.cJSON {
-	obj := create_object()
-	to_object(obj, 'ast_type', t.string_node('ReturnStmt'))
-	to_object(obj, 'tok_kind', t.number_node(int(it.tok_kind)))
-	to_object(obj, 'pos', t.position(it.pos))
-	e_arr := create_array()
-	for e in it.results {
-		to_array(e_arr, t.expr(e))
-	}
-	to_object(obj, 'results', e_arr)
-	return obj
-}
+// fn (t Tree) return_stmt(it ast.ReturnStmt) &C.cJSON {
+// 	obj := create_object()
+// 	to_object(obj, 'ast_type', t.string_node('ReturnStmt'))
+// 	to_object(obj, 'tok_kind', t.number_node(int(it.tok_kind)))
+// 	to_object(obj, 'pos', t.position(it.pos))
+// 	e_arr := create_array()
+// 	for e in it.results {
+// 		to_array(e_arr, t.expr(e))
+// 	}
+// 	to_object(obj, 'results', e_arr)
+// 	return obj
+// }
 
 fn (t Tree) for_c_stmt(it ast.ForCStmt) &C.cJSON {
 	obj := create_object()
