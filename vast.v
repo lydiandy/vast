@@ -1170,11 +1170,22 @@ fn (t Tree) array_init(it ast.ArrayInit) &C.cJSON {
 	to_object(obj, 'exprs', expr_arr)
 	to_object(obj, 'pos', t.position(it.pos))
 	to_object(obj, 'is_fixed', t.bool_node(it.is_fixed))
+	to_object(obj, 'has_val', t.bool_node(it.has_val))
 	to_object(obj, 'mod', t.string_node(it.mod))
 	to_object(obj, 'len_expr', t.expr(it.len_expr))
 	to_object(obj, 'cap_expr', t.expr(it.cap_expr))
+	to_object(obj, 'default_expr', t.expr(it.default_expr))
 	to_object(obj, 'has_len', t.bool_node(it.has_len))
 	to_object(obj, 'has_cap', t.bool_node(it.has_cap))
+	to_object(obj, 'has_default', t.bool_node(it.has_default))
+
+	to_object(obj, 'is_interface', t.bool_node(it.is_interface))
+	to_object(obj, 'interface_type', t.number_node(int(it.interface_type)))
+	i_arr:=create_array()
+	for i in it.interface_types {
+		to_array(i_arr,t.number_node(int(i)))
+	}
+	to_object(obj,'interface_types',i_arr)
 	return obj
 }
 
