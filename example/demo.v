@@ -2,8 +2,7 @@
 module main
 
 import os
-import strings
-import time
+import math
 
 pub const (
 	a = 1
@@ -27,12 +26,11 @@ pub enum Color {
 	blue
 }
 
-type Myint = int
+type Myint int
 
-type MySumType = int | string | bool
+type MySumType = bool | int | string
 
-type Myfn = fn(int) int
-
+type Myfn = fn (arg_1 int) int
 
 // pub interface Myinterfacer {
 // add(int,int) int
@@ -50,6 +48,9 @@ fn main() {
 	}
 	color := Color.red
 	println(color)
+	println(os.args)
+	m := math.max(1, 3)
+	println(m)
 }
 
 // add function

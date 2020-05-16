@@ -109,6 +109,7 @@ fn (t Tree) mod(mod ast.Module) &C.cJSON {
 	to_object(obj, 'path', t.string_node(mod.path))
 	to_object(obj, 'expr', t.expr(mod.expr))
 	to_object(obj, 'is_skipped', t.bool_node(mod.is_skipped))
+	to_object(obj, 'pos', t.position(mod.pos))
 	return obj
 }
 
@@ -412,6 +413,7 @@ fn (t Tree) global_decl(it ast.GlobalDecl) &C.cJSON {
 	to_object(obj, 'expr', t.expr(it.expr))
 	to_object(obj, 'typ', t.number_node(int(it.typ)))
 	to_object(obj, 'has_expr', t.bool_node(it.has_expr))
+	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
 
@@ -1276,6 +1278,7 @@ fn (t Tree) concat_expr(it ast.ConcatExpr) &C.cJSON {
 		to_array(expr_arr, t.expr(e))
 	}
 	to_object(obj, 'vals', expr_arr)
+	to_object(obj, 'return_type', t.number_node(int(it.return_type)))
 	return obj
 }
 
