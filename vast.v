@@ -334,6 +334,7 @@ fn (t Tree) enum_decl(it ast.EnumDecl) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('EnumDecl'))
 	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'is_pub', t.bool_node(it.is_pub))
+	to_object(obj, 'is_flag', t.bool_node(it.is_flag))
 	to_object(obj, 'pos', t.position(it.pos))
 	f_arr := create_array()
 	for f in it.fields {
@@ -553,6 +554,7 @@ fn (t Tree) assign_stmt(it ast.AssignStmt) &C.cJSON {
 		to_array(rt_arr, t.number_node(int(s)))
 	}
 	to_object(obj, 'right_types', rt_arr)
+	to_object(obj, 'has_cross_var', t.bool_node(it.has_cross_var))
 	return obj
 }
 
