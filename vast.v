@@ -1180,6 +1180,7 @@ fn (t Tree) array_init(it ast.ArrayInit) &C.cJSON {
 	}
 	to_object(obj, 'exprs', expr_arr)
 	to_object(obj, 'pos', t.position(it.pos))
+	to_object(obj, 'elem_type_pos', t.position(it.elem_type_pos))
 	to_object(obj, 'is_fixed', t.bool_node(it.is_fixed))
 	to_object(obj, 'has_val', t.bool_node(it.has_val))
 	to_object(obj, 'mod', t.string_node(it.mod))
