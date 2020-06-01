@@ -1313,7 +1313,7 @@ fn to_array(node, child &C.cJSON) {
 fn abs_path(path string) string {
 	if os.is_abs_path(path) {
 		return path
-	} else if path.starts_with(os.path_separator) {
+	} else if path.starts_with('./') {
 		return os.join_path(os.getwd(), path[2..])
 	} else {
 		return os.join_path(os.getwd(), path)
