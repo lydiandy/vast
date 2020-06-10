@@ -46,7 +46,7 @@ v .
 
 ## todo
 
-- make type from id to name
+- make type from id to name (done)
 - make enum from id to name
 
 ## License
