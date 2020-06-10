@@ -452,7 +452,7 @@ fn (t Tree) sum_type_decl(it ast.SumTypeDecl) &C.cJSON {
 	to_object(obj, 'is_pub', t.bool_node(it.is_pub))
 	t_arr := create_array()
 	for s in it.sub_types {
-		to_array(t_arr, t.number_node(int(s)))
+		to_array(t_arr, t.type_node(s))
 	}
 	to_object(obj, 'sub_types', t_arr)
 	to_object(obj, 'pos', t.position(it.pos))
@@ -983,7 +983,7 @@ fn (t Tree) index_expr(it ast.IndexExpr) &C.cJSON {
 	to_object(obj, 'pos', t.position(it.pos))
 	to_object(obj, 'left', t.expr(it.left))
 	to_object(obj, 'index', t.expr(it.index))
-	to_object(obj, 'left_type', t.number_node(int(it.left_type)))
+	to_object(obj, 'left_type', t.type_node(it.left_type))
 	to_object(obj, 'is_setter', t.bool_node(it.is_setter))
 	return obj
 }
@@ -1100,7 +1100,7 @@ fn (t Tree) call_expr(it ast.CallExpr) &C.cJSON {
 	to_object(obj, 'args', arg_arr)
 	t_arr := create_array()
 	for e in it.expected_arg_types {
-		to_array(t_arr, t.number_node(int(e)))
+		to_array(t_arr, t.type_node(e))
 	}
 	to_object(obj, 'expected_arg_types', t_arr)
 	to_object(obj, 'or_block', t.or_expr(it.or_block))
@@ -1183,7 +1183,7 @@ fn (t Tree) array_init(it ast.ArrayInit) &C.cJSON {
 	to_object(obj, 'interface_type', t.type_node(it.interface_type))
 	i_arr := create_array()
 	for i in it.interface_types {
-		to_array(i_arr, t.number_node(int(i)))
+		to_array(i_arr, t.type_node(i))
 	}
 	to_object(obj, 'interface_types', i_arr)
 	return obj
