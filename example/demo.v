@@ -4,13 +4,13 @@ module main
 import os
 import math
 
-pub const (
+const (
 	a = 1
 	b = 3
 	c = 'c'
 )
 
-pub struct Point {
+struct Point {
 	x int
 mut:
 	y string
@@ -20,7 +20,7 @@ pub mut:
 	a string
 }
 
-pub enum Color {
+enum Color {
 	red
 	green
 	blue
@@ -32,10 +32,11 @@ type MySumType = bool | int | string
 
 type Myfn = fn (arg_1 int) int
 
-// pub interface Myinterfacer {
-// add(int,int) int
-// sub(int,int) int
-// }
+interface Myinterfacer {
+add(int,int) int
+sub(int,int) int
+}
+
 // main funciton
 fn main() {
 	add(1, 3)

@@ -48,14 +48,14 @@ fn json_file(file string) {
 fn json(file string) string {
 	t := Tree{
 		root: create_object()
-		table: &table.Table{}
+		table: table.new_table()
 		pref: &pref.Preferences{}
 		global_scope: &ast.Scope{
 			start_pos: 0
 			parent: 0
 		}
 	}
-	ast_file := parser.parse_file(file, t.table, .parse_comments, t.pref, t.global_scope)
+	ast_file := parser.parse_file(file, t.table, .skip_comments, t.pref, t.global_scope)
 	to_object(t.root, 'ast_type', t.string_node('ast.File'))
 	to_object(t.root, 'path', t.string_node(ast_file.path))
 	to_object(t.root, 'mod', t.mod(ast_file.mod))
@@ -129,15 +129,15 @@ fn (t Tree) scope(scope ast.Scope) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Scope'))
 	to_object(obj, 'parent', t.string_node(ptr_str(scope.parent)))
-	// children_arr := create_array()
-	// for s in scope.children {
-	// mut children_obj := create_object()
-	// to_object(children_obj, 'parent', t.string_node(ptr_str(s.parent)))
-	// to_object(children_obj, 'start_pos', t.number_node(s.start_pos))
-	// to_object(children_obj, 'end_pos', t.number_node(s.end_pos))
-	// to_array(children_arr, children_obj)
-	// }
-	// to_object(obj, 'children', children_arr)
+	children_arr := create_array()
+	for s in scope.children {
+		mut children_obj := create_object()
+		to_object(children_obj, 'parent', t.string_node(ptr_str(s.parent)))
+		to_object(children_obj, 'start_pos', t.number_node(s.start_pos))
+		to_object(children_obj, 'end_pos', t.number_node(s.end_pos))
+		to_array(children_arr, children_obj)
+	}
+	to_object(obj, 'children', children_arr)
 	to_object(obj, 'start_pos', t.number_node(scope.start_pos))
 	to_object(obj, 'end_pos', t.number_node(scope.end_pos))
 	to_object(obj, 'objects', t.objects(scope.objects))
@@ -212,7 +212,7 @@ fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		ast.ExprStmt { return t.expr_stmt(it) }
 		ast.GoStmt { return t.go_stmt(it) }
 		ast.Block { return t.block(it) }
-		ast.ComptimeCall {return t.comptime_call(it)}
+		ast.ComptimeCall { return t.comptime_call(it) }
 	}
 }
 
@@ -281,7 +281,7 @@ fn (t Tree) fn_decl(it ast.FnDecl) &C.cJSON {
 	to_object(obj, 'receiver_pos', t.position(it.receiver_pos))
 	to_object(obj, 'is_method', t.bool_node(it.is_method))
 	to_object(obj, 'rec_mut', t.bool_node(it.rec_mut))
-	to_object(obj,'language',t.number_node(int(it.language)))
+	to_object(obj, 'language', t.number_node(int(it.language)))
 	to_object(obj, 'no_body', t.bool_node(it.no_body))
 	to_object(obj, 'is_builtin', t.bool_node(it.is_builtin))
 	to_object(obj, 'is_generic', t.bool_node(it.is_generic))
@@ -318,7 +318,7 @@ fn (t Tree) struct_decl(it ast.StructDecl) &C.cJSON {
 	to_object(obj, 'mut_pos', t.number_node(it.mut_pos))
 	to_object(obj, 'pub_pos', t.number_node(it.pub_pos))
 	to_object(obj, 'pub_mut_pos', t.number_node(it.pub_mut_pos))
-	to_object(obj,'language',t.number_node(int(it.language)))
+	to_object(obj, 'language', t.number_node(int(it.language)))
 	to_object(obj, 'is_union', t.bool_node(it.is_union))
 	to_object(obj, 'attr', t.string_node(it.attr))
 	f_arr := create_array()
@@ -696,10 +696,12 @@ fn (t Tree) block(it ast.Block) &C.cJSON {
 	to_object(obj, 'stmts', stmt_arr)
 	return obj
 }
-fn (t Tree)comptime_call(it ast.ComptimeCall) &C.cJSON {
-	obj:=create_object()
-	// to_object(obj,'name',t.string_node(it.name))
 
+fn (t Tree) comptime_call(it ast.ComptimeCall) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('ComptimeCall'))
+	to_object(obj, 'method_name', t.string_node(it.method_name))
+	to_object(obj, 'left', t.expr(it.left))
 	return obj
 }
 
@@ -711,7 +713,6 @@ fn (t Tree) expr_stmt(it ast.ExprStmt) &C.cJSON {
 	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
-
 
 // expr
 fn (t Tree) expr(e ast.Expr) &C.cJSON {
@@ -812,6 +813,9 @@ fn (t Tree) expr(e ast.Expr) &C.cJSON {
 		ast.TypeOf {
 			return t.type_of(it)
 		}
+		ast.Likely {
+			return t.likely(it)
+		}
 		else {
 			// println('unknown expr')
 			return t.null_node()
@@ -840,7 +844,7 @@ fn (t Tree) string_literal(it ast.StringLiteral) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('StringLiteral'))
 	to_object(obj, 'val', t.string_node(it.val))
 	to_object(obj, 'is_raw', t.bool_node(it.is_raw))
-	to_object(obj,'language',t.number_node(int(it.language)))
+	to_object(obj, 'language', t.number_node(int(it.language)))
 	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
@@ -1062,7 +1066,7 @@ fn (t Tree) ident(it ast.Ident) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('Ident'))
 	to_object(obj, 'name', t.string_node(it.name))
 	to_object(obj, 'value', t.string_node(it.value))
-	to_object(obj,'language',t.number_node(int(it.language)))
+	to_object(obj, 'language', t.number_node(int(it.language)))
 	to_object(obj, 'is_mut', t.bool_node(it.is_mut))
 	to_object(obj, 'tok_kind', t.number_node(int(it.tok_kind)))
 	to_object(obj, 'pos', t.position(it.pos))
@@ -1103,7 +1107,7 @@ fn (t Tree) call_expr(it ast.CallExpr) &C.cJSON {
 	to_object(obj, 'is_method', t.bool_node(it.is_method))
 	to_object(obj, 'mod', t.string_node(it.mod))
 	to_object(obj, 'name', t.string_node(it.name))
-	to_object(obj,'language',t.number_node(int(it.language)))
+	to_object(obj, 'language', t.number_node(int(it.language)))
 	arg_arr := create_array()
 	for e in it.args {
 		to_array(arg_arr, t.call_arg(e))
@@ -1139,7 +1143,7 @@ fn (t Tree) or_expr(it ast.OrExpr) &C.cJSON {
 		to_array(stmt_arr, t.stmt(s))
 	}
 	to_object(obj, 'stmts', stmt_arr)
-	to_object(obj,'kind',t.number_node(int(it.kind)))
+	to_object(obj, 'kind', t.number_node(int(it.kind)))
 	to_object(obj, 'pos', t.position(it.pos))
 	return obj
 }
@@ -1296,6 +1300,15 @@ fn (t Tree) type_of(it ast.TypeOf) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('TypeOf'))
 	to_object(obj, 'expr', t.expr(it.expr))
 	to_object(obj, 'expr_type', t.number_node(int(it.expr_type)))
+	return obj
+}
+
+fn (t Tree) likely(it ast.Likely) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('Likely'))
+	to_object(obj, 'expr', t.expr(it.expr))
+	to_object(obj, 'pos', t.position(it.pos))
+	to_object(obj, 'is_likely', t.bool_node(it.is_likely))
 	return obj
 }
 
