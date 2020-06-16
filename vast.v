@@ -317,7 +317,11 @@ fn (t Tree) struct_decl(it ast.StructDecl) &C.cJSON {
 	to_object(obj, 'pub_mut_pos', t.number_node(it.pub_mut_pos))
 	to_object(obj, 'language', t.number_node(int(it.language)))
 	to_object(obj, 'is_union', t.bool_node(it.is_union))
-	to_object(obj, 'attr', t.string_node(it.attr))
+	a_arr := create_array()
+	for a in it.attrs {
+		to_array(a_arr, t.string_node(a))
+	}
+	to_object(obj, 'attrs', a_arr)
 	f_arr := create_array()
 	for f in it.fields {
 		to_array(f_arr, t.struct_field(f))
@@ -531,7 +535,7 @@ fn (t Tree) assign_stmt(it ast.AssignStmt) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('AssignStmt'))
 	i_arr := create_array()
 	for i in it.left {
-		to_array(i_arr, t.ident(i))
+		to_array(i_arr, t.expr(i))
 	}
 	to_object(obj, 'left', i_arr)
 	e_arr := create_array()
@@ -551,6 +555,7 @@ fn (t Tree) assign_stmt(it ast.AssignStmt) &C.cJSON {
 		to_array(rt_arr, t.type_node(s))
 	}
 	to_object(obj, 'right_types', rt_arr)
+	to_object(obj, 'is_simple', t.bool_node(it.is_simple))
 	to_object(obj, 'has_cross_var', t.bool_node(it.has_cross_var))
 	return obj
 }
@@ -592,7 +597,7 @@ fn (t Tree) for_c_stmt(it ast.ForCStmt) &C.cJSON {
 	to_object(obj, 'has_init', t.bool_node(it.has_init))
 	to_object(obj, 'cond', t.expr(it.cond))
 	to_object(obj, 'has_cond', t.bool_node(it.has_cond))
-	to_object(obj, 'inc', t.expr(it.inc))
+	to_object(obj, 'inc', t.stmt(it.inc))
 	to_object(obj, 'has_inc', t.bool_node(it.has_inc))
 	stmt_arr := create_array()
 	for s in it.stmts {
@@ -694,6 +699,7 @@ fn (t Tree) expr_stmt(it ast.ExprStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ExprStmt'))
 	to_object(obj, 'typ', t.type_node(it.typ))
+	to_object(obj, 'is_expr', t.bool_node(it.is_expr))
 	to_object(obj, 'expr', t.expr(it.expr))
 	to_object(obj, 'pos', t.position(it.pos))
 	return obj
@@ -740,9 +746,6 @@ fn (t Tree) expr(e ast.Expr) &C.cJSON {
 		}
 		ast.PrefixExpr {
 			return t.prefix_expr(it)
-		}
-		ast.AssignExpr {
-			return t.assign_expr(it)
 		}
 		ast.InfixExpr {
 			return t.infix_expr(it)
@@ -801,6 +804,9 @@ fn (t Tree) expr(e ast.Expr) &C.cJSON {
 		ast.Likely {
 			return t.likely(it)
 		}
+		ast.SqlExpr {
+			return t.sql_expr(it)
+		}
 		else {
 			// println('unknown expr')
 			return t.null_node()
@@ -858,11 +864,6 @@ fn (t Tree) string_inter_literal(it ast.StringInterLiteral) &C.cJSON {
 		to_array(v_arr, t.string_node(v))
 	}
 	to_object(obj, 'vals', v_arr)
-	s_arr := create_array()
-	for s in it.expr_fmts {
-		to_array(s_arr, t.string_node(s))
-	}
-	to_object(obj, 'expr_fmts', s_arr)
 	e_arr := create_array()
 	for e in it.exprs {
 		to_array(e_arr, t.expr(e))
@@ -953,18 +954,17 @@ fn (t Tree) prefix_expr(it ast.PrefixExpr) &C.cJSON {
 	return obj
 }
 
-fn (t Tree) assign_expr(it ast.AssignExpr) &C.cJSON {
-	obj := create_object()
-	to_object(obj, 'ast_type', t.string_node('AssignExpr'))
-	to_object(obj, 'op', t.number_node(int(it.op)))
-	to_object(obj, 'pos', t.position(it.pos))
-	to_object(obj, 'left', t.expr(it.left))
-	to_object(obj, 'val', t.expr(it.val))
-	to_object(obj, 'left_type', t.type_node(it.left_type))
-	to_object(obj, 'right_type', t.type_node(it.right_type))
-	return obj
-}
-
+// fn (t Tree) assign_expr(it ast.AssignExpr) &C.cJSON {
+// obj := create_object()
+// to_object(obj, 'ast_type', t.string_node('AssignExpr'))
+// to_object(obj, 'op', t.number_node(int(it.op)))
+// to_object(obj, 'pos', t.position(it.pos))
+// to_object(obj, 'left', t.expr(it.left))
+// to_object(obj, 'val', t.expr(it.val))
+// to_object(obj, 'left_type', t.type_node(it.left_type))
+// to_object(obj, 'right_type', t.type_node(it.right_type))
+// return obj
+// }
 fn (t Tree) infix_expr(it ast.InfixExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('InfixExpr'))
@@ -1210,7 +1210,7 @@ fn (t Tree) map_init(it ast.MapInit) &C.cJSON {
 fn (t Tree) none_expr(it ast.None) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('None'))
-	// todo
+	to_object(obj, 'pos', t.position(it.pos))
 	to_object(obj, 'foo', t.number_node(it.foo))
 	return obj
 }
@@ -1294,6 +1294,12 @@ fn (t Tree) likely(it ast.Likely) &C.cJSON {
 	to_object(obj, 'expr', t.expr(it.expr))
 	to_object(obj, 'pos', t.position(it.pos))
 	to_object(obj, 'is_likely', t.bool_node(it.is_likely))
+	return obj
+}
+
+fn (t Tree) sql_expr(it ast.SqlExpr) &C.cJSON {
+	obj := create_object()
+	// to_object(obj, 'type', t.type_node(it.typ))
 	return obj
 }
 
