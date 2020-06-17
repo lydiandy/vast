@@ -1299,7 +1299,12 @@ fn (t Tree) likely(it ast.Likely) &C.cJSON {
 
 fn (t Tree) sql_expr(it ast.SqlExpr) &C.cJSON {
 	obj := create_object()
-	// to_object(obj, 'type', t.type_node(it.typ))
+	to_object(obj, 'type', t.type_node(it.typ))
+	to_object(obj, 'is_count', t.bool_node(it.is_count))
+	to_object(obj, 'db_var_name', t.string_node(it.db_var_name))
+	to_object(obj, 'table_name', t.string_node(it.table_name))
+	to_object(obj, 'where_expr', t.expr(it.where_expr))
+	to_object(obj, 'has_where', t.bool_node(it.has_where))
 	return obj
 }
 
