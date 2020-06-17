@@ -1305,6 +1305,29 @@ fn (t Tree) sql_expr(it ast.SqlExpr) &C.cJSON {
 	to_object(obj, 'table_name', t.string_node(it.table_name))
 	to_object(obj, 'where_expr', t.expr(it.where_expr))
 	to_object(obj, 'has_where', t.bool_node(it.has_where))
+	field_arr := create_array()
+	for f in it.fields {
+		to_array(field_arr, t.table_field(f))
+	}
+	to_object(obj, 'fields', field_arr)
+	return obj
+}
+
+fn (t Tree) table_field(it table.Field) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('TableField'))
+	to_object(obj, 'name', t.string_node(it.name))
+	to_object(obj, 'default_expr', t.expr(ast.fe2ex(it.default_expr)))
+	to_object(obj, 'has_default_expr', t.bool_node(it.has_default_expr))
+	arr := create_array()
+	for a in it.attrs {
+		to_array(arr, t.string_node(a))
+	}
+	to_object(obj, 'attrs', arr)
+	to_object(obj, 'is_pub', t.bool_node(it.is_pub))
+	to_object(obj, 'is_mut', t.bool_node(it.is_mut))
+	to_object(obj, 'is_global', t.bool_node(it.is_global))
+	to_object(obj, 'typ', t.type_node(it.typ))
 	return obj
 }
 
