@@ -1305,6 +1305,7 @@ fn (t Tree) sql_expr(it ast.SqlExpr) &C.cJSON {
 	to_object(obj, 'table_name', t.string_node(it.table_name))
 	to_object(obj, 'where_expr', t.expr(it.where_expr))
 	to_object(obj, 'has_where', t.bool_node(it.has_where))
+	to_object(obj, 'is_array', t.bool_node(it.is_array))
 	field_arr := create_array()
 	for f in it.fields {
 		to_array(field_arr, t.table_field(f))

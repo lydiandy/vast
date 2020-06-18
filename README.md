@@ -40,6 +40,16 @@ v .
 
 ![](example/json.png)
 
+or you can parse the vlib/builtin/array.v
+
+```shell
+vast your/v/dir/vlib/builtin/array.v 
+```
+
+it will generate array.json file, ~22000 lines json code.
+
+![](example/array.png)
+
 ## AST struct diagram
 
 ![](./ast_struct_diagram.jpg)
