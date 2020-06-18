@@ -954,17 +954,6 @@ fn (t Tree) prefix_expr(it ast.PrefixExpr) &C.cJSON {
 	return obj
 }
 
-// fn (t Tree) assign_expr(it ast.AssignExpr) &C.cJSON {
-// obj := create_object()
-// to_object(obj, 'ast_type', t.string_node('AssignExpr'))
-// to_object(obj, 'op', t.number_node(int(it.op)))
-// to_object(obj, 'pos', t.position(it.pos))
-// to_object(obj, 'left', t.expr(it.left))
-// to_object(obj, 'val', t.expr(it.val))
-// to_object(obj, 'left_type', t.type_node(it.left_type))
-// to_object(obj, 'right_type', t.type_node(it.right_type))
-// return obj
-// }
 fn (t Tree) infix_expr(it ast.InfixExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('InfixExpr'))
