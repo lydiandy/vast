@@ -105,7 +105,7 @@ fn (t Tree) type_node(typ table.Type) &C.cJSON {
 
 // todo:enum type node
 fn (t Tree) enum_node(e int) &C.cJSON {
-	return string_node('enum test')
+	return t.string_node('enum test')
 }
 
 // ast.File node
@@ -288,6 +288,7 @@ fn (t Tree) fn_decl(node ast.FnDecl) &C.cJSON {
 	to_object(obj, 'receiver_pos', t.position(node.receiver_pos))
 	to_object(obj, 'is_method', t.bool_node(node.is_method))
 	to_object(obj, 'rec_mut', t.bool_node(node.rec_mut))
+	// to_object(obj, 'language', t.enum_node(node.language))
 	to_object(obj, 'language', t.number_node(int(node.language)))
 	to_object(obj, 'no_body', t.bool_node(node.no_body))
 	to_object(obj, 'is_builtin', t.bool_node(node.is_builtin))
