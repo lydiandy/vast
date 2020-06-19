@@ -236,6 +236,7 @@ fn (t Tree) position(p token.Position) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'line_nr', t.number_node(p.line_nr))
 	to_object(obj, 'pos', t.number_node(p.pos))
+	to_object(obj, 'len', t.number_node(p.len))
 	return obj
 }
 
@@ -243,10 +244,9 @@ fn (t Tree) comment(node ast.Comment) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Comment'))
 	to_object(obj, 'text', t.string_node(node.text))
-	to_object(obj, 'is_multi', t.bool_node(node.is_multi))
-	to_object(obj, 'line_nr', t.number_node(node.line_nr))
+	// to_object(obj, 'is_multi', t.bool_node(node.is_multi)) //maybe need remove from ast
+	// to_object(obj, 'line_nr', t.number_node(node.line_nr)) //maybe need remove from ast
 	to_object(obj, 'pos', t.position(node.pos))
-	// to_object(obj, 'same_line', t.bool_node(node.same_line))
 	return obj
 }
 
