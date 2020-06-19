@@ -33,7 +33,7 @@ fn main() {
 struct Tree {
 	root         &C.cJSON // the root of tree
 	table        &table.Table
-	pref         &pref.Preferences
+	pref         pref.Preferences
 	global_scope &ast.Scope
 }
 
@@ -49,13 +49,14 @@ fn json(file string) string {
 	t := Tree{
 		root: create_object()
 		table: table.new_table()
-		pref: &pref.Preferences{}
+		pref: pref.new_preferences()
 		global_scope: &ast.Scope{
 			start_pos: 0
 			parent: 0
 		}
 	}
-	ast_file := parser.parse_file(file, t.table, .skip_comments, t.pref, t.global_scope)
+	ast_file := parser.parse_file(file, t.table, .parse_comments, t.pref, t.global_scope)
+	// ast_file := parser.parse_file(file, t.table, .skip_comments, t.pref, t.global_scope)
 	to_object(t.root, 'ast_type', t.string_node('ast.File'))
 	to_object(t.root, 'path', t.string_node(ast_file.path))
 	to_object(t.root, 'mod', t.mod(ast_file.mod))
@@ -68,15 +69,17 @@ fn json(file string) string {
 	return s
 }
 
-// basic type node
+// string type node
 fn (t Tree) string_node(val string) &C.cJSON {
 	return create_string(val)
 }
 
+// number type node
 fn (t Tree) number_node(val int) &C.cJSON {
 	return create_number(val)
 }
 
+// bool type node
 fn (t Tree) bool_node(val bool) &C.cJSON {
 	if val {
 		return create_true()
@@ -85,10 +88,12 @@ fn (t Tree) bool_node(val bool) &C.cJSON {
 	}
 }
 
+// null type node
 fn (t Tree) null_node() &C.cJSON {
 	return create_null()
 }
 
+// type type node
 fn (t Tree) type_node(typ table.Type) &C.cJSON {
 	if typ == 0 {
 		return create_string('')
@@ -96,6 +101,11 @@ fn (t Tree) type_node(typ table.Type) &C.cJSON {
 		type_name := t.table.get_type_name(typ)
 		return create_string(type_name)
 	}
+}
+
+// todo:enum type node
+fn (t Tree) enum_node(e int) &C.cJSON {
+	return string_node('enum test')
 }
 
 // ast.File node
