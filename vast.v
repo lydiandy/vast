@@ -250,6 +250,7 @@ fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		ast.GoStmt { return t.go_stmt(node) }
 		ast.Block { return t.block(node) }
 		ast.ComptimeCall { return t.comptime_call(node) }
+		else {}
 	}
 }
 
@@ -283,13 +284,13 @@ fn (t Tree) comment(node ast.Comment) &C.cJSON {
 fn (t Tree) const_decl(node ast.ConstDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ConstDecl'))
-	field_arr := create_array()
-	for f in node.fields {
-		to_array(field_arr, t.const_field(f))
-	}
-	to_object(obj, 'fields', field_arr)
 	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
 	to_object(obj, 'pos', t.position(node.pos))
+	field_array := create_array()
+	for f in node.fields {
+		to_array(field_array, t.const_field(f))
+	}
+	to_object(obj, 'fields', field_array)
 	return obj
 }
 
@@ -392,9 +393,9 @@ fn (t Tree) enum_field(node ast.EnumField) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('EnumField'))
 	to_object(obj, 'name', t.string_node(node.name))
-	to_object(obj, 'pos', t.position(node.pos))
 	to_object(obj, 'has_expr', t.bool_node(node.has_expr))
 	to_object(obj, 'expr', t.expr(node.expr))
+	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
 
@@ -520,17 +521,17 @@ fn (t Tree) struct_field(node ast.StructField) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('StructField'))
 	to_object(obj, 'name', t.string_node(node.name))
-	to_object(obj, 'pos', t.position(node.pos))
-	to_object(obj, 'comment', t.comment(node.comment))
-	to_object(obj, 'default_expr', t.expr(node.default_expr))
+	to_object(obj, 'typ', t.type_node(node.typ))
+	to_object(obj, 'is_public', t.bool_node(node.is_public))
 	to_object(obj, 'has_default_expr', t.bool_node(node.has_default_expr))
+	to_object(obj, 'default_expr', t.expr(node.default_expr))
+	to_object(obj, 'pos', t.position(node.pos))
 	arr := create_array()
 	for a in node.attrs {
 		to_array(arr, t.string_node(a))
 	}
 	to_object(obj, 'attrs', arr)
-	to_object(obj, 'is_public', t.bool_node(node.is_public))
-	to_object(obj, 'typ', t.type_node(node.typ))
+	to_object(obj, 'comment', t.comment(node.comment))
 	return obj
 }
 
@@ -855,7 +856,7 @@ fn (t Tree) expr(expr ast.Expr) &C.cJSON {
 		}
 		else {
 			// println('unknown expr')
-			return t.null_node()
+			return t.string_node('')
 		}
 	}
 }
