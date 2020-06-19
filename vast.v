@@ -309,7 +309,7 @@ fn (t Tree) fn_decl(node ast.FnDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('FnDecl'))
 	to_object(obj, 'name', t.string_node(node.name))
-	to_object(obj, 'return_type', t.type_node(node.return_type))
+	to_object(obj, 'mod', t.string_node(node.mod))
 	to_object(obj, 'is_deprecated', t.bool_node(node.is_deprecated))
 	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
 	to_object(obj, 'is_variadic', t.bool_node(node.is_variadic))
@@ -323,19 +323,21 @@ fn (t Tree) fn_decl(node ast.FnDecl) &C.cJSON {
 	to_object(obj, 'no_body', t.bool_node(node.no_body))
 	to_object(obj, 'is_builtin', t.bool_node(node.is_builtin))
 	to_object(obj, 'is_generic', t.bool_node(node.is_generic))
+	to_object(obj, 'ctdefine', t.string_node(node.ctdefine))
 	to_object(obj, 'pos', t.position(node.pos))
 	to_object(obj, 'body_pos', t.position(node.body_pos))
 	to_object(obj, 'file', t.string_node(node.file))
-	arg_arr := create_array()
+	to_object(obj, 'return_type', t.type_node(node.return_type))
+	arg_array := create_array()
 	for a in node.args {
-		to_array(arg_arr, t.arg(a))
+		to_array(arg_array, t.arg(a))
 	}
-	to_object(obj, 'args', arg_arr)
-	stmt_arr := create_array()
+	to_object(obj, 'args', arg_array)
+	stmt_array := create_array()
 	for s in node.stmts {
-		to_array(stmt_arr, t.stmt(s))
+		to_array(stmt_array, t.stmt(s))
 	}
-	to_object(obj, 'stmts', stmt_arr)
+	to_object(obj, 'stmts', stmt_array)
 	return obj
 }
 
