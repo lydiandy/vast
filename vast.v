@@ -5,6 +5,7 @@ import v.parser
 import v.table
 import v.ast
 import v.pref
+import v.errors
 import os
 
 const (
@@ -60,9 +61,11 @@ fn json(file string) string {
 	to_object(t.root, 'ast_type', t.string_node('ast.File'))
 	to_object(t.root, 'path', t.string_node(ast_file.path))
 	to_object(t.root, 'mod', t.mod(ast_file.mod))
-	to_object(t.root, 'imports', t.imports(ast_file.imports))
 	to_object(t.root, 'scope', t.scope(ast_file.scope))
 	to_object(t.root, 'global_scope', t.scope(ast_file.global_scope))
+	to_object(t.root, 'imports', t.imports(ast_file.imports))
+	to_object(t.root, 'errors', t.errors(ast_file.errors))
+	to_object(t.root, 'warnings', t.warnings(ast_file.warnings))
 	to_object(t.root, 'stmts', t.stmts(ast_file.stmts))
 	// generate the ast string
 	s := json_print(t.root)
@@ -120,18 +123,6 @@ fn (t Tree) mod(mod ast.Module) &C.cJSON {
 	return obj
 }
 
-fn (t Tree) imports(imports []ast.Import) &C.cJSON {
-	imps := create_array()
-	for imp in imports {
-		obj := create_object()
-		to_object(obj, 'mod', t.string_node(imp.mod))
-		to_object(obj, 'alias', t.string_node(imp.alias))
-		to_object(obj, 'pos', t.position(imp.pos))
-		to_array(imps, obj)
-	}
-	return imps
-}
-
 fn (t Tree) scope(scope ast.Scope) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Scope'))
@@ -167,6 +158,45 @@ fn (t Tree) scope_object(node ast.ScopeObject) &C.cJSON {
 		ast.Var { t.var(node) }
 	}
 	return obj
+}
+
+fn (t Tree) imports(imports []ast.Import) &C.cJSON {
+	imps := create_array()
+	for imp in imports {
+		obj := create_object()
+		to_object(obj, 'mod', t.string_node(imp.mod))
+		to_object(obj, 'alias', t.string_node(imp.alias))
+		to_object(obj, 'pos', t.position(imp.pos))
+		to_array(imps, obj)
+	}
+	return imps
+}
+
+fn (t Tree) errors(errors []errors.Error) &C.cJSON {
+	errs := create_array()
+	for e in errors {
+		obj := create_object()
+		to_object(obj, 'message', t.string_node(e.message))
+		to_object(obj, 'file_path', t.string_node(e.file_path))
+		to_object(obj, 'pos', t.position(e.pos))
+		to_object(obj, 'backtrace', t.string_node(e.backtrace))
+		to_object(obj, 'reporter', t.number_node(int(e.reporter)))
+		to_array(errs, obj)
+	}
+	return errs
+}
+
+fn (t Tree) warnings(warnings []errors.Warning) &C.cJSON {
+	warns := create_array()
+	for w in warnings {
+		obj := create_object()
+		to_object(obj, 'message', t.string_node(w.message))
+		to_object(obj, 'file_path', t.string_node(w.file_path))
+		to_object(obj, 'pos', t.position(w.pos))
+		to_object(obj, 'reporter', t.number_node(int(w.reporter)))
+		to_array(warns, obj)
+	}
+	return warns
 }
 
 fn (t Tree) var(node ast.Var) &C.cJSON {
