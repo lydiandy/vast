@@ -161,15 +161,15 @@ fn (t Tree) scope_object(node ast.ScopeObject) &C.cJSON {
 }
 
 fn (t Tree) imports(imports []ast.Import) &C.cJSON {
-	imps := create_array()
+	import_array := create_array()
 	for imp in imports {
 		obj := create_object()
 		to_object(obj, 'mod', t.string_node(imp.mod))
 		to_object(obj, 'alias', t.string_node(imp.alias))
 		to_object(obj, 'pos', t.position(imp.pos))
-		to_array(imps, obj)
+		to_array(import_array, obj)
 	}
-	return imps
+	return import_array
 }
 
 fn (t Tree) errors(errors []errors.Error) &C.cJSON {
@@ -498,11 +498,11 @@ fn (t Tree) sum_type_decl(node ast.SumTypeDecl) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('SumTypeDecl'))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
-	t_arr := create_array()
+	t_array := create_array()
 	for s in node.sub_types {
-		to_array(t_arr, t.type_node(s))
+		to_array(t_array, t.type_node(s))
 	}
-	to_object(obj, 'sub_types', t_arr)
+	to_object(obj, 'sub_types', t_array)
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
