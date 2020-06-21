@@ -1151,9 +1151,9 @@ fn (t Tree) call_expr(node ast.CallExpr) &C.cJSON {
 fn (t Tree) call_arg(node ast.CallArg) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('CallArg'))
+	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'is_mut', t.bool_node(node.is_mut))
 	to_object(obj, 'expr', t.expr(node.expr))
-	to_object(obj, 'typ', t.type_node(node.typ))
 	return obj
 }
 
