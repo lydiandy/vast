@@ -1372,6 +1372,10 @@ fn (t Tree) table_field(node table.Field) &C.cJSON {
 
 fn (t Tree) sql_insert_expr(node ast.SqlInsertExpr) &C.cJSON {
 	obj := create_object()
+	to_object(obj, 'db_var_name', t.string_node(node.db_var_name))
+	to_object(obj, 'table_name', t.string_node(node.table_name))
+	to_object(obj, 'object_var_name', t.string_node(node.object_var_name))
+	to_object(obj, 'table_type', t.type_node(node.table_type))
 	return obj
 }
 
