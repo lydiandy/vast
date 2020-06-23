@@ -249,8 +249,7 @@ fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		ast.ExprStmt { return t.expr_stmt(node) }
 		ast.GoStmt { return t.go_stmt(node) }
 		ast.Block { return t.block(node) }
-		ast.ComptimeCall { return t.comptime_call(node) }
-		else {}
+		ast.SqlInsertExpr { return t.sql_insert_expr(node) }
 	}
 }
 
@@ -852,8 +851,8 @@ fn (t Tree) expr(expr ast.Expr) &C.cJSON {
 		ast.SqlExpr {
 			return t.sql_expr(expr)
 		}
-		ast.SqlInsertExpr {
-			return t.sql_insert_expr(expr)
+		ast.ComptimeCall {
+			return t.comptime_call(expr)
 		}
 		else {
 			// println('unknown expr')
@@ -1087,7 +1086,6 @@ fn (t Tree) ident(node ast.Ident) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Ident'))
 	to_object(obj, 'name', t.string_node(node.name))
-	to_object(obj, 'value', t.string_node(node.value))
 	to_object(obj, 'language', t.number_node(int(node.language)))
 	to_object(obj, 'is_mut', t.bool_node(node.is_mut))
 	to_object(obj, 'tok_kind', t.number_node(int(node.tok_kind)))
@@ -1339,7 +1337,7 @@ fn (t Tree) sql_expr(node ast.SqlExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'type', t.type_node(node.typ))
 	to_object(obj, 'is_count', t.bool_node(node.is_count))
-	to_object(obj, 'db_var_name', t.string_node(node.db_var_name))
+	to_object(obj, 'db_expr', t.expr(node.db_expr))
 	to_object(obj, 'table_name', t.string_node(node.table_name))
 	to_object(obj, 'where_expr', t.expr(node.where_expr))
 	to_object(obj, 'has_where', t.bool_node(node.has_where))
@@ -1372,7 +1370,7 @@ fn (t Tree) table_field(node table.Field) &C.cJSON {
 
 fn (t Tree) sql_insert_expr(node ast.SqlInsertExpr) &C.cJSON {
 	obj := create_object()
-	to_object(obj, 'db_var_name', t.string_node(node.db_var_name))
+	to_object(obj, 'db_expr', t.expr(node.db_expr))
 	to_object(obj, 'table_name', t.string_node(node.table_name))
 	to_object(obj, 'object_var_name', t.string_node(node.object_var_name))
 	to_object(obj, 'table_type', t.type_node(node.table_type))
