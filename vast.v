@@ -249,7 +249,7 @@ fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		ast.ExprStmt { return t.expr_stmt(node) }
 		ast.GoStmt { return t.go_stmt(node) }
 		ast.Block { return t.block(node) }
-		ast.SqlInsertExpr { return t.sql_insert_expr(node) }
+		ast.SqlStmt { return t.sql_stmt(node) }
 	}
 }
 
@@ -300,7 +300,11 @@ fn (t Tree) const_field(node ast.ConstField) &C.cJSON {
 	to_object(obj, 'expr', t.expr(node.expr))
 	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
 	to_object(obj, 'typ', t.type_node(node.typ))
-	to_object(obj, 'comment', t.comment(node.comment))
+	comment_array := create_array()
+	for c in node.comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'comments', comment_array)
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -345,6 +349,7 @@ fn (t Tree) anon_fn(node ast.AnonFn) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('AnonFn'))
 	to_object(obj, 'decl', t.fn_decl(node.decl))
+	to_object(obj, 'is_called', t.bool_node(node.is_called))
 	to_object(obj, 'typ', t.type_node(node.typ))
 	return obj
 }
@@ -525,12 +530,16 @@ fn (t Tree) struct_field(node ast.StructField) &C.cJSON {
 	to_object(obj, 'has_default_expr', t.bool_node(node.has_default_expr))
 	to_object(obj, 'default_expr', t.expr(node.default_expr))
 	to_object(obj, 'pos', t.position(node.pos))
-	arr := create_array()
+	attr_array := create_array()
 	for a in node.attrs {
-		to_array(arr, t.string_node(a))
+		to_array(attr_array, t.string_node(a))
 	}
-	to_object(obj, 'attrs', arr)
-	to_object(obj, 'comment', t.comment(node.comment))
+	to_object(obj, 'attrs', attr_array)
+	comment_array := create_array()
+	for c in node.comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'comments', comment_array)
 	return obj
 }
 
@@ -1368,8 +1377,9 @@ fn (t Tree) table_field(node table.Field) &C.cJSON {
 	return obj
 }
 
-fn (t Tree) sql_insert_expr(node ast.SqlInsertExpr) &C.cJSON {
+fn (t Tree) sql_stmt(node ast.SqlStmt) &C.cJSON {
 	obj := create_object()
+	to_object(obj, 'kind', t.number_node(int(node.kind)))
 	to_object(obj, 'db_expr', t.expr(node.db_expr))
 	to_object(obj, 'table_name', t.string_node(node.table_name))
 	to_object(obj, 'object_var_name', t.string_node(node.object_var_name))
