@@ -1351,6 +1351,8 @@ fn (t Tree) sql_expr(node ast.SqlExpr) &C.cJSON {
 	to_object(obj, 'where_expr', t.expr(node.where_expr))
 	to_object(obj, 'has_where', t.bool_node(node.has_where))
 	to_object(obj, 'is_array', t.bool_node(node.is_array))
+	to_object(obj, 'pos', t.position(node.pos))
+	to_object(obj, 'table_type', t.type_node(node.table_type))
 	field_arr := create_array()
 	for f in node.fields {
 		to_array(field_arr, t.table_field(f))
@@ -1384,6 +1386,18 @@ fn (t Tree) sql_stmt(node ast.SqlStmt) &C.cJSON {
 	to_object(obj, 'table_name', t.string_node(node.table_name))
 	to_object(obj, 'object_var_name', t.string_node(node.object_var_name))
 	to_object(obj, 'table_type', t.type_node(node.table_type))
+	to_object(obj, 'where_expr', t.expr(node.where_expr))
+	arr := create_array()
+	for c in node.updated_columns {
+		to_array(arr, t.string_node(c))
+	}
+	to_object(obj, 'updated_columns', arr)
+	e_array := create_array()
+	for e in node.update_exprs {
+		to_array(e_array, t.expr(e))
+	}
+	to_object(obj, 'update_exprs', e_array)
+	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
 
