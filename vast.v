@@ -1047,6 +1047,7 @@ fn (t Tree) selector_expr(node ast.SelectorExpr) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('SelectorExpr'))
 	to_object(obj, 'expr', t.expr(node.expr))
 	to_object(obj, 'expr_type', t.type_node(node.expr_type))
+	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'field_name', t.string_node(node.field_name))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
@@ -1353,6 +1354,10 @@ fn (t Tree) sql_expr(node ast.SqlExpr) &C.cJSON {
 	to_object(obj, 'is_array', t.bool_node(node.is_array))
 	to_object(obj, 'pos', t.position(node.pos))
 	to_object(obj, 'table_type', t.type_node(node.table_type))
+	to_object(obj, 'has_limit', t.bool_node(node.has_limit))
+	to_object(obj, 'limit_expr', t.expr(node.limit_expr))
+	to_object(obj, 'has_offset', t.bool_node(node.has_offset))
+	to_object(obj, 'offset_expr', t.expr(node.offset_expr))
 	field_arr := create_array()
 	for f in node.fields {
 		to_array(field_arr, t.table_field(f))
