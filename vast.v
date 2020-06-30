@@ -18,7 +18,6 @@ fn main() {
 		return
 	}
 	file := os.args[1]
-	// file:='./example/demo.v'
 	if os.file_ext(file) != '.v' {
 		println('the file must be v file')
 		return
