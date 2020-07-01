@@ -1076,6 +1076,7 @@ fn (t Tree) index_expr(node ast.IndexExpr) &C.cJSON {
 	to_object(obj, 'left_type', t.type_node(node.left_type))
 	to_object(obj, 'index', t.expr(node.index))
 	to_object(obj, 'is_setter', t.bool_node(node.is_setter))
+	to_object(obj, 'expr', t.string_node('expr'))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
