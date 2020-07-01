@@ -1040,8 +1040,11 @@ fn (t Tree) type_expr(node ast.Type) &C.cJSON {
 fn (t Tree) size_of(node ast.SizeOf) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('SizeOf'))
+	to_object(obj, 'is_type', t.bool_node(node.is_type))
 	to_object(obj, 'type_name', t.string_node(node.type_name))
 	to_object(obj, 'typ', t.type_node(node.typ))
+	to_object(obj, 'expr', t.expr(node.expr))
+	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
 
