@@ -396,6 +396,11 @@ fn (t Tree) enum_decl(node ast.EnumDecl) &C.cJSON {
 		to_array(f_arr, t.enum_field(f))
 	}
 	to_object(obj, 'fields', f_arr)
+	c_array := create_array()
+	for c in node.comments {
+		to_array(c_array, t.comment(c))
+	}
+	to_object(obj, 'comments', c_array)
 	return obj
 }
 
@@ -406,6 +411,11 @@ fn (t Tree) enum_field(node ast.EnumField) &C.cJSON {
 	to_object(obj, 'has_expr', t.bool_node(node.has_expr))
 	to_object(obj, 'expr', t.expr(node.expr))
 	to_object(obj, 'pos', t.position(node.pos))
+	c_array := create_array()
+	for c in node.comments {
+		to_array(c_array, t.comment(c))
+	}
+	to_object(obj, 'comments', c_array)
 	return obj
 }
 
@@ -1252,7 +1262,7 @@ fn (t Tree) struct_init_field(node ast.StructInitField) &C.cJSON {
 	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'expected_type', t.type_node(node.expected_type))
 	to_object(obj, 'pos', t.position(node.pos))
-	to_object(obj,'comment',t.comment(node.comment))
+	to_object(obj, 'comment', t.comment(node.comment))
 	return obj
 }
 
@@ -1367,6 +1377,11 @@ fn (t Tree) match_branch(node ast.MatchBranch) &C.cJSON {
 	to_object(obj, 'is_else', t.bool_node(node.is_else))
 	to_object(obj, 'comment', t.comment(node.comment))
 	to_object(obj, 'pos', t.position(node.pos))
+	c_array := create_array()
+	for c in node.post_comments {
+		to_array(c_array, t.comment(c))
+	}
+	to_object(obj, 'post_comments', c_array)
 	return obj
 }
 
