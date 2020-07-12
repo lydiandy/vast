@@ -353,7 +353,6 @@ fn (t Tree) anon_fn(node ast.AnonFn) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('AnonFn'))
 	to_object(obj, 'decl', t.fn_decl(node.decl))
-	to_object(obj, 'is_called', t.bool_node(node.is_called))
 	to_object(obj, 'typ', t.type_node(node.typ))
 	return obj
 }
@@ -393,6 +392,7 @@ fn (t Tree) enum_decl(node ast.EnumDecl) &C.cJSON {
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
 	to_object(obj, 'is_flag', t.bool_node(node.is_flag))
+	to_object(obj, 'is_multi_allowed', t.bool_node(node.is_multi_allowed))
 	to_object(obj, 'pos', t.position(node.pos))
 	f_arr := create_array()
 	for f in node.fields {
@@ -791,7 +791,6 @@ fn (t Tree) lock_expr(node ast.LockExpr) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('LockExpr'))
 	to_object(obj, 'is_rlock', t.bool_node(node.is_rlock))
 	to_object(obj, 'is_expr', t.bool_node(node.is_expr))
-	to_object(obj, 'is_rw', t.bool_node(node.is_rw))
 	to_object(obj, 'typ', t.type_node(node.typ))
 	stmt_array := create_array()
 	for s in node.stmts {
@@ -1195,6 +1194,7 @@ fn (t Tree) if_branch(node ast.IfBranch) &C.cJSON {
 	for c in node.comments {
 		to_array(comment_array, t.comment(c))
 	}
+	to_object(obj, 'left_as_name', t.string_node(node.left_as_name))
 	to_object(obj, 'comments', comment_array)
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
