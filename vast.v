@@ -786,26 +786,6 @@ fn (t Tree) comptime_call(node ast.ComptimeCall) &C.cJSON {
 	return obj
 }
 
-fn (t Tree) lock_expr(node ast.LockExpr) &C.cJSON {
-	obj := create_object()
-	to_object(obj, 'ast_type', t.string_node('LockExpr'))
-	to_object(obj, 'is_rlock', t.bool_node(node.is_rlock))
-	to_object(obj, 'is_expr', t.bool_node(node.is_expr))
-	to_object(obj, 'typ', t.type_node(node.typ))
-	stmt_array := create_array()
-	for s in node.stmts {
-		to_array(stmt_array, t.stmt(s))
-	}
-	to_object(obj, 'stmts', stmt_array)
-	ident_array := create_array()
-	for i in node.lockeds {
-		to_array(ident_array, t.ident(i))
-	}
-	to_object(obj, 'lockeds', ident_array)
-	to_object(obj, 'pos', t.position(node.pos))
-	return obj
-}
-
 fn (t Tree) expr_stmt(node ast.ExprStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ExprStmt'))
@@ -923,6 +903,9 @@ fn (t Tree) expr(expr ast.Expr) &C.cJSON {
 		}
 		ast.LockExpr {
 			return t.lock_expr(expr)
+		}
+		ast.UnsafeExpr {
+			return t.unsafe_expr(expr)
 		}
 		else {
 			// println('unknown expr')
@@ -1527,6 +1510,37 @@ fn (t Tree) sql_stmt(node ast.SqlStmt) &C.cJSON {
 	}
 	to_object(obj, 'update_exprs', e_array)
 	to_object(obj, 'pos', t.position(node.pos))
+	return obj
+}
+
+fn (t Tree) lock_expr(node ast.LockExpr) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('LockExpr'))
+	to_object(obj, 'is_rlock', t.bool_node(node.is_rlock))
+	to_object(obj, 'is_expr', t.bool_node(node.is_expr))
+	to_object(obj, 'typ', t.type_node(node.typ))
+	stmt_array := create_array()
+	for s in node.stmts {
+		to_array(stmt_array, t.stmt(s))
+	}
+	to_object(obj, 'stmts', stmt_array)
+	ident_array := create_array()
+	for i in node.lockeds {
+		to_array(ident_array, t.ident(i))
+	}
+	to_object(obj, 'lockeds', ident_array)
+	to_object(obj, 'pos', t.position(node.pos))
+	return obj
+}
+
+fn (t Tree) unsafe_expr(expr ast.UnsafeExpr) &C.cJSON {
+	obj := create_object()
+	stmt_array := create_array()
+	for s in expr.stmts {
+		to_array(stmt_array, t.stmt(s))
+	}
+	to_object(obj, 'stmts', stmt_array)
+	to_object(obj, 'pos', t.position(expr.pos))
 	return obj
 }
 
