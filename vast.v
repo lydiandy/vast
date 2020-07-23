@@ -262,6 +262,19 @@ fn (t Tree) import_(node ast.Import) &C.cJSON {
 	to_object(obj, 'mod', t.string_node(node.mod))
 	to_object(obj, 'alias', t.string_node(node.alias))
 	to_object(obj, 'pos', t.position(node.pos))
+	syms := create_array()
+	for s in node.syms {
+		to_array(syms, t.import_symbol(s))
+	}
+	to_object(obj, 'syms', syms)
+	return obj
+}
+
+fn (t Tree) import_symbol(node ast.ImportSymbol) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'name', t.string_node(node.name))
+	to_object(obj, 'pos', t.position(node.pos))
+	to_object(obj, 'kind', t.number_node(node.kind))
 	return obj
 }
 
