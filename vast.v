@@ -226,7 +226,7 @@ fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 	match node {
 		ast.Module { return t.mod(node) }
 		ast.Import { return t.import_(node) }
-		ast.Comment { return t.comment(node) }
+		// ast.Comment { return t.comment(node) }
 		ast.ConstDecl { return t.const_decl(node) }
 		ast.FnDecl { return t.fn_decl(node) }
 		ast.StructDecl { return t.struct_decl(node) }
@@ -1161,6 +1161,11 @@ fn (t Tree) if_expr(node ast.IfExpr) &C.cJSON {
 	to_object(obj, 'has_else', t.bool_node(node.has_else))
 	to_object(obj, 'is_expr', t.bool_node(node.is_expr))
 	to_object(obj, 'pos', t.position(node.pos))
+	comment_array := create_array()
+	for c in node.post_comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'post_comments', comment_array)
 	return obj
 }
 
@@ -1194,6 +1199,7 @@ fn (t Tree) ident(node ast.Ident) &C.cJSON {
 	to_object(obj, 'kind', t.number_node(int(node.kind)))
 	to_object(obj, 'info', t.ident_info(node.info))
 	to_object(obj, 'pos', t.position(node.pos))
+	to_object(obj, 'obj', t.scope_object(node.obj))
 	return obj
 }
 
@@ -1257,6 +1263,11 @@ fn (t Tree) call_arg(node ast.CallArg) &C.cJSON {
 	to_object(obj, 'is_mut', t.bool_node(node.is_mut))
 	to_object(obj, 'share', t.number_node(int(node.share)))
 	to_object(obj, 'expr', t.expr(node.expr))
+	comments := create_array()
+	for c in node.comments {
+		to_array(comments, t.comment(c))
+	}
+	to_object(obj, 'comments', comments)
 	return obj
 }
 
