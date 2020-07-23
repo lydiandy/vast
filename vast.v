@@ -439,6 +439,7 @@ fn (t Tree) interface_decl(node ast.InterfaceDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('InterfaceDecl'))
 	to_object(obj, 'name', t.string_node(node.name))
+	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
 	str_arr := create_array()
 	for s in node.field_names {
 		to_array(str_arr, t.string_node(s))
