@@ -303,6 +303,11 @@ fn (t Tree) const_decl(node ast.ConstDecl) &C.cJSON {
 	}
 	to_object(obj, 'fields', field_array)
 	to_object(obj, 'pos', t.position(node.pos))
+	comment_array := create_array()
+	for c in node.end_comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'end_comments', comment_array)
 	return obj
 }
 
@@ -606,9 +611,9 @@ fn (t Tree) field(node ast.Field) &C.cJSON {
 	return obj
 }
 
-fn (t Tree) arg(node table.Arg) &C.cJSON {
+fn (t Tree) arg(node table.Param) &C.cJSON {
 	obj := create_object()
-	to_object(obj, 'ast_type', t.string_node('Arg'))
+	to_object(obj, 'ast_type', t.string_node('Param'))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'is_mut', t.bool_node(node.is_mut))
@@ -1270,11 +1275,13 @@ fn (t Tree) call_arg(node ast.CallArg) &C.cJSON {
 	to_object(obj, 'is_mut', t.bool_node(node.is_mut))
 	to_object(obj, 'share', t.number_node(int(node.share)))
 	to_object(obj, 'expr', t.expr(node.expr))
+	to_object(obj, 'is_tmp_autofree', t.bool_node(node.is_tmp_autofree))
 	comments := create_array()
 	for c in node.comments {
 		to_array(comments, t.comment(c))
 	}
 	to_object(obj, 'comments', comments)
+
 	return obj
 }
 
