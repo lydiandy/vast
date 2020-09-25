@@ -232,7 +232,6 @@ fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		ast.EnumDecl { return t.enum_decl(node) }
 		ast.InterfaceDecl { return t.interface_decl(node) }
 		ast.HashStmt { return t.hash_stmt(node) }
-		ast.CompIf { return t.comp_if(node) }
 		ast.CompFor { return t.comp_for(node) }
 		ast.GlobalDecl { return t.global_decl(node) }
 		ast.DeferStmt { return t.defer_stmt(node) }
@@ -476,31 +475,30 @@ fn (t Tree) hash_stmt(node ast.HashStmt) &C.cJSON {
 	return obj
 }
 
-fn (t Tree) comp_if(node ast.CompIf) &C.cJSON {
-	obj := create_object()
-	to_object(obj, 'ast_type', t.string_node('CompIf'))
-	to_object(obj, 'val', t.string_node(node.val))
-	to_object(obj, 'is_not', t.bool_node(node.is_not))
-	stmt_arr := create_array()
-	for s in node.stmts {
-		to_array(stmt_arr, t.stmt(s))
-	}
-	to_object(obj, 'stmts', stmt_arr)
-	else_stmt_arr := create_array()
-	for s in node.else_stmts {
-		to_array(else_stmt_arr, t.stmt(s))
-	}
-	to_object(else_stmt_arr, 'else_stmts', else_stmt_arr)
-	to_object(obj, 'has_else', t.bool_node(node.has_else))
-	to_object(obj, 'is_opt', t.bool_node(node.is_opt))
-	to_object(obj, 'pos', t.position(node.pos))
-	to_object(obj, 'kind', t.number_node(int(node.kind)))
-	to_object(obj, 'tchk_expr', t.expr(node.tchk_expr))
-	to_object(obj, 'tchk_type', t.type_node(node.tchk_type))
-	to_object(obj, 'tchk_match', t.bool_node(node.tchk_match))
-	return obj
-}
-
+// fn (t Tree) comp_if(node ast.CompIf) &C.cJSON {
+// obj := create_object()
+// to_object(obj, 'ast_type', t.string_node('CompIf'))
+// to_object(obj, 'val', t.string_node(node.val))
+// to_object(obj, 'is_not', t.bool_node(node.is_not))
+// stmt_arr := create_array()
+// for s in node.stmts {
+// to_array(stmt_arr, t.stmt(s))
+// }
+// to_object(obj, 'stmts', stmt_arr)
+// else_stmt_arr := create_array()
+// for s in node.else_stmts {
+// to_array(else_stmt_arr, t.stmt(s))
+// }
+// to_object(else_stmt_arr, 'else_stmts', else_stmt_arr)
+// to_object(obj, 'has_else', t.bool_node(node.has_else))
+// to_object(obj, 'is_opt', t.bool_node(node.is_opt))
+// to_object(obj, 'pos', t.position(node.pos))
+// to_object(obj, 'kind', t.number_node(int(node.kind)))
+// to_object(obj, 'tchk_expr', t.expr(node.tchk_expr))
+// to_object(obj, 'tchk_type', t.type_node(node.tchk_type))
+// to_object(obj, 'tchk_match', t.bool_node(node.tchk_match))
+// return obj
+// }
 fn (t Tree) comp_for(node ast.CompFor) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('CompFor'))
@@ -589,6 +587,7 @@ fn (t Tree) struct_field(node ast.StructField) &C.cJSON {
 	to_object(obj, 'has_default_expr', t.bool_node(node.has_default_expr))
 	to_object(obj, 'default_expr', t.expr(node.default_expr))
 	to_object(obj, 'pos', t.position(node.pos))
+	to_object(obj, 'type_pos', t.position(node.type_pos))
 	attr_array := create_array()
 	for a in node.attrs {
 		to_array(attr_array, t.attr(a))
@@ -918,6 +917,9 @@ fn (t Tree) expr(expr ast.Expr) &C.cJSON {
 		ast.ChanInit {
 			return t.chan_init(expr)
 		}
+		ast.SelectExpr {
+			return t.select_expr(expr)
+		}
 		else {
 			// println('unknown expr')
 			return t.string_node('')
@@ -1162,6 +1164,7 @@ fn (t Tree) range_expr(node ast.RangeExpr) &C.cJSON {
 fn (t Tree) if_expr(node ast.IfExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('IfExpr'))
+	to_object(obj, 'is_comptime', t.bool_node(node.is_comptime))
 	to_object(obj, 'tok_kind', t.number_node(int(node.tok_kind)))
 	branch_arr := create_array()
 	for b in node.branches {
@@ -1281,7 +1284,6 @@ fn (t Tree) call_arg(node ast.CallArg) &C.cJSON {
 		to_array(comments, t.comment(c))
 	}
 	to_object(obj, 'comments', comments)
-
 	return obj
 }
 
@@ -1411,6 +1413,7 @@ fn (t Tree) match_expr(node ast.MatchExpr) &C.cJSON {
 	to_object(obj, 'branches', m_arr)
 	to_object(obj, 'cond_type', t.type_node(node.cond_type))
 	to_object(obj, 'return_type', t.type_node(node.return_type))
+	to_object(obj, 'expected_type', t.type_node(node.expected_type))
 	to_object(obj, 'is_sum_type', t.bool_node(node.is_sum_type))
 	to_object(obj, 'is_expr', t.bool_node(node.is_expr))
 	to_object(obj, 'is_mut', t.bool_node(node.is_mut))
@@ -1560,11 +1563,7 @@ fn (t Tree) lock_expr(node ast.LockExpr) &C.cJSON {
 
 fn (t Tree) unsafe_expr(expr ast.UnsafeExpr) &C.cJSON {
 	obj := create_object()
-	stmt_array := create_array()
-	for s in expr.stmts {
-		to_array(stmt_array, t.stmt(s))
-	}
-	to_object(obj, 'stmts', stmt_array)
+	to_object(obj, 'expr', t.expr(expr.expr))
 	to_object(obj, 'pos', t.position(expr.pos))
 	return obj
 }
@@ -1577,6 +1576,41 @@ fn (t Tree) chan_init(expr ast.ChanInit) &C.cJSON {
 	to_object(obj, 'typ', t.type_node(expr.typ))
 	to_object(obj, 'elem_type', t.type_node(expr.elem_type))
 	to_object(obj, 'pos', t.position(expr.pos))
+	return obj
+}
+
+fn (t Tree) select_expr(expr ast.SelectExpr) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('SelectExpr'))
+	branch_array := create_array()
+	for b in expr.branches {
+		to_array(branch_array, t.select_branch(b))
+	}
+	to_object(obj, 'branches', branch_array)
+	to_object(obj, 'is_expr', t.bool_node(expr.is_expr))
+	to_object(obj, 'has_exception', t.bool_node(expr.has_exception))
+	to_object(obj, 'expected_type', t.type_node(expr.expected_type))
+	to_object(obj, 'pos', t.position(expr.pos))
+	return obj
+}
+
+fn (t Tree) select_branch(expr ast.SelectBranch) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'stmt', t.stmt(expr.stmt))
+	stmt_array := create_array()
+	for s in expr.stmts {
+		to_array(stmt_array, t.stmt(s))
+	}
+	to_object(obj, 'stmts', stmt_array)
+	to_object(obj, 'pos', t.position(expr.pos))
+	to_object(obj, 'comment', t.comment(expr.comment))
+	to_object(obj, 'is_else', t.bool_node(expr.is_else))
+	to_object(obj, 'is_timeout', t.bool_node(expr.is_timeout))
+	comment_array := create_array()
+	for c in expr.post_comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'post_comments', comment_array)
 	return obj
 }
 
