@@ -354,11 +354,11 @@ fn (t Tree) fn_decl(node ast.FnDecl) &C.cJSON {
 		to_array(a_arr, t.attr(a))
 	}
 	to_object(obj, 'attrs', a_arr)
-	arg_array := create_array()
-	for a in node.args {
-		to_array(arg_array, t.arg(a))
+	params_array := create_array()
+	for a in node.params {
+		to_array(params_array, t.arg(a))
 	}
-	to_object(obj, 'args', arg_array)
+	to_object(obj, 'params', params_array)
 	stmt_array := create_array()
 	for s in node.stmts {
 		to_array(stmt_array, t.stmt(s))
