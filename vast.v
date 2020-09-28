@@ -42,7 +42,7 @@ fn json_file(file string) string {
 	ast_json := json(file)
 	json_file := file[0..file.len - 2] + '.json'
 	os.write_file(json_file, ast_json)
-    return json_file
+	return json_file
 }
 
 // generate json string
