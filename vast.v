@@ -13,21 +13,27 @@ const (
 )
 
 fn main() {
-	if os.args.len != 2 {
-		println('unknown args,Usage:vast demo.v')
+	if os.args.len !in [2,3] {
+		println('unknown args,Usage: `vast demo.v` - produce demo.json, or `vast demo.v -p` - print AST to stdout')
 		return
 	}
 	file := os.args[1]
 	if os.file_ext(file) != '.v' {
-		println('the file must be v file')
+		println('the file `$file` must be a v file')
 		return
 	}
 	if !os.exists(file) {
-		println('the v file does not exist')
+		println('the v file `$file` does not exist')
 		return
 	}
 	apath := abs_path(file)
-	println('AST written to: ' + json_file(apath))
+
+	if os.args.len == 3 && os.args[2] == '-p' {
+		println(json(file))
+		return
+	} else {
+		println('AST written to: ' + json_file(apath))
+	}        
 }
 
 struct Tree {
