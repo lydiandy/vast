@@ -26,7 +26,7 @@ enum Color {
 	blue
 }
 
-type Myint int
+type Myint = int
 
 type MySumType = bool | int | string
 

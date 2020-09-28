@@ -27,7 +27,7 @@ fn main() {
 		return
 	}
 	apath := abs_path(file)
-	json_file(apath)
+	println('AST written to: ' + json_file(apath))
 }
 
 struct Tree {
@@ -38,10 +38,11 @@ struct Tree {
 }
 
 // generate json file with the same file name
-fn json_file(file string) {
+fn json_file(file string) string {
 	ast_json := json(file)
 	json_file := file[0..file.len - 2] + '.json'
 	os.write_file(json_file, ast_json)
+    return json_file
 }
 
 // generate json string
