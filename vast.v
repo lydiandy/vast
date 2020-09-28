@@ -664,6 +664,7 @@ fn (t Tree) assign_stmt(node ast.AssignStmt) &C.cJSON {
 	}
 	to_object(obj, 'right_types', right_type_array)
 	to_object(obj, 'op', t.number_node(int(node.op)))
+	to_object(obj, '_op', t.string_node(node.op.str()))
 	to_object(obj, 'is_static', t.bool_node(node.is_static))
 	to_object(obj, 'is_simple', t.bool_node(node.is_simple))
 	to_object(obj, 'has_cross_var', t.bool_node(node.has_cross_var))
@@ -1108,6 +1109,7 @@ fn (t Tree) prefix_expr(node ast.PrefixExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('PrefixExpr'))
 	to_object(obj, 'op', t.number_node(int(node.op)))
+	to_object(obj, '_op', t.string_node(node.op.str()))
 	to_object(obj, 'right', t.expr(node.right))
 	to_object(obj, 'right_type', t.type_node(node.right_type))
 	to_object(obj, 'pos', t.position(node.pos))
@@ -1118,6 +1120,7 @@ fn (t Tree) infix_expr(node ast.InfixExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('InfixExpr'))
 	to_object(obj, 'op', t.number_node(int(node.op)))
+	to_object(obj, '_op', t.string_node(node.op.str()))
 	to_object(obj, 'left', t.expr(node.left))
 	to_object(obj, 'left_type', t.type_node(node.left_type))
 	to_object(obj, 'right', t.expr(node.right))
@@ -1142,6 +1145,7 @@ fn (t Tree) postfix_expr(node ast.PostfixExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('PostfixExpr'))
 	to_object(obj, 'op', t.number_node(int(node.op)))
+	to_object(obj, '_op', t.string_node(node.op.str()))
 	to_object(obj, 'expr', t.expr(node.expr))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
