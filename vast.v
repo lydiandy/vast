@@ -778,6 +778,7 @@ fn (t Tree) block(node ast.Block) &C.cJSON {
 	}
 	to_object(obj, 'stmts', stmt_arr)
 	to_object(obj, 'is_unsafe', t.bool_node(node.is_unsafe))
+	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
 
@@ -1267,6 +1268,7 @@ fn (t Tree) call_expr(node ast.CallExpr) &C.cJSON {
 	to_object(obj, 'return_type', t.type_node(node.return_type))
 	to_object(obj, 'should_be_skipped', t.bool_node(node.should_be_skipped))
 	to_object(obj, 'generic_type', t.type_node(node.generic_type))
+	to_object(obj, 'autofree_pregen', t.string_node(node.autofree_pregen))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }

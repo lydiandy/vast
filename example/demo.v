@@ -26,15 +26,15 @@ enum Color {
 	blue
 }
 
-type Myint int
+type Myint = int
 
 type MySumType = bool | int | string
 
 type Myfn = fn (arg_1 int) int
 
 interface Myinterfacer {
-add(int,int) int
-sub(int,int) int
+	add(int,int) int
+	sub(int,int) int
 }
 
 // main funciton
