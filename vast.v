@@ -13,21 +13,27 @@ const (
 )
 
 fn main() {
-	if os.args.len != 2 {
-		println('unknown args,Usage:vast demo.v')
+	if os.args.len !in [2,3] {
+		println('unknown args,Usage: `vast demo.v` - produce demo.json, or `vast demo.v -p` - print AST to stdout')
 		return
 	}
 	file := os.args[1]
 	if os.file_ext(file) != '.v' {
-		println('the file must be v file')
+		println('the file `$file` must be a v file')
 		return
 	}
 	if !os.exists(file) {
-		println('the v file does not exist')
+		println('the v file `$file` does not exist')
 		return
 	}
 	apath := abs_path(file)
-	json_file(apath)
+
+	if os.args.len == 3 && os.args[2] == '-p' {
+		println(json(file))
+		return
+	} else {
+		println('AST written to: ' + json_file(apath))
+	}        
 }
 
 struct Tree {
@@ -38,10 +44,11 @@ struct Tree {
 }
 
 // generate json file with the same file name
-fn json_file(file string) {
+fn json_file(file string) string {
 	ast_json := json(file)
 	json_file := file[0..file.len - 2] + '.json'
 	os.write_file(json_file, ast_json)
+	return json_file
 }
 
 // generate json string
@@ -657,6 +664,7 @@ fn (t Tree) assign_stmt(node ast.AssignStmt) &C.cJSON {
 	}
 	to_object(obj, 'right_types', right_type_array)
 	to_object(obj, 'op', t.number_node(int(node.op)))
+	to_object(obj, '_op', t.string_node(node.op.str()))
 	to_object(obj, 'is_static', t.bool_node(node.is_static))
 	to_object(obj, 'is_simple', t.bool_node(node.is_simple))
 	to_object(obj, 'has_cross_var', t.bool_node(node.has_cross_var))
@@ -1102,6 +1110,7 @@ fn (t Tree) prefix_expr(node ast.PrefixExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('PrefixExpr'))
 	to_object(obj, 'op', t.number_node(int(node.op)))
+	to_object(obj, '_op', t.string_node(node.op.str()))
 	to_object(obj, 'right', t.expr(node.right))
 	to_object(obj, 'right_type', t.type_node(node.right_type))
 	to_object(obj, 'pos', t.position(node.pos))
@@ -1112,6 +1121,7 @@ fn (t Tree) infix_expr(node ast.InfixExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('InfixExpr'))
 	to_object(obj, 'op', t.number_node(int(node.op)))
+	to_object(obj, '_op', t.string_node(node.op.str()))
 	to_object(obj, 'left', t.expr(node.left))
 	to_object(obj, 'left_type', t.type_node(node.left_type))
 	to_object(obj, 'right', t.expr(node.right))
@@ -1136,6 +1146,7 @@ fn (t Tree) postfix_expr(node ast.PostfixExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('PostfixExpr'))
 	to_object(obj, 'op', t.number_node(int(node.op)))
+	to_object(obj, '_op', t.string_node(node.op.str()))
 	to_object(obj, 'expr', t.expr(node.expr))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj

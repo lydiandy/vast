@@ -12,11 +12,10 @@ jobs:
         git clone --depth 1 https://github.com/vlang/v ../v
         cd ../v
         make
+        cd ../vast
     - name: Build example
       run: |
-        cp -rf ../vast ../v/vlib/vast
-        cd example/        
-        time ../../v/v run main.v
+        time ../v/v run . example/demo.v
     - name: Results
       run: ls -lart example/*
     - name: demo.json
@@ -31,11 +30,10 @@ jobs:
         git clone --depth 1 https://github.com/vlang/v ../v
         cd ../v
         make
+        cd ../vast
     - name: Build example
       run: |
-        cp -rf ../vast ../v/vlib/vast
-        cd example
-        time ../../v/v run main.v
+        time ../v/v run . example/demo.v
     - name: Results
       run: ls -lart example/*
     - name: demo.json
@@ -52,13 +50,11 @@ jobs:
         git clone --depth 1 https://github.com/vlang/v ..\v
         cd ..\v
         .\make.bat -msvc
+        cd ..\vast
     - name: Build example
       run: |
-        xcopy ..\vast ..\v\vlib\vast /e /i /h
-        cd example
-        ..\..\v\v.exe run main.v
+        ..\v\v.exe run . example\demo.v
     - name: Results
       run: dir example\
     - name: demo.json
-      run: type example/demo.json
-
+      run: type example\demo.json
