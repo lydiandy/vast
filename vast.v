@@ -159,7 +159,7 @@ fn (t Tree) scope_object(node ast.ScopeObject) &C.cJSON {
 	obj := create_object()
 	match node {
 		ast.ConstField { t.const_field(node) }
-		ast.GlobalDecl { t.global_decl(node) }
+		ast.GlobalField { t.global_field(node) }
 		ast.Var { t.var(node) }
 	}
 	return obj
@@ -523,10 +523,32 @@ fn (t Tree) comp_for(node ast.CompFor) &C.cJSON {
 fn (t Tree) global_decl(node ast.GlobalDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('GlobalDecl'))
+	to_object(obj, 'pos', t.position(node.pos))
+	field_array := create_array()
+	for f in node.fields {
+		to_array(field_array, t.global_field(f))
+	}
+	to_object(obj, 'fields', field_array)
+	comment_array := create_array()
+	for c in node.end_comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'end_comments', comment_array)
+	return obj
+}
+
+fn (t Tree) global_field(node ast.GlobalField) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('GlobalField'))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'expr', t.expr(node.expr))
 	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'has_expr', t.bool_node(node.has_expr))
+	comment_array := create_array()
+	for c in node.comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'comments', comment_array)
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
