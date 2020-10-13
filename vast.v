@@ -13,7 +13,7 @@ const (
 )
 
 fn main() {
-	if os.args.len !in [2,3] {
+	if os.args.len !in [2, 3] {
 		println('unknown args,Usage: `vast demo.v` - produce demo.json, or `vast demo.v -p` - print AST to stdout')
 		return
 	}
@@ -27,13 +27,12 @@ fn main() {
 		return
 	}
 	apath := abs_path(file)
-
 	if os.args.len == 3 && os.args[2] == '-p' {
 		println(json(file))
 		return
 	} else {
 		println('AST written to: ' + json_file(apath))
-	}        
+	}
 }
 
 struct Tree {
@@ -429,6 +428,11 @@ fn (t Tree) enum_decl(node ast.EnumDecl) &C.cJSON {
 		to_array(c_array, t.comment(c))
 	}
 	to_object(obj, 'comments', c_array)
+	attr_array := create_array()
+	for a in node.attrs {
+		to_array(attr_array, t.attr(a))
+	}
+	to_object(obj, 'attrs', attr_array)
 	return obj
 }
 
