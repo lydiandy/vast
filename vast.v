@@ -443,11 +443,11 @@ fn (t Tree) enum_field(node ast.EnumField) &C.cJSON {
 	to_object(obj, 'has_expr', t.bool_node(node.has_expr))
 	to_object(obj, 'expr', t.expr(node.expr))
 	to_object(obj, 'pos', t.position(node.pos))
-	c_array := create_array()
+	comment_array := create_array()
 	for c in node.comments {
-		to_array(c_array, t.comment(c))
+		to_array(comment_array, t.comment(c))
 	}
-	to_object(obj, 'comments', c_array)
+	to_object(obj, 'comments', comment_array)
 	return obj
 }
 
@@ -466,6 +466,11 @@ fn (t Tree) interface_decl(node ast.InterfaceDecl) &C.cJSON {
 		to_array(m_arr, t.fn_decl(m))
 	}
 	to_object(obj, 'methods', m_arr)
+	comment_array := create_array()
+	for c in node.pre_comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'pre_comments', comment_array)
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -757,6 +762,7 @@ fn (t Tree) for_in_stmt(node ast.ForInStmt) &C.cJSON {
 	to_object(obj, 'val_type', t.type_node(node.val_type))
 	to_object(obj, 'cond_type', t.type_node(node.cond_type))
 	to_object(obj, 'kind', t.number_node(int(node.kind)))
+	to_object(obj, 'val_is_mut', t.bool_node(node.val_is_mut))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
