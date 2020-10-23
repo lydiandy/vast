@@ -55,6 +55,6 @@ fn main() {
 }
 
 // add function
-fn add(x, y int) int {
+fn add(x int, y int) int {
 	return x + y
 }

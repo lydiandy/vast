@@ -481,35 +481,15 @@ fn (t Tree) attr(node table.Attr) &C.cJSON {
 fn (t Tree) hash_stmt(node ast.HashStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('HashStmt'))
-	to_object(obj, 'val', t.string_node(node.val))
 	to_object(obj, 'mod', t.string_node(node.mod))
+	to_object(obj, 'val', t.string_node(node.val))
+	to_object(obj, 'kind', t.string_node(node.kind))
+	to_object(obj, 'main', t.string_node(node.main))
+	to_object(obj, 'msg', t.string_node(node.msg))
+	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
 
-// fn (t Tree) comp_if(node ast.CompIf) &C.cJSON {
-// obj := create_object()
-// to_object(obj, 'ast_type', t.string_node('CompIf'))
-// to_object(obj, 'val', t.string_node(node.val))
-// to_object(obj, 'is_not', t.bool_node(node.is_not))
-// stmt_arr := create_array()
-// for s in node.stmts {
-// to_array(stmt_arr, t.stmt(s))
-// }
-// to_object(obj, 'stmts', stmt_arr)
-// else_stmt_arr := create_array()
-// for s in node.else_stmts {
-// to_array(else_stmt_arr, t.stmt(s))
-// }
-// to_object(else_stmt_arr, 'else_stmts', else_stmt_arr)
-// to_object(obj, 'has_else', t.bool_node(node.has_else))
-// to_object(obj, 'is_opt', t.bool_node(node.is_opt))
-// to_object(obj, 'pos', t.position(node.pos))
-// to_object(obj, 'kind', t.number_node(int(node.kind)))
-// to_object(obj, 'tchk_expr', t.expr(node.tchk_expr))
-// to_object(obj, 'tchk_type', t.type_node(node.tchk_type))
-// to_object(obj, 'tchk_match', t.bool_node(node.tchk_match))
-// return obj
-// }
 fn (t Tree) comp_for(node ast.CompFor) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('CompFor'))
@@ -1305,7 +1285,8 @@ fn (t Tree) call_expr(node ast.CallExpr) &C.cJSON {
 	to_object(obj, 'return_type', t.type_node(node.return_type))
 	to_object(obj, 'should_be_skipped', t.bool_node(node.should_be_skipped))
 	to_object(obj, 'generic_type', t.type_node(node.generic_type))
-	to_object(obj, 'autofree_pregen', t.string_node(node.autofree_pregen))
+	to_object(obj, 'free_receiver', t.bool_node(node.free_receiver))
+	// to_object(obj, 'autofree_pregen', t.string_node(node.autofree_pregen))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -1360,8 +1341,12 @@ fn (t Tree) struct_init_field(node ast.StructInitField) &C.cJSON {
 	to_object(obj, 'expr', t.expr(node.expr))
 	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'expected_type', t.type_node(node.expected_type))
+	comment_array := create_array()
+	for c in node.comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'comments', comment_array)
 	to_object(obj, 'pos', t.position(node.pos))
-	to_object(obj, 'comment', t.comment(node.comment))
 	return obj
 }
 
@@ -1475,8 +1460,12 @@ fn (t Tree) match_branch(node ast.MatchBranch) &C.cJSON {
 	}
 	to_object(obj, 'stmts', stmt_arr)
 	to_object(obj, 'is_else', t.bool_node(node.is_else))
-	to_object(obj, 'comment', t.comment(node.comment))
 	to_object(obj, 'pos', t.position(node.pos))
+	comment_array := create_array()
+	for c in node.comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'comments', comment_array)
 	c_array := create_array()
 	for c in node.post_comments {
 		to_array(c_array, t.comment(c))
@@ -1659,7 +1648,7 @@ fn to_object(node &C.cJSON, key string, child &C.cJSON) {
 }
 
 [inline]
-fn to_array(node, child &C.cJSON) {
+fn to_array(node &C.cJSON, child &C.cJSON) {
 	add_item_to_array(node, child)
 }
 

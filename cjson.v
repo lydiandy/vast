@@ -47,7 +47,7 @@ fn C.cJSON_IsRaw(arg_1 voidptr) bool
 
 fn C.cJSON_AddItemToObject(arg_1 voidptr, arg_2 byteptr, arg_3 voidptr)
 
-fn C.cJSON_AddItemToArray(arg_1, arg_2 voidptr)
+fn C.cJSON_AddItemToArray(arg_1 voidptr, arg_2 voidptr)
 
 fn C.cJSON_Delete(arg_1 voidptr)
 
@@ -106,7 +106,7 @@ fn add_item_to_object(obj &C.cJSON, key string, item &C.cJSON) {
 }
 
 [inline]
-fn add_item_to_array(obj, item &C.cJSON) {
+fn add_item_to_array(obj &C.cJSON, item &C.cJSON) {
 	C.cJSON_AddItemToArray(obj, item)
 }
 
