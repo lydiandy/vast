@@ -602,6 +602,7 @@ fn (t Tree) struct_field(node ast.StructField) &C.cJSON {
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'is_public', t.bool_node(node.is_public))
+	to_object(obj, 'is_embed', t.bool_node(node.is_embed))
 	to_object(obj, 'has_default_expr', t.bool_node(node.has_default_expr))
 	to_object(obj, 'default_expr', t.expr(node.default_expr))
 	to_object(obj, 'pos', t.position(node.pos))
@@ -1305,6 +1306,7 @@ fn (t Tree) call_arg(node ast.CallArg) &C.cJSON {
 	to_object(obj, 'share', t.number_node(int(node.share)))
 	to_object(obj, 'expr', t.expr(node.expr))
 	to_object(obj, 'is_tmp_autofree', t.bool_node(node.is_tmp_autofree))
+	to_object(obj, 'pos', t.position(node.pos))
 	comments := create_array()
 	for c in node.comments {
 		to_array(comments, t.comment(c))
