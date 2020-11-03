@@ -238,7 +238,6 @@ fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 	match node {
 		ast.Module { return t.mod(node) }
 		ast.Import { return t.import_module(node) }
-		// ast.Comment { return t.comment(node) }
 		ast.ConstDecl { return t.const_decl(node) }
 		ast.FnDecl { return t.fn_decl(node) }
 		ast.StructDecl { return t.struct_decl(node) }
@@ -949,6 +948,9 @@ fn (t Tree) expr(expr ast.Expr) &C.cJSON {
 		}
 		ast.SelectExpr {
 			return t.select_expr(expr)
+		}
+		ast.Comment {
+			return t.comment(expr)
 		}
 		else {
 			// println('unknown expr')
