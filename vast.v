@@ -178,7 +178,7 @@ fn (t Tree) scope_object(node ast.ScopeObject) &C.cJSON {
 fn (t Tree) imports(imports []ast.Import) &C.cJSON {
 	import_array := create_array()
 	for imp in imports {
-		to_array(import_array, t.import_(imp))
+		to_array(import_array, t.import_module(imp))
 	}
 	return import_array
 }
@@ -237,7 +237,7 @@ fn (t Tree) stmts(stmts []ast.Stmt) &C.cJSON {
 fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 	match node {
 		ast.Module { return t.mod(node) }
-		ast.Import { return t.import_(node) }
+		ast.Import { return t.import_module(node) }
 		// ast.Comment { return t.comment(node) }
 		ast.ConstDecl { return t.const_decl(node) }
 		ast.FnDecl { return t.fn_decl(node) }
@@ -265,7 +265,7 @@ fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 	}
 }
 
-fn (t Tree) import_(node ast.Import) &C.cJSON {
+fn (t Tree) import_module(node ast.Import) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Import'))
 	to_object(obj, 'mod', t.string_node(node.mod))
