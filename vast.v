@@ -178,11 +178,7 @@ fn (t Tree) scope_object(node ast.ScopeObject) &C.cJSON {
 fn (t Tree) imports(imports []ast.Import) &C.cJSON {
 	import_array := create_array()
 	for imp in imports {
-		obj := create_object()
-		to_object(obj, 'mod', t.string_node(imp.mod))
-		to_object(obj, 'alias', t.string_node(imp.alias))
-		to_object(obj, 'pos', t.position(imp.pos))
-		to_array(import_array, obj)
+		to_array(import_array, t.import_(imp))
 	}
 	return import_array
 }
