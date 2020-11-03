@@ -36,10 +36,11 @@ fn main() {
 }
 
 struct Tree {
-	root         &C.cJSON // the root of tree
 	table        &table.Table
 	pref         pref.Preferences
 	global_scope &ast.Scope
+mut:
+	root         &C.cJSON // the root of tree
 }
 
 // generate json file with the same file name
@@ -52,7 +53,7 @@ fn json_file(file string) string {
 
 // generate json string
 fn json(file string) string {
-	t := Tree{
+	mut t := Tree{
 		root: create_object()
 		table: table.new_table()
 		pref: pref.new_preferences()
@@ -61,16 +62,11 @@ fn json(file string) string {
 			parent: 0
 		}
 	}
+	// parse file with comment
 	ast_file := parser.parse_file(file, t.table, .parse_comments, t.pref, t.global_scope)
+	// parse file without comment
 	// ast_file := parser.parse_file(file, t.table, .skip_comments, t.pref, t.global_scope)
-	to_object(t.root, 'ast_type', t.string_node('ast.File'))
-	to_object(t.root, 'path', t.string_node(ast_file.path))
-	to_object(t.root, 'mod', t.mod(ast_file.mod))
-	to_object(t.root, 'imports', t.imports(ast_file.imports))
-	to_object(t.root, 'global_scope', t.scope(ast_file.global_scope))
-	to_object(t.root, 'errors', t.errors(ast_file.errors))
-	to_object(t.root, 'warnings', t.warnings(ast_file.warnings))
-	to_object(t.root, 'stmts', t.stmts(ast_file.stmts))
+	t.root = t.ast_file(ast_file)
 	// generate the ast string
 	s := json_print(t.root)
 	return s
@@ -115,7 +111,22 @@ fn (t Tree) enum_node(e int) &C.cJSON {
 	return t.string_node('enum test')
 }
 
-// ast.File node
+// ast file node
+fn (t Tree) ast_file(ast_file ast.File) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('ast.File'))
+	to_object(obj, 'path', t.string_node(ast_file.path))
+	to_object(obj, 'mod', t.mod(ast_file.mod))
+	to_object(obj, 'imports', t.imports(ast_file.imports))
+	to_object(obj, 'global_scope', t.scope(ast_file.global_scope))
+	to_object(obj, 'scope', t.scope(ast_file.scope))
+	to_object(obj, 'errors', t.errors(ast_file.errors))
+	to_object(obj, 'warnings', t.warnings(ast_file.warnings))
+	to_object(obj, 'stmts', t.stmts(ast_file.stmts))
+	return obj
+}
+
+// ast module node
 fn (t Tree) mod(mod ast.Module) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Module'))
@@ -332,6 +343,7 @@ fn (t Tree) const_field(node ast.ConstField) &C.cJSON {
 	return obj
 }
 
+// function declaration
 fn (t Tree) fn_decl(node ast.FnDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('FnDecl'))
