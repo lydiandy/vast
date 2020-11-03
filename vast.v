@@ -829,6 +829,11 @@ fn (t Tree) expr_stmt(node ast.ExprStmt) &C.cJSON {
 	to_object(obj, 'is_expr', t.bool_node(node.is_expr))
 	to_object(obj, 'expr', t.expr(node.expr))
 	to_object(obj, 'pos', t.position(node.pos))
+	comment_array := create_array()
+	for c in node.comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'comments', comment_array)
 	return obj
 }
 
