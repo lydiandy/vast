@@ -325,16 +325,17 @@ fn (t Tree) const_decl(node ast.ConstDecl) &C.cJSON {
 fn (t Tree) const_field(node ast.ConstField) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ConstField'))
+	to_object(obj, 'mod', t.string_node(node.mod))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'expr', t.expr(node.expr))
 	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
 	to_object(obj, 'typ', t.type_node(node.typ))
+	to_object(obj, 'pos', t.position(node.pos))
 	comment_array := create_array()
 	for c in node.comments {
 		to_array(comment_array, t.comment(c))
 	}
 	to_object(obj, 'comments', comment_array)
-	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
 
@@ -358,6 +359,7 @@ fn (t Tree) fn_decl(node ast.FnDecl) &C.cJSON {
 	to_object(obj, 'no_body', t.bool_node(node.no_body))
 	to_object(obj, 'is_builtin', t.bool_node(node.is_builtin))
 	to_object(obj, 'is_generic', t.bool_node(node.is_generic))
+	to_object(obj, 'is_direct_arr', t.bool_node(node.is_direct_arr))
 	to_object(obj, 'pos', t.position(node.pos))
 	to_object(obj, 'body_pos', t.position(node.body_pos))
 	to_object(obj, 'file', t.string_node(node.file))
@@ -487,6 +489,9 @@ fn (t Tree) attr(node table.Attr) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('Attr'))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'is_string', t.bool_node(node.is_string))
+	to_object(obj, 'is_ctdefine', t.bool_node(node.is_ctdefine))
+	to_object(obj, 'arg', t.string_node(node.arg))
+	to_object(obj, 'is_string_arg', t.bool_node(node.is_string_arg))
 	return obj
 }
 
