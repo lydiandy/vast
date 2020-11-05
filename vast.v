@@ -395,8 +395,8 @@ fn (t Tree) struct_decl(node ast.StructDecl) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('StructDecl'))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
-	to_object(obj, 'mut_pos', t.number_node(node.mut_pos))
 	to_object(obj, 'pub_pos', t.number_node(node.pub_pos))
+	to_object(obj, 'mut_pos', t.number_node(node.mut_pos))
 	to_object(obj, 'pub_mut_pos', t.number_node(node.pub_mut_pos))
 	to_object(obj, 'language', t.number_node(int(node.language)))
 	to_object(obj, 'is_union', t.bool_node(node.is_union))
@@ -1406,6 +1406,8 @@ fn (t Tree) array_init(node ast.ArrayInit) &C.cJSON {
 	to_object(obj, 'has_cap', t.bool_node(node.has_cap))
 	to_object(obj, 'has_default', t.bool_node(node.has_default))
 	to_object(obj, 'is_interface', t.bool_node(node.is_interface))
+	to_object(obj, 'typ', t.type_node(node.typ))
+	to_object(obj, 'elem_type', t.type_node(node.elem_type))
 	to_object(obj, 'interface_type', t.type_node(node.interface_type))
 	i_arr := create_array()
 	for i in node.interface_types {
