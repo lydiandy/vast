@@ -875,6 +875,9 @@ fn (t Tree) expr(expr ast.Expr) &C.cJSON {
 		ast.Assoc {
 			return t.assoc(expr)
 		}
+		ast.AtExpr {
+			return t.at_expr(expr)
+		}
 		ast.CastExpr {
 			return t.cast_expr(expr)
 		}
@@ -1101,6 +1104,16 @@ fn (t Tree) assoc(node ast.Assoc) &C.cJSON {
 	to_object(obj, 'exprs', e_arr)
 	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'pos', t.position(node.pos))
+	return obj
+}
+
+fn (t Tree) at_expr(node ast.AtExpr) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('AtExpr'))
+	to_object(obj, 'name', t.string_node(node.name))
+	to_object(obj, 'pos', t.position(node.pos))
+	to_object(obj, 'kind', t.number_node(int(node.kind)))
+	to_object(obj, 'val', t.string_node(node.val))
 	return obj
 }
 
