@@ -1126,6 +1126,7 @@ fn (t Tree) cast_expr(node ast.CastExpr) &C.cJSON {
 	to_object(obj, 'typname', t.string_node(node.typname))
 	to_object(obj, 'expr_type', t.type_node(node.expr_type))
 	to_object(obj, 'has_arg', t.bool_node(node.has_arg))
+	to_object(obj, 'in_prexpr', t.bool_node(node.in_prexpr))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -1178,6 +1179,7 @@ fn (t Tree) infix_expr(node ast.InfixExpr) &C.cJSON {
 	to_object(obj, 'left_type', t.type_node(node.left_type))
 	to_object(obj, 'right', t.expr(node.right))
 	to_object(obj, 'right_type', t.type_node(node.right_type))
+	to_object(obj, 'auto_locked', t.string_node(node.auto_locked))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -1200,6 +1202,7 @@ fn (t Tree) postfix_expr(node ast.PostfixExpr) &C.cJSON {
 	to_object(obj, 'op', t.number_node(int(node.op)))
 	to_object(obj, '_op', t.string_node(node.op.str()))
 	to_object(obj, 'expr', t.expr(node.expr))
+	to_object(obj, 'auto_locked', t.string_node(node.auto_locked))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -1209,8 +1212,8 @@ fn (t Tree) selector_expr(node ast.SelectorExpr) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('SelectorExpr'))
 	to_object(obj, 'expr', t.expr(node.expr))
 	to_object(obj, 'expr_type', t.type_node(node.expr_type))
-	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'field_name', t.string_node(node.field_name))
+	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
