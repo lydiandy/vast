@@ -1256,6 +1256,11 @@ fn (t Tree) if_branch(node ast.IfBranch) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('IfBranch'))
 	to_object(obj, 'cond', t.expr(node.cond))
+	to_object(obj, 'left_as_name', t.string_node(node.left_as_name))
+	to_object(obj, 'pos', t.position(node.pos))
+	to_object(obj, 'body_pos', t.position(node.body_pos))
+	to_object(obj, 'mut_name', t.bool_node(node.mut_name))
+	to_object(obj, 'smartcast', t.bool_node(node.smartcast))
 	stmt_array := create_array()
 	for s in node.stmts {
 		to_array(stmt_array, t.stmt(s))
@@ -1265,9 +1270,7 @@ fn (t Tree) if_branch(node ast.IfBranch) &C.cJSON {
 	for c in node.comments {
 		to_array(comment_array, t.comment(c))
 	}
-	to_object(obj, 'left_as_name', t.string_node(node.left_as_name))
 	to_object(obj, 'comments', comment_array)
-	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
 
