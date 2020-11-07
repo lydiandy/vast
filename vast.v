@@ -99,7 +99,7 @@ fn (t Tree) null_node() &C.cJSON {
 // type type node
 fn (t Tree) type_node(typ table.Type) &C.cJSON {
 	if typ == 0 {
-		return create_string('')
+		return create_null()
 	} else {
 		type_name := t.table.get_type_name(typ)
 		return create_string(type_name)
@@ -971,9 +971,12 @@ fn (t Tree) expr(expr ast.Expr) &C.cJSON {
 		ast.Comment {
 			return t.comment(expr)
 		}
+		ast.AnonFn {
+			return t.anon_fn(expr)
+		}
 		else {
 			// println('unknown expr')
-			return t.string_node('')
+			return t.null_node()
 		}
 	}
 }
