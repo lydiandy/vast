@@ -352,6 +352,7 @@ fn (t Tree) fn_decl(node ast.FnDecl) &C.cJSON {
 	to_object(obj, 'receiver', t.field(node.receiver))
 	to_object(obj, 'receiver_pos', t.position(node.receiver_pos))
 	to_object(obj, 'is_method', t.bool_node(node.is_method))
+	to_object(obj, 'method_idx', t.number_node(node.method_idx))
 	to_object(obj, 'rec_mut', t.bool_node(node.rec_mut))
 	to_object(obj, 'rec_share', t.number_node(int(node.rec_share)))
 	// to_object(obj, 'language', t.enum_node(node.language))
@@ -364,6 +365,7 @@ fn (t Tree) fn_decl(node ast.FnDecl) &C.cJSON {
 	to_object(obj, 'body_pos', t.position(node.body_pos))
 	to_object(obj, 'file', t.string_node(node.file))
 	to_object(obj, 'return_type', t.type_node(node.return_type))
+	to_object(obj, 'source_file', t.number_node(int(node.source_file)))
 	a_arr := create_array()
 	for a in node.attrs {
 		to_array(a_arr, t.attr(a))
@@ -379,6 +381,11 @@ fn (t Tree) fn_decl(node ast.FnDecl) &C.cJSON {
 		to_array(stmt_array, t.stmt(s))
 	}
 	to_object(obj, 'stmts', stmt_array)
+	comment_array := create_array()
+	for c in node.comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'comments', comment_array)
 	return obj
 }
 
@@ -1217,6 +1224,7 @@ fn (t Tree) selector_expr(node ast.SelectorExpr) &C.cJSON {
 	to_object(obj, 'expr_type', t.type_node(node.expr_type))
 	to_object(obj, 'field_name', t.string_node(node.field_name))
 	to_object(obj, 'typ', t.type_node(node.typ))
+	to_object(obj, 'name_type', t.type_node(node.name_type))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -1387,6 +1395,11 @@ fn (t Tree) struct_init(node ast.StructInit) &C.cJSON {
 		to_array(s_arr, t.struct_init_field(f))
 	}
 	to_object(obj, 'fields', s_arr)
+	comments := create_array()
+	for c in node.pre_comments {
+		to_array(comments, t.comment(c))
+	}
+	to_object(obj, 'pre_comments', comments)
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
