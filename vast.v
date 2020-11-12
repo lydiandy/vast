@@ -424,21 +424,26 @@ fn (t Tree) struct_decl(node ast.StructDecl) &C.cJSON {
 	to_object(obj, 'language', t.number_node(int(node.language)))
 	to_object(obj, 'is_union', t.bool_node(node.is_union))
 	to_object(obj, 'pos', t.position(node.pos))
-	a_arr := create_array()
-	for a in node.attrs {
-		to_array(a_arr, t.attr(a))
-	}
-	to_object(obj, 'attrs', a_arr)
-	f_arr := create_array()
+	f_array := create_array()
 	for f in node.fields {
-		to_array(f_arr, t.struct_field(f))
+		to_array(f_array, t.struct_field(f))
 	}
-	to_object(obj, 'fields', f_arr)
-	c_arr := create_array()
+	to_object(obj, 'fields', f_array)
+	gen_type_array := create_array()
+	for typ in node.gen_types {
+		to_array(gen_type_array, t.type_node(typ))
+	}
+	to_object(obj, 'gen_types', gen_type_array)
+	a_array := create_array()
+	for a in node.attrs {
+		to_array(a_array, t.attr(a))
+	}
+	to_object(obj, 'attrs', a_array)
+	c_array := create_array()
 	for c in node.end_comments {
-		to_array(c_arr, t.comment(c))
+		to_array(c_array, t.comment(c))
 	}
-	to_object(obj, 'end_comments', c_arr)
+	to_object(obj, 'end_comments', c_array)
 	return obj
 }
 
