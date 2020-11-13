@@ -1468,6 +1468,17 @@ fn (t Tree) array_init(node ast.ArrayInit) &C.cJSON {
 		to_array(expr_arr, t.expr(e))
 	}
 	to_object(obj, 'exprs', expr_arr)
+	// expr comments:[][]Comment
+	expr_comments := create_array()
+	println(node.ecmnts)
+	for c_array in node.ecmnts {
+		comment_array := create_array()
+		for c in c_array {
+			to_array(comment_array, t.comment(c))
+		}
+		to_array(expr_comments, comment_array)
+	}
+	to_object(obj, 'ecmnts', expr_comments)
 	to_object(obj, 'elem_type_pos', t.position(node.elem_type_pos))
 	to_object(obj, 'is_fixed', t.bool_node(node.is_fixed))
 	to_object(obj, 'has_val', t.bool_node(node.has_val))
@@ -1564,6 +1575,16 @@ fn (t Tree) match_branch(node ast.MatchBranch) &C.cJSON {
 		to_array(expr_arr, t.expr(e))
 	}
 	to_object(obj, 'exprs', expr_arr)
+	// expr comments:[][]Comment
+	expr_comments := create_array()
+	for c_array in node.ecmnts {
+		comment_array := create_array()
+		for c in c_array {
+			to_array(comment_array, t.comment(c))
+		}
+		to_array(expr_comments, comment_array)
+	}
+	to_object(obj, 'ecmnts', expr_comments)
 	stmt_arr := create_array()
 	for s in node.stmts {
 		to_array(stmt_arr, t.stmt(s))
