@@ -1387,6 +1387,7 @@ fn (t Tree) call_expr(node ast.CallExpr) &C.cJSON {
 	to_object(obj, 'return_type', t.type_node(node.return_type))
 	to_object(obj, 'should_be_skipped', t.bool_node(node.should_be_skipped))
 	to_object(obj, 'generic_type', t.type_node(node.generic_type))
+	to_object(obj, 'generic_list_pos', t.position(node.generic_list_pos))
 	to_object(obj, 'free_receiver', t.bool_node(node.free_receiver))
 	// to_object(obj, 'autofree_pregen', t.string_node(node.autofree_pregen))
 	to_object(obj, 'pos', t.position(node.pos))
@@ -1470,7 +1471,6 @@ fn (t Tree) array_init(node ast.ArrayInit) &C.cJSON {
 	to_object(obj, 'exprs', expr_arr)
 	// expr comments:[][]Comment
 	expr_comments := create_array()
-	println(node.ecmnts)
 	for c_array in node.ecmnts {
 		comment_array := create_array()
 		for c in c_array {
