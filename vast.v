@@ -1308,7 +1308,7 @@ fn (t Tree) if_branch(node ast.IfBranch) &C.cJSON {
 	to_object(obj, 'left_as_name', t.string_node(node.left_as_name))
 	to_object(obj, 'pos', t.position(node.pos))
 	to_object(obj, 'body_pos', t.position(node.body_pos))
-	to_object(obj, 'mut_name', t.bool_node(node.mut_name))
+	to_object(obj, 'is_mut_name', t.bool_node(node.is_mut_name))
 	to_object(obj, 'smartcast', t.bool_node(node.smartcast))
 	stmt_array := create_array()
 	for s in node.stmts {
