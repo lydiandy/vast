@@ -278,6 +278,8 @@ fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		ast.Block { return t.block(node) }
 		ast.SqlStmt { return t.sql_stmt(node) }
 	}
+	// fixed ForCStmt without init stmt
+	return t.null_node()
 }
 
 fn (t Tree) import_module(node ast.Import) &C.cJSON {
@@ -784,12 +786,13 @@ fn (t Tree) for_c_stmt(node ast.ForCStmt) &C.cJSON {
 	to_object(obj, 'has_cond', t.bool_node(node.has_cond))
 	to_object(obj, 'inc', t.stmt(node.inc))
 	to_object(obj, 'has_inc', t.bool_node(node.has_inc))
+	to_object(obj, 'label', t.string_node(node.label))
+	to_object(obj, 'pos', t.position(node.pos))
 	stmt_arr := create_array()
 	for s in node.stmts {
 		to_array(stmt_arr, t.stmt(s))
 	}
 	to_object(obj, 'stmts', stmt_arr)
-	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
 
@@ -797,13 +800,14 @@ fn (t Tree) for_stmt(node ast.ForStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ForStmt'))
 	to_object(obj, 'cond', t.expr(node.cond))
+	to_object(obj, 'is_inf', t.bool_node(node.is_inf))
+	to_object(obj, 'label', t.string_node(node.label))
+	to_object(obj, 'pos', t.position(node.pos))
 	stmt_arr := create_array()
 	for s in node.stmts {
 		to_array(stmt_arr, t.stmt(s))
 	}
 	to_object(obj, 'stmts', stmt_arr)
-	to_object(obj, 'is_inf', t.bool_node(node.is_inf))
-	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
 
@@ -815,17 +819,18 @@ fn (t Tree) for_in_stmt(node ast.ForInStmt) &C.cJSON {
 	to_object(obj, 'cond', t.expr(node.cond))
 	to_object(obj, 'is_range', t.bool_node(node.is_range))
 	to_object(obj, 'high', t.expr(node.high))
-	stmt_arr := create_array()
-	for s in node.stmts {
-		to_array(stmt_arr, t.stmt(s))
-	}
-	to_object(obj, 'stmts', stmt_arr)
 	to_object(obj, 'key_type', t.type_node(node.key_type))
 	to_object(obj, 'val_type', t.type_node(node.val_type))
 	to_object(obj, 'cond_type', t.type_node(node.cond_type))
 	to_object(obj, 'kind', t.number_node(int(node.kind)))
 	to_object(obj, 'val_is_mut', t.bool_node(node.val_is_mut))
+	to_object(obj, 'label', t.string_node(node.label))
 	to_object(obj, 'pos', t.position(node.pos))
+	stmt_arr := create_array()
+	for s in node.stmts {
+		to_array(stmt_arr, t.stmt(s))
+	}
+	to_object(obj, 'stmts', stmt_arr)
 	return obj
 }
 
@@ -833,6 +838,7 @@ fn (t Tree) branch_stmt(node ast.BranchStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('BranchStmt'))
 	to_object(obj, 'kind', t.number_node(int(node.kind)))
+	to_object(obj, 'label', t.string_node(node.label))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
