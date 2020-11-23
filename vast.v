@@ -183,7 +183,7 @@ fn (t Tree) objects(so map[string]ast.ScopeObject) &C.cJSON {
 
 fn (t Tree) scope_object(node ast.ScopeObject) &C.cJSON {
 	obj := create_object()
-	match node {
+	match union node {
 		ast.ConstField { t.const_field(node) }
 		ast.GlobalField { t.global_field(node) }
 		ast.Var { t.var(node) }
@@ -251,7 +251,7 @@ fn (t Tree) stmts(stmts []ast.Stmt) &C.cJSON {
 }
 
 fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
-	match node {
+	match union node {
 		ast.Module { return t.mod(node) }
 		ast.Import { return t.import_module(node) }
 		ast.ConstDecl { return t.const_decl(node) }
@@ -340,7 +340,7 @@ fn (t Tree) const_decl(node ast.ConstDecl) &C.cJSON {
 	return obj
 }
 
-fn (t Tree) const_field(node ast.ConstField) &C.cJSON {
+fn (t Tree) const_field(node &ast.ConstField) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ConstField'))
 	to_object(obj, 'mod', t.string_node(node.mod))
@@ -599,7 +599,7 @@ fn (t Tree) defer_stmt(node ast.DeferStmt) &C.cJSON {
 }
 
 fn (t Tree) type_decl(node ast.TypeDecl) &C.cJSON {
-	match node {
+	match union node {
 		ast.AliasTypeDecl { return t.alias_type_decl(node) }
 		ast.FnTypeDecl { return t.fn_type_decl(node) }
 		ast.SumTypeDecl { return t.sum_type_decl(node) }
@@ -901,7 +901,7 @@ fn (t Tree) expr_stmt(node ast.ExprStmt) &C.cJSON {
 
 // expr
 fn (t Tree) expr(expr ast.Expr) &C.cJSON {
-	match expr {
+	match union expr {
 		ast.IntegerLiteral {
 			return t.integer_literal(expr)
 		}
@@ -1345,7 +1345,7 @@ fn (t Tree) ident(node ast.Ident) &C.cJSON {
 }
 
 fn (t Tree) ident_info(info ast.IdentInfo) &C.cJSON {
-	match info {
+	match union info {
 		ast.IdentVar { return t.ident_var(info) }
 		ast.IdentFn { return t.ident_fn(info) }
 	}
@@ -1557,11 +1557,6 @@ fn (t Tree) match_expr(node ast.MatchExpr) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('MatchExpr'))
 	to_object(obj, 'tok_kind', t.number_node(int(node.tok_kind)))
 	to_object(obj, 'cond', t.expr(node.cond))
-	m_arr := create_array()
-	for b in node.branches {
-		to_array(m_arr, t.match_branch(b))
-	}
-	to_object(obj, 'branches', m_arr)
 	to_object(obj, 'cond_type', t.type_node(node.cond_type))
 	to_object(obj, 'return_type', t.type_node(node.return_type))
 	to_object(obj, 'expected_type', t.type_node(node.expected_type))
@@ -1570,6 +1565,11 @@ fn (t Tree) match_expr(node ast.MatchExpr) &C.cJSON {
 	to_object(obj, 'is_mut', t.bool_node(node.is_mut))
 	to_object(obj, 'var_name', t.string_node(node.var_name))
 	to_object(obj, 'pos', t.position(node.pos))
+	branch_array := create_array()
+	for b in node.branches {
+		to_array(branch_array, t.match_branch(b))
+	}
+	to_object(obj, 'branches', branch_array)
 	return obj
 }
 
