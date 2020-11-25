@@ -591,8 +591,7 @@ fn (t Tree) type_decl(node ast.TypeDecl) &C.cJSON {
 	match node {
 		ast.AliasTypeDecl { return t.alias_type_decl(node) }
 		ast.FnTypeDecl { return t.fn_type_decl(node) }
-		// ast.SumTypeDecl { return t.sum_type_decl(node) }
-		ast.UnionSumTypeDecl { return t.union_sum_type_decl(node) }
+		ast.SumTypeDecl { return t.sum_type_decl(node) }
 	}
 }
 
@@ -606,23 +605,9 @@ fn (t Tree) alias_type_decl(node ast.AliasTypeDecl) &C.cJSON {
 	return obj
 }
 
-// fn (t Tree) sum_type_decl(node ast.SumTypeDecl) &C.cJSON {
-// 	obj := create_object()
-// 	to_object(obj, 'ast_type', t.string_node('SumTypeDecl'))
-// 	to_object(obj, 'name', t.string_node(node.name))
-// 	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
-// 	t_array := create_array()
-// 	for s in node.sub_types {
-// 		to_array(t_array, t.type_node(s))
-// 	}
-// 	to_object(obj, 'sub_types', t_array)
-// 	to_object(obj, 'pos', t.position(node.pos))
-// 	return obj
-// }
-
-fn (t Tree) union_sum_type_decl(node ast.UnionSumTypeDecl) &C.cJSON {
+fn (t Tree) sum_type_decl(node ast.SumTypeDecl) &C.cJSON {
 	obj := create_object()
-	to_object(obj, 'ast_type', t.string_node('UnionSumTypeDecl'))
+	to_object(obj, 'ast_type', t.string_node('SumTypeDecl'))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
 	t_array := create_array()
@@ -1558,7 +1543,6 @@ fn (t Tree) match_expr(node ast.MatchExpr) &C.cJSON {
 	to_object(obj, 'is_sum_type', t.bool_node(node.is_sum_type))
 	to_object(obj, 'is_expr', t.bool_node(node.is_expr))
 	to_object(obj, 'is_mut', t.bool_node(node.is_mut))
-	// to_object(obj, 'var_name', t.string_node(node.var_name))
 	to_object(obj, 'pos', t.position(node.pos))
 	branch_array := create_array()
 	for b in node.branches {
