@@ -168,8 +168,12 @@ fn (t Tree) scope_struct_field(node ast.ScopeStructField) &C.cJSON {
 	to_object(obj, 'struct_type', t.type_node(node.struct_type))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'typ', t.type_node(node.typ))
-	to_object(obj, 'sum_typ_cast', t.type_node(node.sum_type_cast))
 	to_object(obj, 'pos', t.position(node.pos))
+	type_array := create_array()
+	for typ in node.sum_type_casts {
+		to_array(type_array, t.type_node(typ))
+	}
+	to_object(obj, 'sum_type_casts', type_array)
 	return obj
 }
 
@@ -183,7 +187,7 @@ fn (t Tree) objects(so map[string]ast.ScopeObject) &C.cJSON {
 
 fn (t Tree) scope_object(node ast.ScopeObject) &C.cJSON {
 	obj := create_object()
-	match union node {
+	match node {
 		ast.ConstField { t.const_field(node) }
 		ast.GlobalField { t.global_field(node) }
 		ast.Var { t.var(node) }
@@ -226,21 +230,6 @@ fn (t Tree) warnings(warnings []errors.Warning) &C.cJSON {
 	return warns
 }
 
-fn (t Tree) var(node ast.Var) &C.cJSON {
-	obj := create_object()
-	to_object(obj, 'ast_type', t.string_node('Var'))
-	to_object(obj, 'name', t.string_node(node.name))
-	to_object(obj, 'expr', t.expr(node.expr))
-	to_object(obj, 'is_mut', t.bool_node(node.is_mut))
-	to_object(obj, 'is_arg', t.bool_node(node.is_arg))
-	to_object(obj, 'typ', t.type_node(node.typ))
-	to_object(obj, 'is_used', t.bool_node(node.is_used))
-	to_object(obj, 'is_changed', t.bool_node(node.is_changed))
-	to_object(obj, 'share', t.number_node(int(node.share)))
-	to_object(obj, 'pos', t.position(node.pos))
-	return obj
-}
-
 // stmt node
 fn (t Tree) stmts(stmts []ast.Stmt) &C.cJSON {
 	stmt_array := create_array()
@@ -251,7 +240,7 @@ fn (t Tree) stmts(stmts []ast.Stmt) &C.cJSON {
 }
 
 fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
-	match union node {
+	match node {
 		ast.Module { return t.mod(node) }
 		ast.Import { return t.import_module(node) }
 		ast.ConstDecl { return t.const_decl(node) }
@@ -340,7 +329,7 @@ fn (t Tree) const_decl(node ast.ConstDecl) &C.cJSON {
 	return obj
 }
 
-fn (t Tree) const_field(node &ast.ConstField) &C.cJSON {
+fn (t Tree) const_field(node ast.ConstField) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ConstField'))
 	to_object(obj, 'mod', t.string_node(node.mod))
@@ -599,10 +588,10 @@ fn (t Tree) defer_stmt(node ast.DeferStmt) &C.cJSON {
 }
 
 fn (t Tree) type_decl(node ast.TypeDecl) &C.cJSON {
-	match union node {
+	match node {
 		ast.AliasTypeDecl { return t.alias_type_decl(node) }
 		ast.FnTypeDecl { return t.fn_type_decl(node) }
-		ast.SumTypeDecl { return t.sum_type_decl(node) }
+		// ast.SumTypeDecl { return t.sum_type_decl(node) }
 		ast.UnionSumTypeDecl { return t.union_sum_type_decl(node) }
 	}
 }
@@ -617,19 +606,19 @@ fn (t Tree) alias_type_decl(node ast.AliasTypeDecl) &C.cJSON {
 	return obj
 }
 
-fn (t Tree) sum_type_decl(node ast.SumTypeDecl) &C.cJSON {
-	obj := create_object()
-	to_object(obj, 'ast_type', t.string_node('SumTypeDecl'))
-	to_object(obj, 'name', t.string_node(node.name))
-	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
-	t_array := create_array()
-	for s in node.sub_types {
-		to_array(t_array, t.type_node(s))
-	}
-	to_object(obj, 'sub_types', t_array)
-	to_object(obj, 'pos', t.position(node.pos))
-	return obj
-}
+// fn (t Tree) sum_type_decl(node ast.SumTypeDecl) &C.cJSON {
+// 	obj := create_object()
+// 	to_object(obj, 'ast_type', t.string_node('SumTypeDecl'))
+// 	to_object(obj, 'name', t.string_node(node.name))
+// 	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
+// 	t_array := create_array()
+// 	for s in node.sub_types {
+// 		to_array(t_array, t.type_node(s))
+// 	}
+// 	to_object(obj, 'sub_types', t_array)
+// 	to_object(obj, 'pos', t.position(node.pos))
+// 	return obj
+// }
 
 fn (t Tree) union_sum_type_decl(node ast.UnionSumTypeDecl) &C.cJSON {
 	obj := create_object()
@@ -745,18 +734,24 @@ fn (t Tree) assign_stmt(node ast.AssignStmt) &C.cJSON {
 	return obj
 }
 
-fn (t Tree) var_decl(node ast.Var) &C.cJSON {
+fn (t Tree) var(node ast.Var) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Var'))
 	to_object(obj, 'name', t.string_node(node.name))
-	to_object(obj, 'expr', t.expr(node.expr))
-	to_object(obj, 'is_mut', t.bool_node(node.is_mut))
-	to_object(obj, 'is_arg', t.bool_node(node.is_arg))
 	to_object(obj, 'typ', t.type_node(node.typ))
-	to_object(obj, 'sum_type_cast', t.type_node(node.sum_type_cast))
+	to_object(obj, 'expr', t.expr(node.expr))
+	to_object(obj, 'is_arg', t.bool_node(node.is_arg))
+	to_object(obj, 'is_mut', t.bool_node(node.is_mut))
 	to_object(obj, 'is_used', t.bool_node(node.is_used))
 	to_object(obj, 'is_changed', t.bool_node(node.is_changed))
+	to_object(obj, 'is_autofree_tmp', t.bool_node(node.is_autofree_tmp))
+	to_object(obj, 'share', t.number_node(int(node.share)))
 	to_object(obj, 'pos', t.position(node.pos))
+	type_array := create_array()
+	for typ in node.sum_type_casts {
+		to_array(type_array, t.type_node(typ))
+	}
+	to_object(obj, 'sum_type_casts', type_array)
 	return obj
 }
 
@@ -901,7 +896,7 @@ fn (t Tree) expr_stmt(node ast.ExprStmt) &C.cJSON {
 
 // expr
 fn (t Tree) expr(expr ast.Expr) &C.cJSON {
-	match union expr {
+	match expr {
 		ast.IntegerLiteral {
 			return t.integer_literal(expr)
 		}
@@ -1311,7 +1306,7 @@ fn (t Tree) if_branch(node ast.IfBranch) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('IfBranch'))
 	to_object(obj, 'cond', t.expr(node.cond))
-	to_object(obj, 'left_as_name', t.string_node(node.left_as_name))
+	// to_object(obj, 'left_as_name', t.string_node(node.left_as_name))
 	to_object(obj, 'pos', t.position(node.pos))
 	to_object(obj, 'body_pos', t.position(node.body_pos))
 	to_object(obj, 'is_mut_name', t.bool_node(node.is_mut_name))
@@ -1345,7 +1340,7 @@ fn (t Tree) ident(node ast.Ident) &C.cJSON {
 }
 
 fn (t Tree) ident_info(info ast.IdentInfo) &C.cJSON {
-	match union info {
+	match info {
 		ast.IdentVar { return t.ident_var(info) }
 		ast.IdentFn { return t.ident_fn(info) }
 	}
@@ -1563,7 +1558,7 @@ fn (t Tree) match_expr(node ast.MatchExpr) &C.cJSON {
 	to_object(obj, 'is_sum_type', t.bool_node(node.is_sum_type))
 	to_object(obj, 'is_expr', t.bool_node(node.is_expr))
 	to_object(obj, 'is_mut', t.bool_node(node.is_mut))
-	to_object(obj, 'var_name', t.string_node(node.var_name))
+	// to_object(obj, 'var_name', t.string_node(node.var_name))
 	to_object(obj, 'pos', t.position(node.pos))
 	branch_array := create_array()
 	for b in node.branches {
