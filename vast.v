@@ -610,12 +610,22 @@ fn (t Tree) sum_type_decl(node ast.SumTypeDecl) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('SumTypeDecl'))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
-	t_array := create_array()
-	for s in node.sub_types {
-		to_array(t_array, t.type_node(s))
-	}
-	to_object(obj, 'sub_types', t_array)
 	to_object(obj, 'pos', t.position(node.pos))
+	// comments
+	comment_array := create_array()
+	for c in node.comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'comments', comment_array)
+	// variants
+	t_array := create_array()
+	for s in node.variants {
+		variants_obj := create_object()
+		to_object(variants_obj, 'typ', t.type_node(s.typ))
+		to_object(variants_obj, 'pos', t.position(s.pos))
+		to_array(t_array, variants_obj)
+	}
+	to_object(obj, 'variants', t_array)
 	return obj
 }
 
