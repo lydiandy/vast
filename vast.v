@@ -1486,11 +1486,6 @@ fn (t Tree) array_init(node ast.ArrayInit) &C.cJSON {
 	to_object(obj, 'has_default', t.bool_node(node.has_default))
 	to_object(obj, 'is_interface', t.bool_node(node.is_interface))
 	to_object(obj, 'interface_type', t.type_node(node.interface_type))
-	i_arr := create_array()
-	for i in node.interface_types {
-		to_array(i_arr, t.type_node(i))
-	}
-	to_object(obj, 'interface_types', i_arr)
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
