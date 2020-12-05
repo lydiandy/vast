@@ -739,6 +739,7 @@ fn (t Tree) var(node ast.Var) &C.cJSON {
 	to_object(obj, 'is_mut', t.bool_node(node.is_mut))
 	to_object(obj, 'is_used', t.bool_node(node.is_used))
 	to_object(obj, 'is_changed', t.bool_node(node.is_changed))
+	to_object(obj, 'is_or', t.bool_node(node.is_or))
 	to_object(obj, 'is_autofree_tmp', t.bool_node(node.is_autofree_tmp))
 	to_object(obj, 'share', t.number_node(int(node.share)))
 	to_object(obj, 'pos', t.position(node.pos))
