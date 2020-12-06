@@ -740,6 +740,7 @@ fn (t Tree) var(node ast.Var) &C.cJSON {
 	to_object(obj, 'is_used', t.bool_node(node.is_used))
 	to_object(obj, 'is_changed', t.bool_node(node.is_changed))
 	to_object(obj, 'is_or', t.bool_node(node.is_or))
+	// to_object(obj, 'is_tmp', t.bool_node(node.is_tmp))
 	to_object(obj, 'is_autofree_tmp', t.bool_node(node.is_autofree_tmp))
 	to_object(obj, 'share', t.number_node(int(node.share)))
 	to_object(obj, 'pos', t.position(node.pos))
@@ -831,6 +832,7 @@ fn (t Tree) branch_stmt(node ast.BranchStmt) &C.cJSON {
 	to_object(obj, 'kind', t.number_node(int(node.kind)))
 	to_object(obj, 'label', t.string_node(node.label))
 	to_object(obj, 'pos', t.position(node.pos))
+	to_object(obj, 'parent_pos', t.number_node(node.parent_pos))
 	return obj
 }
 
