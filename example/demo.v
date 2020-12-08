@@ -1,17 +1,19 @@
 // comment for module
 module main
 
-//import module
+// import module
 import os
 import math
+import time { now, Time }
 
-//const decl
+// const decl
 const (
 	a = 1
 	b = 3
 	c = 'c'
 )
-//struct decl
+
+// struct decl
 struct Point {
 	x int
 mut:
@@ -26,22 +28,24 @@ pub mut:
 pub fn (p Point) get_x() int {
 	return p.x
 }
-//enum type
+
+// enum type
 enum Color {
 	red
 	green
 	blue
 }
-//type alias
+
+// type alias
 type Myint = int
 
-//sum type
+// sum type
 type MySumType = bool | int | string
 
-//function type
+// function type
 type Myfn = fn (arg_1 int) int
 
-//interface type
+// interface type
 interface Myinterfacer {
 	add(int, int) int
 	sub(int, int) int
@@ -62,6 +66,9 @@ fn main() {
 	println(os.args)
 	m := math.max(1, 3)
 	println(m)
+	println(now())
+	t := Time{}
+	println(t)
 }
 
 // normal function
@@ -75,8 +82,8 @@ fn g_fn<T>(p T) T {
 }
 
 // generic struct
-struct GenericStruct<T> {
-	point    Point
+struct GenericStruct <T> {
+	point Point
 mut:
 	model T
 }

@@ -111,7 +111,7 @@ fn (t Tree) enum_node(e int) &C.cJSON {
 	return t.string_node('enum test')
 }
 
-// ast file node
+// ast file root node
 fn (t Tree) ast_file(ast_file ast.File) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ast.File'))
@@ -122,6 +122,16 @@ fn (t Tree) ast_file(ast_file ast.File) &C.cJSON {
 	to_object(obj, 'scope', t.scope(ast_file.scope))
 	to_object(obj, 'errors', t.errors(ast_file.errors))
 	to_object(obj, 'warnings', t.warnings(ast_file.warnings))
+	symbol_obj := create_object()
+	for key, val in ast_file.imported_symbols {
+		to_object(symbol_obj, key, t.string_node(val))
+	}
+	to_object(obj, 'imported_symbols', symbol_obj)
+	fn_array := create_array()
+	for f in ast_file.generic_fns {
+		to_array(fn_array, t.fn_decl(f))
+	}
+	to_object(obj, 'generic_fns', fn_array)
 	to_object(obj, 'stmts', t.stmts(ast_file.stmts))
 	return obj
 }
@@ -288,7 +298,6 @@ fn (t Tree) import_module(node ast.Import) &C.cJSON {
 fn (t Tree) import_symbol(node ast.ImportSymbol) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'name', t.string_node(node.name))
-	to_object(obj, 'kind', t.number_node(node.kind))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
