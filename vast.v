@@ -1461,6 +1461,11 @@ fn (t Tree) struct_init_field(node ast.StructInitField) &C.cJSON {
 		to_array(comment_array, t.comment(c))
 	}
 	to_object(obj, 'comments', comment_array)
+	next_comment_array := create_array()
+	for c in node.next_comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'next_comments', next_comment_array)
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
