@@ -382,6 +382,7 @@ fn (t Tree) fn_decl(node ast.FnDecl) &C.cJSON {
 	to_object(obj, 'file', t.string_node(node.file))
 	to_object(obj, 'return_type', t.type_node(node.return_type))
 	to_object(obj, 'source_file', t.number_node(int(node.source_file)))
+	to_object(obj, 'scope', t.number_node(int(node.scope)))
 	a_arr := create_array()
 	for a in node.attrs {
 		to_array(a_arr, t.attr(a))
@@ -789,6 +790,7 @@ fn (t Tree) for_c_stmt(node ast.ForCStmt) &C.cJSON {
 	to_object(obj, 'has_inc', t.bool_node(node.has_inc))
 	to_object(obj, 'label', t.string_node(node.label))
 	to_object(obj, 'pos', t.position(node.pos))
+	to_object(obj, 'scope', t.number_node(int(node.scope)))
 	stmt_arr := create_array()
 	for s in node.stmts {
 		to_array(stmt_arr, t.stmt(s))
@@ -804,6 +806,7 @@ fn (t Tree) for_stmt(node ast.ForStmt) &C.cJSON {
 	to_object(obj, 'is_inf', t.bool_node(node.is_inf))
 	to_object(obj, 'label', t.string_node(node.label))
 	to_object(obj, 'pos', t.position(node.pos))
+	to_object(obj, 'scope', t.number_node(int(node.scope)))
 	stmt_arr := create_array()
 	for s in node.stmts {
 		to_array(stmt_arr, t.stmt(s))
@@ -827,6 +830,7 @@ fn (t Tree) for_in_stmt(node ast.ForInStmt) &C.cJSON {
 	to_object(obj, 'val_is_mut', t.bool_node(node.val_is_mut))
 	to_object(obj, 'label', t.string_node(node.label))
 	to_object(obj, 'pos', t.position(node.pos))
+	to_object(obj, 'scope', t.number_node(int(node.scope)))
 	stmt_arr := create_array()
 	for s in node.stmts {
 		to_array(stmt_arr, t.stmt(s))
@@ -1159,6 +1163,7 @@ fn (t Tree) assoc(node ast.Assoc) &C.cJSON {
 	to_object(obj, 'exprs', e_arr)
 	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'pos', t.position(node.pos))
+	to_object(obj, 'scope', t.number_node(int(node.scope)))
 	return obj
 }
 
@@ -1271,6 +1276,7 @@ fn (t Tree) selector_expr(node ast.SelectorExpr) &C.cJSON {
 	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'name_type', t.type_node(node.name_type))
 	to_object(obj, 'pos', t.position(node.pos))
+	to_object(obj, 'scope', t.number_node(int(node.scope)))
 	return obj
 }
 
@@ -1315,6 +1321,7 @@ fn (t Tree) if_branch(node ast.IfBranch) &C.cJSON {
 	to_object(obj, 'pos', t.position(node.pos))
 	to_object(obj, 'body_pos', t.position(node.body_pos))
 	to_object(obj, 'smartcast', t.bool_node(node.smartcast))
+	to_object(obj, 'scope', t.number_node(int(node.scope)))
 	stmt_array := create_array()
 	for s in node.stmts {
 		to_array(stmt_array, t.stmt(s))
@@ -1341,6 +1348,7 @@ fn (t Tree) ident(node ast.Ident) &C.cJSON {
 	to_object(obj, 'pos', t.position(node.pos))
 	to_object(obj, 'mut_pos', t.position(node.mut_pos))
 	to_object(obj, 'obj', t.scope_object(node.obj))
+	to_object(obj, 'scope', t.number_node(int(node.scope)))
 	return obj
 }
 
@@ -1377,6 +1385,7 @@ fn (t Tree) call_expr(node ast.CallExpr) &C.cJSON {
 	to_object(obj, 'mod', t.string_node(node.mod))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'language', t.number_node(int(node.language)))
+	to_object(obj, 'scope', t.number_node(int(node.scope)))
 	arg_arr := create_array()
 	for e in node.args {
 		to_array(arg_arr, t.call_arg(e))
@@ -1611,6 +1620,7 @@ fn (t Tree) match_branch(node ast.MatchBranch) &C.cJSON {
 		to_array(c_array, t.comment(c))
 	}
 	to_object(obj, 'post_comments', c_array)
+	to_object(obj, 'scope', t.number_node(int(node.scope)))
 	return obj
 }
 
