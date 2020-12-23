@@ -2,7 +2,7 @@
 
 A simple tool for vlang, generate v source file to  AST json file.
 
-so you can see the AST of  v source file.
+so you can see the AST of v source file.
 
 **NOTE:**
 
