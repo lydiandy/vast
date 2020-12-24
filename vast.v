@@ -1417,7 +1417,6 @@ fn (t Tree) call_expr(node ast.CallExpr) &C.cJSON {
 	to_object(obj, 'generic_list_pos', t.position(node.generic_list_pos))
 	to_object(obj, 'free_receiver', t.bool_node(node.free_receiver))
 	to_object(obj, 'from_embed_type', t.type_node(node.from_embed_type))
-	to_object(obj, 'scope', t.number_node(int(node.scope)))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }

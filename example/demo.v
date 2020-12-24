@@ -17,16 +17,22 @@ const (
 struct Point {
 	x int
 mut:
-	y string
+	y int
 pub:
-	z f32
+	z int
 pub mut:
-	a string
+	name string
 }
 
 // method of Point
 pub fn (p Point) get_x() int {
 	return p.x
+}
+
+// embed struct 
+struct MyPoint {
+	Point
+	title string
 }
 
 // enum type
@@ -43,7 +49,7 @@ type Myint = int
 type MySumType = bool | int | string
 
 // function type
-type Myfn = fn (arg_1 int) int
+type Myfn = fn (int) int
 
 // interface type
 interface Myinterfacer {
@@ -69,6 +75,18 @@ fn main() {
 	println(now())
 	t := Time{}
 	println(t)
+	p := Point{
+		x: 1
+		y: 2
+		z: 3
+	}
+	println(p)
+	my_point := MyPoint{
+		// x: 1
+		// y: 3
+		// z: 5
+	}
+	println(my_point.get_x())
 }
 
 // normal function
