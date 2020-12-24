@@ -445,6 +445,17 @@ fn (t Tree) struct_decl(node ast.StructDecl) &C.cJSON {
 		to_array(c_array, t.comment(c))
 	}
 	to_object(obj, 'end_comments', c_array)
+	embed_array:=create_array()
+	for e in node.embeds {
+		to_array(embed_array,t.embed(e))
+	}
+	to_object(obj,'embeds',embed_array)
+	return obj
+}
+fn (t Tree) embed(node ast.Embed) &C.cJSON {
+	obj:=create_object()
+	to_object(obj,'typ',t.type_node(node.typ))
+	to_object(obj,'pos',t.position(node.pos))
 	return obj
 }
 
@@ -655,7 +666,6 @@ fn (t Tree) struct_field(node ast.StructField) &C.cJSON {
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'is_public', t.bool_node(node.is_public))
-	to_object(obj, 'is_embed', t.bool_node(node.is_embed))
 	to_object(obj, 'has_default_expr', t.bool_node(node.has_default_expr))
 	to_object(obj, 'default_expr', t.expr(node.default_expr))
 	to_object(obj, 'pos', t.position(node.pos))
@@ -1276,6 +1286,7 @@ fn (t Tree) selector_expr(node ast.SelectorExpr) &C.cJSON {
 	to_object(obj, 'field_name', t.string_node(node.field_name))
 	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'name_type', t.type_node(node.name_type))
+	to_object(obj, 'from_embed_type', t.type_node(node.from_embed_type))
 	to_object(obj, 'pos', t.position(node.pos))
 	to_object(obj, 'scope', t.number_node(int(node.scope)))
 	return obj
@@ -1405,7 +1416,8 @@ fn (t Tree) call_expr(node ast.CallExpr) &C.cJSON {
 	to_object(obj, 'generic_type', t.type_node(node.generic_type))
 	to_object(obj, 'generic_list_pos', t.position(node.generic_list_pos))
 	to_object(obj, 'free_receiver', t.bool_node(node.free_receiver))
-	// to_object(obj, 'autofree_pregen', t.string_node(node.autofree_pregen))
+	to_object(obj, 'from_embed_type', t.type_node(node.from_embed_type))
+	to_object(obj, 'scope', t.number_node(int(node.scope)))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -1445,11 +1457,16 @@ fn (t Tree) struct_init(node ast.StructInit) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('StructInit'))
 	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'is_short', t.bool_node(node.is_short))
-	s_arr := create_array()
+	field_array := create_array()
 	for f in node.fields {
-		to_array(s_arr, t.struct_init_field(f))
+		to_array(field_array, t.struct_init_field(f))
 	}
-	to_object(obj, 'fields', s_arr)
+	to_object(obj, 'fields', field_array)
+	embed_array:=create_array()
+	for e in node.embeds {
+		to_array(embed_array,t.struct_init_embed(e))
+	}
+	to_object(obj,'embeds',embed_array)
 	comments := create_array()
 	for c in node.pre_comments {
 		to_array(comments, t.comment(c))
@@ -1462,6 +1479,27 @@ fn (t Tree) struct_init(node ast.StructInit) &C.cJSON {
 fn (t Tree) struct_init_field(node ast.StructInitField) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('StructInitField'))
+	to_object(obj, 'name', t.string_node(node.name))
+	to_object(obj, 'expr', t.expr(node.expr))
+	to_object(obj, 'typ', t.type_node(node.typ))
+	to_object(obj, 'expected_type', t.type_node(node.expected_type))
+	comment_array := create_array()
+	for c in node.comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'comments', comment_array)
+	next_comment_array := create_array()
+	for c in node.next_comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'next_comments', next_comment_array)
+	to_object(obj, 'pos', t.position(node.pos))
+	return obj
+}
+
+fn (t Tree) struct_init_embed(node ast.StructInitEmbed) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('StructInitEmbed'))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'expr', t.expr(node.expr))
 	to_object(obj, 'typ', t.type_node(node.typ))
