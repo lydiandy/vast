@@ -7,31 +7,71 @@ import v.ast
 import v.pref
 import v.errors
 import os
+import time
 
 const (
-	version = '0.2.0' //the version of vast will follow vlang
+	version = '0.2.0' // the version of vast will follow vlang
+	usage   = '
+usage:
+  1.vast demo.v 	 generate demo.json file and exit.
+  2.vast -w demo.v 	 generate demo.json and watch,if demo.v file change,regenerate.
+  3.vast -p demo.v 	 no generate json file,print the json string to terimal.'
 )
 
 fn main() {
-	if os.args.len !in [2, 3] {
-		println('unknown args,Usage: `vast demo.v` - produce demo.json, or `vast demo.v -p` - print AST to stdout')
-		return
+	args := os.args.clone()
+	match args.len {
+		2 {
+			file := get_abs_path(args[1])
+			check_file(file)
+			println('AST written to: ' + json_file(file))
+		}
+		3 {
+			file := get_abs_path(args[2])
+			check_file(file)
+			option := args[1]
+			if option == '-p' {
+				println(json(file))
+			} else if option == '-w' {
+				println('start watching...')
+				mut timestamp := os.file_last_mod_unix(file)
+				for {
+					new_timestamp := os.file_last_mod_unix(file)
+					if timestamp != new_timestamp {
+						res := json_file(file)
+						println('$time.now() : AST written to: ' + res)
+					}
+					timestamp = new_timestamp
+					time.sleep_ms(500)
+				}
+			} else {
+				println(usage)
+			}
+		}
+		else {
+			println(usage)
+		}
 	}
-	file := os.args[1]
+}
+
+// get absolute path for file
+fn get_abs_path(path string) string {
+	if os.is_abs_path(path) {
+		return path
+	} else if path.starts_with('./') {
+		return os.join_path(os.getwd(), path[2..])
+	} else {
+		return os.join_path(os.getwd(), path)
+	}
+}
+
+// check file is v file and exists
+fn check_file(file string) {
 	if os.file_ext(file) != '.v' {
-		println('the file `$file` must be a v file')
-		return
+		panic('the file `$file` must be a v file')
 	}
 	if !os.exists(file) {
-		println('the v file `$file` does not exist')
-		return
-	}
-	apath := abs_path(file)
-	if os.args.len == 3 && os.args[2] == '-p' {
-		println(json(file))
-		return
-	} else {
-		println('AST written to: ' + json_file(apath))
+		panic('the v file `$file` does not exist')
 	}
 }
 
@@ -445,17 +485,18 @@ fn (t Tree) struct_decl(node ast.StructDecl) &C.cJSON {
 		to_array(c_array, t.comment(c))
 	}
 	to_object(obj, 'end_comments', c_array)
-	embed_array:=create_array()
+	embed_array := create_array()
 	for e in node.embeds {
-		to_array(embed_array,t.embed(e))
+		to_array(embed_array, t.embed(e))
 	}
-	to_object(obj,'embeds',embed_array)
+	to_object(obj, 'embeds', embed_array)
 	return obj
 }
+
 fn (t Tree) embed(node ast.Embed) &C.cJSON {
-	obj:=create_object()
-	to_object(obj,'typ',t.type_node(node.typ))
-	to_object(obj,'pos',t.position(node.pos))
+	obj := create_object()
+	to_object(obj, 'typ', t.type_node(node.typ))
+	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
 
@@ -1236,7 +1277,7 @@ fn (t Tree) prefix_expr(node ast.PrefixExpr) &C.cJSON {
 	to_object(obj, '_op', t.string_node(node.op.str()))
 	to_object(obj, 'right', t.expr(node.right))
 	to_object(obj, 'right_type', t.type_node(node.right_type))
-	to_object(obj, 'or_block',t.or_expr(node.or_block))
+	to_object(obj, 'or_block', t.or_expr(node.or_block))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -1262,7 +1303,7 @@ fn (t Tree) index_expr(node ast.IndexExpr) &C.cJSON {
 	to_object(obj, 'left_type', t.type_node(node.left_type))
 	to_object(obj, 'index', t.expr(node.index))
 	to_object(obj, 'is_setter', t.bool_node(node.is_setter))
-	to_object(obj, 'or_expr',t.or_expr(node.or_expr))
+	to_object(obj, 'or_expr', t.or_expr(node.or_expr))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -1461,11 +1502,11 @@ fn (t Tree) struct_init(node ast.StructInit) &C.cJSON {
 		to_array(field_array, t.struct_init_field(f))
 	}
 	to_object(obj, 'fields', field_array)
-	embed_array:=create_array()
+	embed_array := create_array()
 	for e in node.embeds {
-		to_array(embed_array,t.struct_init_embed(e))
+		to_array(embed_array, t.struct_init_embed(e))
 	}
-	to_object(obj,'embeds',embed_array)
+	to_object(obj, 'embeds', embed_array)
 	comments := create_array()
 	for c in node.pre_comments {
 		to_array(comments, t.comment(c))
@@ -1840,15 +1881,4 @@ fn to_object(node &C.cJSON, key string, child &C.cJSON) {
 [inline]
 fn to_array(node &C.cJSON, child &C.cJSON) {
 	add_item_to_array(node, child)
-}
-
-// get absolute path for file
-fn abs_path(path string) string {
-	if os.is_abs_path(path) {
-		return path
-	} else if path.starts_with('./') {
-		return os.join_path(os.getwd(), path[2..])
-	} else {
-		return os.join_path(os.getwd(), path)
-	}
 }
