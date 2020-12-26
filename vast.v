@@ -30,22 +30,26 @@ fn main() {
 			file := get_abs_path(args[2])
 			check_file(file)
 			option := args[1]
-			if option == '-p' {
-				println(json(file))
-			} else if option == '-w' {
-				println('start watching...')
-				mut timestamp := os.file_last_mod_unix(file)
-				for {
-					new_timestamp := os.file_last_mod_unix(file)
-					if timestamp != new_timestamp {
-						res := json_file(file)
-						println('$time.now() : AST written to: ' + res)
-					}
-					timestamp = new_timestamp
-					time.sleep_ms(500)
+			match option {
+				'-p' {
+					println(json(file))
 				}
-			} else {
-				println(usage)
+				'-w' {
+					println('start watching...')
+					mut timestamp := os.file_last_mod_unix(file)
+					for {
+						new_timestamp := os.file_last_mod_unix(file)
+						if timestamp != new_timestamp {
+							res := json_file(file)
+							println('$time.now() : AST written to: ' + res)
+						}
+						timestamp = new_timestamp
+						time.sleep_ms(500)
+					}
+				}
+				else {
+					println(usage)
+				}
 			}
 		}
 		else {
