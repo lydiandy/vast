@@ -56,8 +56,8 @@ it will generate array.json file, ~22000 lines json code.
 
 ## todo
 
-- make type from id to name (done)
-- make enum from id to name
+- vast -w xxx.v or vast -watch xxx.v
+
 
 ## License
 
