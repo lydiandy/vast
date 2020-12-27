@@ -91,7 +91,7 @@ mut:
 fn json_file(file string) string {
 	ast_json := json(file)
 	// support .v and .vsh file
-	file_name := if os.file_ext(file).len == 2 { file[0..file.len - 2] } else { file[0..file.len - 4] }
+	file_name := file[0..(file.len - os.file_ext(file).len)]
 	json_file := file_name + '.json'
 	os.write_file(json_file, ast_json)
 	return json_file
