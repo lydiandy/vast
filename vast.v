@@ -71,8 +71,8 @@ fn get_abs_path(path string) string {
 
 // check file is v file and exists
 fn check_file(file string) {
-	if os.file_ext(file) != '.v' {
-		panic('the file `$file` must be a v file')
+	if os.file_ext(file) !in ['.v', '.vsh'] {
+		panic('the file `$file` must be a v file or vsh file')
 	}
 	if !os.exists(file) {
 		panic('the v file `$file` does not exist')
@@ -90,7 +90,9 @@ mut:
 // generate json file with the same file name
 fn json_file(file string) string {
 	ast_json := json(file)
-	json_file := file[0..file.len - 2] + '.json'
+	// support .v and .vsh file
+	file_name := if os.file_ext(file).len == 2 { file[0..file.len - 2] } else { file[0..file.len - 4] }
+	json_file := file_name + '.json'
 	os.write_file(json_file, ast_json)
 	return json_file
 }
