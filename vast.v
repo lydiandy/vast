@@ -36,7 +36,7 @@ fn main() {
 				}
 				'-w' {
 					println('start watching...')
-					mut timestamp := os.file_last_mod_unix(file)
+					mut timestamp := 0
 					for {
 						new_timestamp := os.file_last_mod_unix(file)
 						if timestamp != new_timestamp {
@@ -187,8 +187,8 @@ fn (t Tree) mod(mod ast.Module) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Module'))
 	to_object(obj, 'name', t.string_node(mod.name))
-	to_object(obj, 'path', t.string_node(mod.path))
-	to_object(obj, 'expr', t.expr(mod.expr))
+	// to_object(obj, 'path', t.string_node(mod.path))
+	// to_object(obj, 'expr', t.expr(mod.expr))
 	to_object(obj, 'is_skipped', t.bool_node(mod.is_skipped))
 	to_object(obj, 'pos', t.position(mod.pos))
 	return obj
