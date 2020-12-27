@@ -33,11 +33,11 @@ v .
 ## usage
 
 ```
-vast demo.v 	   //generate demo.json file and exit.
+vast demo.v 	 //generate demo.json file and exit.
 
 vast -w demo.v 	 //generate demo.json and watch,if demo.v file change,regenerate.
 
-vast -p demo.v 	 //no generate json file,print the json string to terimal.
+vast -p demo.v 	 //no generate json file,just print the json string to termial.
 ```
 
 
