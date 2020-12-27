@@ -27,7 +27,7 @@ ln -s `pwd`/vast ~/.vmodules/vast
 
 ```shell
 cd vast
-v .
+v -prod .
 ```
 
 ## usage
