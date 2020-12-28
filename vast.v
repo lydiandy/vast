@@ -454,6 +454,11 @@ fn (t Tree) fn_decl(node ast.FnDecl) &C.cJSON {
 		to_array(comment_array, t.comment(c))
 	}
 	to_object(obj, 'comments', comment_array)
+	next_comment_array := create_array()
+	for c in node.next_comments {
+		to_array(next_comment_array, t.comment(c))
+	}
+	to_object(obj, 'next_comments', next_comment_array)
 	return obj
 }
 
