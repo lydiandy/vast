@@ -152,9 +152,20 @@ fn (t Tree) type_node(typ table.Type) &C.cJSON {
 	}
 }
 
-// todo:enum type node
-fn (t Tree) enum_node(e int) &C.cJSON {
-	return t.string_node('enum test')
+// token type node
+fn (t Tree) token_node(tok_kind token.Kind) &C.cJSON {
+	return t.string_node('token:${tok_kind}(${token.token_str[tok_kind]})')
+}
+
+// waiting for generic method works in V
+// enum node
+// fn (t Tree) enum_node<T>(value T) &C.cJSON {
+// 	return t.string_node(value.str())
+// }
+//
+// use generic function temporary
+fn enum_node<T>(t Tree, value T) &C.cJSON {
+	return t.string_node('enum:${int(value)}($value)')
 }
 
 // ast file root node
@@ -267,7 +278,7 @@ fn (t Tree) errors(errors []errors.Error) &C.cJSON {
 		to_object(obj, 'file_path', t.string_node(e.file_path))
 		to_object(obj, 'pos', t.position(e.pos))
 		to_object(obj, 'backtrace', t.string_node(e.backtrace))
-		to_object(obj, 'reporter', t.number_node(int(e.reporter)))
+		to_object(obj, 'reporter', enum_node(t, e.reporter))
 		to_array(errs, obj)
 	}
 	return errs
@@ -280,7 +291,7 @@ fn (t Tree) warnings(warnings []errors.Warning) &C.cJSON {
 		to_object(obj, 'message', t.string_node(w.message))
 		to_object(obj, 'file_path', t.string_node(w.file_path))
 		to_object(obj, 'pos', t.position(w.pos))
-		to_object(obj, 'reporter', t.number_node(int(w.reporter)))
+		to_object(obj, 'reporter', enum_node(t, w.reporter))
 		to_array(warns, obj)
 	}
 	return warns
@@ -416,9 +427,8 @@ fn (t Tree) fn_decl(node ast.FnDecl) &C.cJSON {
 	to_object(obj, 'is_method', t.bool_node(node.is_method))
 	to_object(obj, 'method_idx', t.number_node(node.method_idx))
 	to_object(obj, 'rec_mut', t.bool_node(node.rec_mut))
-	to_object(obj, 'rec_share', t.number_node(int(node.rec_share)))
-	// to_object(obj, 'language', t.enum_node(node.language))
-	to_object(obj, 'language', t.number_node(int(node.language)))
+	to_object(obj, 'rec_share', enum_node(t, node.rec_share))
+	to_object(obj, 'language', enum_node(t, node.language))
 	to_object(obj, 'no_body', t.bool_node(node.no_body))
 	to_object(obj, 'is_builtin', t.bool_node(node.is_builtin))
 	to_object(obj, 'is_generic', t.bool_node(node.is_generic))
@@ -468,7 +478,7 @@ fn (t Tree) struct_decl(node ast.StructDecl) &C.cJSON {
 	to_object(obj, 'pub_pos', t.number_node(node.pub_pos))
 	to_object(obj, 'mut_pos', t.number_node(node.mut_pos))
 	to_object(obj, 'pub_mut_pos', t.number_node(node.pub_mut_pos))
-	to_object(obj, 'language', t.number_node(int(node.language)))
+	to_object(obj, 'language', enum_node(t, node.language))
 	to_object(obj, 'is_union', t.bool_node(node.is_union))
 	to_object(obj, 'pos', t.position(node.pos))
 	f_array := create_array()
@@ -604,7 +614,7 @@ fn (t Tree) comp_for(node ast.CompFor) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('CompFor'))
 	to_object(obj, 'val_var', t.string_node(node.val_var))
 	to_object(obj, 'typ', t.type_node(node.typ))
-	to_object(obj, 'kind', t.number_node(int(node.kind)))
+	to_object(obj, 'kind', enum_node(t, node.kind))
 	to_object(obj, 'pos', t.position(node.pos))
 	stmt_array := create_array()
 	for s in node.stmts {
@@ -813,7 +823,7 @@ fn (t Tree) var(node ast.Var) &C.cJSON {
 	to_object(obj, 'is_or', t.bool_node(node.is_or))
 	to_object(obj, 'is_tmp', t.bool_node(node.is_tmp))
 	to_object(obj, 'is_autofree_tmp', t.bool_node(node.is_autofree_tmp))
-	to_object(obj, 'share', t.number_node(int(node.share)))
+	to_object(obj, 'share', enum_node(t, node.share))
 	to_object(obj, 'pos', t.position(node.pos))
 	type_array := create_array()
 	for typ in node.sum_type_casts {
@@ -887,7 +897,7 @@ fn (t Tree) for_in_stmt(node ast.ForInStmt) &C.cJSON {
 	to_object(obj, 'key_type', t.type_node(node.key_type))
 	to_object(obj, 'val_type', t.type_node(node.val_type))
 	to_object(obj, 'cond_type', t.type_node(node.cond_type))
-	to_object(obj, 'kind', t.number_node(int(node.kind)))
+	to_object(obj, 'kind', enum_node(t, node.kind))
 	to_object(obj, 'val_is_mut', t.bool_node(node.val_is_mut))
 	to_object(obj, 'label', t.string_node(node.label))
 	to_object(obj, 'pos', t.position(node.pos))
@@ -903,7 +913,7 @@ fn (t Tree) for_in_stmt(node ast.ForInStmt) &C.cJSON {
 fn (t Tree) branch_stmt(node ast.BranchStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('BranchStmt'))
-	to_object(obj, 'kind', t.number_node(int(node.kind)))
+	to_object(obj, 'kind', t.token_node(node.kind))
 	to_object(obj, 'label', t.string_node(node.label))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
@@ -1119,7 +1129,7 @@ fn (t Tree) string_literal(node ast.StringLiteral) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('StringLiteral'))
 	to_object(obj, 'val', t.string_node(node.val))
 	to_object(obj, 'is_raw', t.bool_node(node.is_raw))
-	to_object(obj, 'language', t.number_node(int(node.language)))
+	to_object(obj, 'language', enum_node(t, node.language))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -1185,7 +1195,7 @@ fn (t Tree) string_inter_literal(node ast.StringInterLiteral) &C.cJSON {
 	to_object(obj, 'fmt_poss', poss_arr)
 	fmts_arr := create_array()
 	for f in node.fmts {
-		to_array(fmts_arr, t.number_node(int(f)))
+		to_array(fmts_arr, enum_node(t, f))
 	}
 	to_object(obj, 'fmts', fmts_arr)
 	n_arr := create_array()
@@ -1233,7 +1243,7 @@ fn (t Tree) at_expr(node ast.AtExpr) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('AtExpr'))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'pos', t.position(node.pos))
-	to_object(obj, 'kind', t.number_node(int(node.kind)))
+	to_object(obj, 'kind', enum_node(t, node.kind))
 	to_object(obj, 'val', t.string_node(node.val))
 	return obj
 }
@@ -1355,7 +1365,7 @@ fn (t Tree) if_expr(node ast.IfExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('IfExpr'))
 	to_object(obj, 'is_comptime', t.bool_node(node.is_comptime))
-	to_object(obj, 'tok_kind', t.string_node(token.token_str[node.tok_kind]))
+	to_object(obj, 'tok_kind', t.token_node(node.tok_kind))
 	branch_arr := create_array()
 	for b in node.branches {
 		to_array(branch_arr, t.if_branch(b))
@@ -1400,10 +1410,10 @@ fn (t Tree) ident(node ast.Ident) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('Ident'))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'mod', t.string_node(node.mod))
-	to_object(obj, 'language', t.number_node(int(node.language)))
+	to_object(obj, 'language', enum_node(t, node.language))
 	to_object(obj, 'is_mut', t.bool_node(node.is_mut))
-	to_object(obj, 'tok_kind', t.string_node(token.token_str[node.tok_kind]))
-	to_object(obj, 'kind', t.number_node(int(node.kind)))
+	to_object(obj, 'tok_kind', t.token_node(node.tok_kind))
+	to_object(obj, 'kind', enum_node(t, node.kind))
 	to_object(obj, 'info', t.ident_info(node.info))
 	to_object(obj, 'pos', t.position(node.pos))
 	to_object(obj, 'mut_pos', t.position(node.mut_pos))
@@ -1426,7 +1436,7 @@ fn (t Tree) ident_var(node ast.IdentVar) &C.cJSON {
 	to_object(obj, 'is_mut', t.bool_node(node.is_mut))
 	to_object(obj, 'is_static', t.bool_node(node.is_static))
 	to_object(obj, 'is_optional', t.bool_node(node.is_optional))
-	to_object(obj, 'share', t.number_node(int(node.share)))
+	to_object(obj, 'share', enum_node(t, node.share))
 	return obj
 }
 
@@ -1444,7 +1454,7 @@ fn (t Tree) call_expr(node ast.CallExpr) &C.cJSON {
 	to_object(obj, 'is_method', t.bool_node(node.is_method))
 	to_object(obj, 'mod', t.string_node(node.mod))
 	to_object(obj, 'name', t.string_node(node.name))
-	to_object(obj, 'language', t.number_node(int(node.language)))
+	to_object(obj, 'language', enum_node(t, node.language))
 	to_object(obj, 'scope', t.number_node(int(node.scope)))
 	arg_arr := create_array()
 	for e in node.args {
@@ -1474,7 +1484,7 @@ fn (t Tree) call_arg(node ast.CallArg) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('CallArg'))
 	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'is_mut', t.bool_node(node.is_mut))
-	to_object(obj, 'share', t.number_node(int(node.share)))
+	to_object(obj, 'share', enum_node(t, node.share))
 	to_object(obj, 'expr', t.expr(node.expr))
 	to_object(obj, 'is_tmp_autofree', t.bool_node(node.is_tmp_autofree))
 	to_object(obj, 'pos', t.position(node.pos))
@@ -1494,7 +1504,7 @@ fn (t Tree) or_expr(node ast.OrExpr) &C.cJSON {
 		to_array(stmt_arr, t.stmt(s))
 	}
 	to_object(obj, 'stmts', stmt_arr)
-	to_object(obj, 'kind', t.number_node(int(node.kind)))
+	to_object(obj, 'kind', enum_node(t, node.kind))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -1655,7 +1665,7 @@ fn (t Tree) if_guard_expr(node ast.IfGuardExpr) &C.cJSON {
 fn (t Tree) match_expr(node ast.MatchExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('MatchExpr'))
-	to_object(obj, 'tok_kind', t.string_node(token.token_str[node.tok_kind]))
+	to_object(obj, 'tok_kind', t.token_node(node.tok_kind))
 	to_object(obj, 'cond', t.expr(node.cond))
 	to_object(obj, 'cond_type', t.type_node(node.cond_type))
 	to_object(obj, 'return_type', t.type_node(node.return_type))
@@ -1787,7 +1797,7 @@ fn (t Tree) table_field(node table.Field) &C.cJSON {
 
 fn (t Tree) sql_stmt(node ast.SqlStmt) &C.cJSON {
 	obj := create_object()
-	to_object(obj, 'kind', t.number_node(int(node.kind)))
+	to_object(obj, 'kind', enum_node(t, node.kind))
 	to_object(obj, 'db_expr', t.expr(node.db_expr))
 	to_object(obj, 'table_name', t.string_node(node.table_name))
 	to_object(obj, 'object_var_name', t.string_node(node.object_var_name))
