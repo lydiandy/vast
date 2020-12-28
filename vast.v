@@ -158,11 +158,6 @@ fn (t Tree) token_node(tok_kind token.Kind) &C.cJSON {
 }
 
 // waiting for generic method works in V
-// enum node
-// fn (t Tree) enum_node<T>(value T) &C.cJSON {
-// 	return t.string_node(value.str())
-// }
-//
 // use generic function temporary
 fn enum_node<T>(t Tree, value T) &C.cJSON {
 	return t.string_node('enum:${int(value)}($value)')
