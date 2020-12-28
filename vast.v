@@ -802,6 +802,16 @@ fn (t Tree) assign_stmt(node ast.AssignStmt) &C.cJSON {
 	to_object(obj, 'is_simple', t.bool_node(node.is_simple))
 	to_object(obj, 'has_cross_var', t.bool_node(node.has_cross_var))
 	to_object(obj, 'pos', t.position(node.pos))
+	comment_array := create_array()
+	for c in node.comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'comments', comment_array)
+	end_comment_array := create_array()
+	for c in node.end_comments {
+		to_array(end_comment_array, t.comment(c))
+	}
+	to_object(obj, 'end_comments', end_comment_array)
 	return obj
 }
 
