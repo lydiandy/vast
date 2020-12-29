@@ -1168,51 +1168,61 @@ fn (t Tree) string_inter_literal(node ast.StringInterLiteral) &C.cJSON {
 		to_array(v_arr, t.string_node(v))
 	}
 	to_object(obj, 'vals', v_arr)
+	//
 	e_arr := create_array()
 	for e in node.exprs {
 		to_array(e_arr, t.expr(e))
 	}
 	to_object(obj, 'exprs', e_arr)
+	//
 	et_arr := create_array()
 	for e in node.expr_types {
 		to_array(et_arr, t.type_node(e))
 	}
 	to_object(obj, 'expr_types', et_arr)
+	//
 	fw_arr := create_array()
 	for fw in node.fwidths {
 		to_array(fw_arr, t.number_node(fw))
 	}
 	to_object(obj, 'fwidths', fw_arr)
+	//
 	p_arr := create_array()
 	for p in node.precisions {
 		to_array(p_arr, t.number_node(p))
 	}
 	to_object(obj, 'precisions', p_arr)
+	//
 	pl_arr := create_array()
 	for p in node.pluss {
 		to_array(pl_arr, t.bool_node(p))
 	}
 	to_object(obj, 'pluss', pl_arr)
+	//
 	f_arr := create_array()
 	for f in node.fills {
 		to_array(f_arr, t.bool_node(f))
 	}
 	to_object(obj, 'fills', f_arr)
+	//
 	poss_arr := create_array()
 	for p in node.fmt_poss {
 		to_array(poss_arr, t.position(p))
 	}
 	to_object(obj, 'fmt_poss', poss_arr)
+	//
 	fmts_arr := create_array()
 	for f in node.fmts {
-		to_array(fmts_arr, enum_node(t, f))
+		to_array(fmts_arr, t.number_node(int(f)))
 	}
 	to_object(obj, 'fmts', fmts_arr)
+	//
 	n_arr := create_array()
 	for n in node.need_fmts {
 		to_array(n_arr, t.bool_node(n))
 	}
 	to_object(obj, 'need_fmts', n_arr)
+	//
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
