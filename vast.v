@@ -1792,6 +1792,7 @@ fn (t Tree) likely(node ast.Likely) &C.cJSON {
 
 fn (t Tree) sql_expr(node ast.SqlExpr) &C.cJSON {
 	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('SqlExpr'))
 	to_object(obj, 'type', t.type_node(node.typ))
 	to_object(obj, 'is_count', t.bool_node(node.is_count))
 	to_object(obj, 'db_expr', t.expr(node.db_expr))
@@ -1808,11 +1809,11 @@ fn (t Tree) sql_expr(node ast.SqlExpr) &C.cJSON {
 	to_object(obj, 'limit_expr', t.expr(node.limit_expr))
 	to_object(obj, 'has_offset', t.bool_node(node.has_offset))
 	to_object(obj, 'offset_expr', t.expr(node.offset_expr))
-	field_arr := create_array()
+	field_array := create_array()
 	for f in node.fields {
-		to_array(field_arr, t.table_field(f))
+		to_array(field_array, t.table_field(f))
 	}
-	to_object(obj, 'fields', field_arr)
+	to_object(obj, 'fields', field_array)
 	return obj
 }
 
@@ -1836,22 +1837,32 @@ fn (t Tree) table_field(node table.Field) &C.cJSON {
 
 fn (t Tree) sql_stmt(node ast.SqlStmt) &C.cJSON {
 	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('SqlStmt'))
 	to_object(obj, 'kind', enum_node(t, node.kind))
 	to_object(obj, 'db_expr', t.expr(node.db_expr))
 	to_object(obj, 'table_name', t.string_node(node.table_name))
 	to_object(obj, 'object_var_name', t.string_node(node.object_var_name))
 	to_object(obj, 'table_type', t.type_node(node.table_type))
 	to_object(obj, 'where_expr', t.expr(node.where_expr))
-	arr := create_array()
+	//
+	field_array := create_array()
+	for f in node.fields {
+		to_array(field_array, t.table_field(f))
+	}
+	to_object(obj, 'fields', field_array)
+	//
+	column_array := create_array()
 	for c in node.updated_columns {
-		to_array(arr, t.string_node(c))
+		to_array(column_array, t.string_node(c))
 	}
-	to_object(obj, 'updated_columns', arr)
-	e_array := create_array()
+	to_object(obj, 'updated_columns', column_array)
+	//
+	expr_array := create_array()
 	for e in node.update_exprs {
-		to_array(e_array, t.expr(e))
+		to_array(expr_array, t.expr(e))
 	}
-	to_object(obj, 'update_exprs', e_array)
+	to_object(obj, 'update_exprs', expr_array)
+	//
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
