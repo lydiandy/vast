@@ -97,12 +97,20 @@ fn json_file(file string) string {
 	return json_file
 }
 
+// for enable_globals
+fn new_preferences() pref.Preferences {
+	mut p := pref.Preferences{}
+	p.fill_with_defaults()
+	p.enable_globals = true
+	return p
+}
+
 // generate json string
 fn json(file string) string {
 	mut t := Tree{
 		root: create_object()
 		table: table.new_table()
-		pref: pref.new_preferences()
+		pref: new_preferences()
 		global_scope: &ast.Scope{
 			start_pos: 0
 			parent: 0
