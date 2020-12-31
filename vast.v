@@ -1893,6 +1893,7 @@ fn (t Tree) lock_expr(node ast.LockExpr) &C.cJSON {
 
 fn (t Tree) unsafe_expr(expr ast.UnsafeExpr) &C.cJSON {
 	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('UnsafeExpr'))
 	to_object(obj, 'expr', t.expr(expr.expr))
 	to_object(obj, 'pos', t.position(expr.pos))
 	return obj
@@ -1926,6 +1927,7 @@ fn (t Tree) select_expr(expr ast.SelectExpr) &C.cJSON {
 
 fn (t Tree) select_branch(expr ast.SelectBranch) &C.cJSON {
 	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('SelectBranch'))
 	to_object(obj, 'stmt', t.stmt(expr.stmt))
 	stmt_array := create_array()
 	for s in expr.stmts {
