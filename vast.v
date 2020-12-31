@@ -384,6 +384,7 @@ fn (t Tree) const_decl(node ast.ConstDecl) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ConstDecl'))
 	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
+	to_object(obj, 'is_block', t.bool_node(node.is_block))
 	field_array := create_array()
 	for f in node.fields {
 		to_array(field_array, t.const_field(f))
@@ -1129,6 +1130,9 @@ fn (t Tree) expr(expr ast.Expr) &C.cJSON {
 		}
 		ast.AnonFn {
 			return t.anon_fn(expr)
+		}
+		ast.ArrayDecompose {
+			return t.array_decompose(expr)
 		}
 		else {
 			// println('unknown expr')
@@ -1937,6 +1941,16 @@ fn (t Tree) select_branch(expr ast.SelectBranch) &C.cJSON {
 		to_array(comment_array, t.comment(c))
 	}
 	to_object(obj, 'post_comments', comment_array)
+	return obj
+}
+
+fn (t Tree) array_decompose(expr ast.ArrayDecompose) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('ArrayDecompose'))
+	to_object(obj, 'expr', t.expr(expr.expr))
+	to_object(obj, 'expr_type', t.type_node(expr.expr_type))
+	to_object(obj, 'arg_type', t.type_node(expr.arg_type))
+	to_object(obj, 'pos', t.position(expr.pos))
 	return obj
 }
 
