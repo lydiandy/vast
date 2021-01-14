@@ -184,11 +184,18 @@ fn (t Tree) ast_file(ast_file ast.File) &C.cJSON {
 	to_object(obj, 'scope', t.scope(ast_file.scope))
 	to_object(obj, 'errors', t.errors(ast_file.errors))
 	to_object(obj, 'warnings', t.warnings(ast_file.warnings))
+	auto_import_array := create_array()
+	for i in ast_file.auto_imports {
+		to_array(auto_import_array, t.string_node(i))
+	}
+	to_object(obj, 'auto_imports', auto_import_array)
+	//
 	symbol_obj := create_object()
 	for key, val in ast_file.imported_symbols {
 		to_object(symbol_obj, key, t.string_node(val))
 	}
 	to_object(obj, 'imported_symbols', symbol_obj)
+	//
 	fn_array := create_array()
 	for f in ast_file.generic_fns {
 		to_array(fn_array, t.fn_decl(f))
@@ -203,9 +210,12 @@ fn (t Tree) mod(mod ast.Module) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Module'))
 	to_object(obj, 'name', t.string_node(mod.name))
-	// to_object(obj, 'path', t.string_node(mod.path))
-	// to_object(obj, 'expr', t.expr(mod.expr))
 	to_object(obj, 'is_skipped', t.bool_node(mod.is_skipped))
+	a_arr := create_array()
+	for a in mod.attrs {
+		to_array(a_arr, t.attr(a))
+	}
+	to_object(obj, 'attrs', a_arr)
 	to_object(obj, 'pos', t.position(mod.pos))
 	return obj
 }
@@ -428,6 +438,7 @@ fn (t Tree) fn_decl(node ast.FnDecl) &C.cJSON {
 	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
 	to_object(obj, 'is_variadic', t.bool_node(node.is_variadic))
 	to_object(obj, 'is_anon', t.bool_node(node.is_anon))
+	to_object(obj, 'is_manualfree', t.bool_node(node.is_manualfree))
 	to_object(obj, 'receiver', t.field(node.receiver))
 	to_object(obj, 'receiver_pos', t.position(node.receiver_pos))
 	to_object(obj, 'is_method', t.bool_node(node.is_method))
@@ -989,6 +1000,18 @@ fn (t Tree) comptime_call(node ast.ComptimeCall) &C.cJSON {
 	to_object(obj, 'vweb_tmpl', t.string_node(node.vweb_tmpl.path))
 	to_object(obj, 'args_var', t.string_node(node.args_var))
 	to_object(obj, 'sym', t.string_node(node.sym.name))
+	to_object(obj, 'has_parens', t.bool_node(node.has_parens))
+	return obj
+}
+
+fn (t Tree) comptime_selector(node ast.ComptimeSelector) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('ComptimeSelector'))
+	to_object(obj, 'has_parens', t.bool_node(node.has_parens))
+	to_object(obj, 'left', t.expr(node.left))
+	to_object(obj, 'field_expr', t.expr(node.field_expr))
+	to_object(obj, 'left_type', t.type_node(node.left_type))
+	to_object(obj, 'typ', t.type_node(node.typ))
 	return obj
 }
 
@@ -1114,6 +1137,9 @@ fn (t Tree) expr(expr ast.Expr) &C.cJSON {
 		}
 		ast.ComptimeCall {
 			return t.comptime_call(expr)
+		}
+		ast.ComptimeSelector {
+			return t.comptime_selector(expr)
 		}
 		ast.LockExpr {
 			return t.lock_expr(expr)
@@ -1328,7 +1354,6 @@ fn (t Tree) size_of(node ast.SizeOf) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('SizeOf'))
 	to_object(obj, 'is_type', t.bool_node(node.is_type))
-	to_object(obj, 'type_name', t.string_node(node.type_name))
 	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'expr', t.expr(node.expr))
 	to_object(obj, 'pos', t.position(node.pos))
@@ -1355,6 +1380,7 @@ fn (t Tree) infix_expr(node ast.InfixExpr) &C.cJSON {
 	to_object(obj, 'right', t.expr(node.right))
 	to_object(obj, 'right_type', t.type_node(node.right_type))
 	to_object(obj, 'auto_locked', t.string_node(node.auto_locked))
+	to_object(obj, 'or_block', t.or_expr(node.or_block))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -1390,6 +1416,7 @@ fn (t Tree) selector_expr(node ast.SelectorExpr) &C.cJSON {
 	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'name_type', t.type_node(node.name_type))
 	to_object(obj, 'from_embed_type', t.type_node(node.from_embed_type))
+	to_object(obj, 'next_token', t.token_node(node.next_token))
 	to_object(obj, 'pos', t.position(node.pos))
 	to_object(obj, 'scope', t.number_node(int(node.scope)))
 	return obj
@@ -1520,6 +1547,11 @@ fn (t Tree) call_expr(node ast.CallExpr) &C.cJSON {
 	to_object(obj, 'generic_list_pos', t.position(node.generic_list_pos))
 	to_object(obj, 'free_receiver', t.bool_node(node.free_receiver))
 	to_object(obj, 'from_embed_type', t.type_node(node.from_embed_type))
+	comment_array := create_array()
+	for c in node.comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'comments', comment_array)
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -1559,6 +1591,9 @@ fn (t Tree) struct_init(node ast.StructInit) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('StructInit'))
 	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'is_short', t.bool_node(node.is_short))
+	to_object(obj, 'has_update_expr', t.bool_node(node.has_update_expr))
+	to_object(obj, 'update_expr', t.expr(node.update_expr))
+	to_object(obj, 'update_expr_type', t.type_node(node.update_expr_type))
 	field_array := create_array()
 	for f in node.fields {
 		to_array(field_array, t.struct_init_field(f))
