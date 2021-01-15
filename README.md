@@ -33,7 +33,7 @@ v -prod .
 # Usage
 
 ```shell
-vast demo.v				//generate example.json and watch example.v.
+vast demo.v		//generate example.json and watch example.v.
 
 vast -w demo.v		//generate example.json and watch example.v.
 
