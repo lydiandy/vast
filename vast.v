@@ -87,7 +87,7 @@ struct Tree {
 	pref         pref.Preferences
 	global_scope &ast.Scope
 mut:
-	root         &C.cJSON // the root of tree
+	root &C.cJSON // the root of tree
 }
 
 // generate json file with the same file name
@@ -201,22 +201,38 @@ fn (t Tree) ast_file(ast_file ast.File) &C.cJSON {
 		to_array(fn_array, t.fn_decl(f))
 	}
 	to_object(obj, 'generic_fns', fn_array)
+	//
+	embed_file_array := create_array()
+	for e in ast_file.embedded_files {
+		to_array(embed_file_array, t.embed_file(e))
+	}
+	to_object(obj, 'embedded_files', embed_file_array)
+	//
 	to_object(obj, 'stmts', t.stmts(ast_file.stmts))
 	return obj
 }
 
+// embed files
+fn (t Tree) embed_file(node ast.EmbeddedFile) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('EmbeddedFile'))
+	to_object(obj, 'rpath', t.string_node(node.rpath))
+	to_object(obj, 'apath', t.string_node(node.apath))
+	return obj
+}
+
 // ast module node
-fn (t Tree) mod(mod ast.Module) &C.cJSON {
+fn (t Tree) mod(node ast.Module) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Module'))
-	to_object(obj, 'name', t.string_node(mod.name))
-	to_object(obj, 'is_skipped', t.bool_node(mod.is_skipped))
+	to_object(obj, 'name', t.string_node(node.name))
+	to_object(obj, 'is_skipped', t.bool_node(node.is_skipped))
 	a_arr := create_array()
-	for a in mod.attrs {
+	for a in node.attrs {
 		to_array(a_arr, t.attr(a))
 	}
 	to_object(obj, 'attrs', a_arr)
-	to_object(obj, 'pos', t.position(mod.pos))
+	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
 
@@ -1001,6 +1017,8 @@ fn (t Tree) comptime_call(node ast.ComptimeCall) &C.cJSON {
 	to_object(obj, 'args_var', t.string_node(node.args_var))
 	to_object(obj, 'sym', t.string_node(node.sym.name))
 	to_object(obj, 'has_parens', t.bool_node(node.has_parens))
+	to_object(obj, 'is_embed', t.bool_node(node.is_embed))
+	to_object(obj, 'embed_file', t.embed_file(node.embed_file))
 	return obj
 }
 
