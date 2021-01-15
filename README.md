@@ -74,6 +74,12 @@ All the AST struct declarations can be found in V source code: [vlib/v/ast/ast.v
 
 ## File
 
+AST struct
+
+```
+File
+```
+
 example code
 
 ```v
@@ -131,6 +137,8 @@ const (
 ```
 
 ## Enum
+
+AST struct
 
 ```
 EnumDecl
@@ -471,11 +479,11 @@ module main
 
 fn main() {
 	a := ['a', 'b', 'c'] 
-	println(variadic_fn_a(a...)) //ArrayDecompose
+	println(variadic_fn_a(...a)) //ArrayDecompose
 }
 
 fn variadic_fn_a(a ...string) string {
-	return variadic_fn_b(a...) //ArrayDecompose
+	return variadic_fn_b(...a) //ArrayDecompose
 }
 
 fn variadic_fn_b(a ...string) string {
@@ -940,15 +948,7 @@ interface Speaker { //comment 1
 AST struct
 
 ```v
-//Alias type declaration
-pub struct AliasTypeDecl {
-pub:
-	name        string
-	is_pub      bool
-	parent_type table.Type
-	pos         token.Position
-	comments    []Comment
-}
+AliasTypeDecl
 ```
 
 example code
