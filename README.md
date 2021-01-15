@@ -33,11 +33,11 @@ v -prod .
 # Usage
 
 ```shell
-vast demo.v 	 		//generate example.json and watch example.v.
+vast demo.v				//generate example.json and watch example.v.
 
-vast -w demo.v 	 //generate example.json and watch example.v.
+vast -w demo.v		//generate example.json and watch example.v.
 
-vast -p demo.v 	 //no generate json file,just print the json string to termial.
+vast -p demo.v		//no generate json file,just print the json string to termial.
 ```
 
 
@@ -64,7 +64,7 @@ it will generate array.json file, ~22000 lines json code.
 
 ![](./ast_struct_diagram.jpg)
 
-# Vlang  AST introduction
+# Vlang  AST struct introduction
 
 ## Overview
 
@@ -84,163 +84,6 @@ import time
 
 fn main() {
   
-}
-```
-
-generate AST json
-
-```json
-{
-	"ast_type": "ast.File",
-	"path": "/Users/xxx/v/vprojects/v_test/main.v",
-	"mod": {
-		"ast_type": "Module",
-		"name": "main",
-		"is_skipped": false,
-		"pos": {
-			"line_nr": 0,
-			"pos": 0,
-			"len": 19
-		}
-	},
-	"imports": [
-		{
-			"ast_type": "Import",
-			"mod": "os",
-			"alias": "os",
-			"syms": [],
-			"pos": {
-				"line_nr": 2,
-				"pos": 20,
-				"len": 2
-			}
-		},
-		{
-			"ast_type": "Import",
-			"mod": "time",
-			"alias": "time",
-			"syms": [],
-			"pos": {
-				"line_nr": 3,
-				"pos": 30,
-				"len": 4
-			}
-		}
-	],
-	"global_scope": {
-		"ast_type": "Scope",
-		"parent": "0",
-		"children": [],
-		"start_pos": 0,
-		"end_pos": 0,
-		"objects": {},
-		"struct_fields": []
-	},
-	"scope": {
-		"ast_type": "Scope",
-		"parent": "7f970ef07c90",
-		"children": [
-			{
-				"parent": "7f970ef081f0",
-				"start_pos": 39,
-				"end_pos": 51
-			}
-		],
-		"start_pos": 0,
-		"end_pos": 53,
-		"objects": {},
-		"struct_fields": []
-	},
-	"errors": [],
-	"warnings": [],
-	"imported_symbols": {},
-	"generic_fns": [],
-	"stmts": [
-		{
-			"ast_type": "Module",
-			"name": "main",
-			"is_skipped": false,
-			"pos": {
-				"line_nr": 0,
-				"pos": 0,
-				"len": 19
-			}
-		},
-		{
-			"ast_type": "Import",
-			"mod": "os",
-			"alias": "os",
-			"syms": [],
-			"pos": {
-				"line_nr": 2,
-				"pos": 20,
-				"len": 2
-			}
-		},
-		{
-			"ast_type": "Import",
-			"mod": "time",
-			"alias": "time",
-			"syms": [],
-			"pos": {
-				"line_nr": 3,
-				"pos": 30,
-				"len": 4
-			}
-		},
-		{
-			"ast_type": "FnDecl",
-			"name": "main.main",
-			"mod": "main",
-			"is_deprecated": false,
-			"is_pub": false,
-			"is_variadic": false,
-			"is_anon": false,
-			"receiver": {
-				"ast_type": "Field",
-				"name": "",
-				"typ": "void",
-				"pos": {
-					"line_nr": 0,
-					"pos": 0,
-					"len": 0
-				}
-			},
-			"receiver_pos": {
-				"line_nr": 0,
-				"pos": 0,
-				"len": 0
-			},
-			"is_method": false,
-			"method_idx": 0,
-			"rec_mut": false,
-			"rec_share": "enum:0(mut)",
-			"language": "enum:0(v)",
-			"no_body": false,
-			"is_builtin": false,
-			"is_generic": false,
-			"is_direct_arr": false,
-			"pos": {
-				"line_nr": 5,
-				"pos": 36,
-				"len": 9
-			},
-			"body_pos": {
-				"line_nr": 7,
-				"pos": 51,
-				"len": 1
-			},
-			"file": "/Users/xxx/v/vprojects/v_test/main.v",
-			"return_type": "void",
-			"source_file": 0,
-			"scope": 250645264,
-			"attrs": [],
-			"params": [],
-			"stmts": [],
-			"comments": [],
-			"next_comments": []
-		}
-	]
 }
 ```
 
