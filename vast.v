@@ -989,7 +989,7 @@ fn (t Tree) assert_stmt(node ast.AssertStmt) &C.cJSON {
 fn (t Tree) go_stmt(node ast.GoStmt) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('GoStmt'))
-	to_object(obj, 'call_expr', t.expr(node.call_expr))
+	to_object(obj, 'call_expr', t.call_expr(node.call_expr))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -1179,6 +1179,9 @@ fn (t Tree) expr(expr ast.Expr) &C.cJSON {
 		}
 		ast.ArrayDecompose {
 			return t.array_decompose(expr)
+		}
+		ast.GoExpr {
+			return t.go_expr(expr)
 		}
 		else {
 			// println('unknown expr')
@@ -2007,6 +2010,15 @@ fn (t Tree) array_decompose(expr ast.ArrayDecompose) &C.cJSON {
 	to_object(obj, 'expr', t.expr(expr.expr))
 	to_object(obj, 'expr_type', t.type_node(expr.expr_type))
 	to_object(obj, 'arg_type', t.type_node(expr.arg_type))
+	to_object(obj, 'pos', t.position(expr.pos))
+	return obj
+}
+
+fn (t Tree) go_expr(expr ast.GoExpr) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('GoExpr'))
+	to_object(obj, 'go_stmt', t.go_stmt(expr.go_stmt))
+	// to_object(obj, 'return_type', t.type_node(expr.return_type))
 	to_object(obj, 'pos', t.position(expr.pos))
 	return obj
 }
