@@ -1415,7 +1415,7 @@ module main
 import time
 
 fn do_something() { 
-  println('start do_something...')
+ println('start do_something...')
 	time.sleep(2) 
 	println('end do_something')
 }
@@ -1427,7 +1427,7 @@ fn add(x int, y int) int {
 }
 
 fn main() {
-  g	:= go do_something()
+  g:= go do_something()
   g2 := go add(3, 2) 
   g.wait() 
 	result := g2.wait()
