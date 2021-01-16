@@ -235,7 +235,7 @@ IdentFn
 IdentVar
 ```
 
-example code(todo: need more kind)
+example code
 
 ```v
 module main
@@ -385,7 +385,7 @@ AST struct
 CastExpr
 ```
 
-example code ( todo: need more about string(buf,n) )
+example code
 
 ```v
 module main
@@ -1399,6 +1399,42 @@ fn main() {
 }
 ```
 
+### GoExpr
+
+AST struct
+
+```
+GoExpr
+```
+
+example code
+
+```v
+module main
+
+import time
+
+fn do_something() { 
+  println('start do_something...')
+	time.sleep(2) 
+	println('end do_something')
+}
+fn add(x int, y int) int { 
+	println('add start...')
+	time.sleep(4) //
+	println('end add')
+	return x + y
+}
+
+fn main() {
+  g	:= go do_something()
+  g2 := go add(3, 2) 
+  g.wait() 
+	result := g2.wait()
+	println(result)
+}
+```
+
 ## Unsafe
 
 AST struct
@@ -1646,20 +1682,6 @@ fn main() {
 		println('b')
 	}
 }
-```
-
-### CTempVar
-
-AST struct
-
-```v
-CTempVar
-```
-
-example code(todo)
-
-```v
-
 ```
 
 ## Comment
