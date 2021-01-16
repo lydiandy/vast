@@ -15,7 +15,7 @@ const (
 usage:
   1.vast demo.v 	 generate demo.json file.
   2.vast -w demo.v 	 generate demo.json file, and watch.
-  3.vast -c domo.v   generate deom.json and demo.c file, and watch.
+  3.vast -c domo.v 	 generate deom.json and demo.c file, and watch.
   4.vast -p demo.v 	 print the json string to termial.'
 )
 
