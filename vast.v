@@ -178,6 +178,7 @@ fn (t Tree) ast_file(ast_file ast.File) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('ast.File'))
 	to_object(obj, 'path', t.string_node(ast_file.path))
+	to_object(obj, 'path_base', t.string_node(ast_file.path_base))
 	to_object(obj, 'mod', t.mod(ast_file.mod))
 	to_object(obj, 'imports', t.imports(ast_file.imports))
 	to_object(obj, 'global_scope', t.scope(ast_file.global_scope))
