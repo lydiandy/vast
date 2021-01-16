@@ -1360,10 +1360,43 @@ AST struct
 LockExpr
 ```
 
-example code(todo)
+example code
 
 ```v
+module main
 
+import time
+
+struct St {
+mut:
+	x f64
+}
+
+fn f(x int, y f64, shared s St,shared m map[string]string) {
+	time.usleep(50000)
+	lock s,m { 
+		s.x = x * y
+		println(s.x)
+		unsafe {
+			m['a']='aa'
+		}
+		println(m['a'])
+	}
+	return
+}
+
+fn main() {
+	shared t := &St{}
+	shared m := &map[string]string
+	unsafe {
+		m['a']='aa'
+	}
+	r := go f(3, 4.0, shared t,shared m) 
+	r.wait()
+	rlock t { 
+		println(t.x)
+	}
+}
 ```
 
 ## Unsafe
