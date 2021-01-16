@@ -33,11 +33,11 @@ v -prod .
 # Usage
 
 ```shell
-vast demo.v		//generate example.json and watch example.v.
+vast demo.v		//generate demo.json.
 
-vast -w demo.v		//generate example.json and watch example.v.
+vast -w demo.v		//generate demo.json and watch.
 
-vast -p demo.v		//no generate json file,just print the json string to termial.
+vast -p demo.v		//print the json string to termial.
 ```
 
 
@@ -125,6 +125,8 @@ example code
 
 ```v
 module main
+
+const single_const = 'abc'
 
 const (
 	// version comment 1

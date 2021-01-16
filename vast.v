@@ -13,9 +13,10 @@ const (
 	version = '0.2.0' // the version of vast will follow vlang
 	usage   = '
 usage:
-  1.vast demo.v 	 generate demo.json file and exit.
-  2.vast -w demo.v 	 generate demo.json and watch,if demo.v file change,regenerate.
-  3.vast -p demo.v 	 no generate json file,print the json string to termial.'
+  1.vast demo.v 	 generate demo.json file.
+  2.vast -w demo.v 	 generate demo.json file, and watch.
+  3.vast -c domo.v   generate deom.json and demo.c file, and watch.
+  4.vast -p demo.v 	 print the json string to termial.'
 )
 
 fn main() {
@@ -31,33 +32,34 @@ fn main() {
 			check_file(file)
 			option := args[1]
 			match option {
-				'-p' {
-					println(json(file))
-				}
-				'-w' {
-					println('start watching...')
-					mut timestamp := 0
-					for {
-						new_timestamp := os.file_last_mod_unix(file)
-						if timestamp != new_timestamp {
-							res := json_file(file)
-							println('$time.now() : AST written to: ' + res)
-							// also generate C
-							// file_name := file[0..(file.len - os.file_ext(file).len)]
-							// os.system('v -o ${file_name}.c $file')
-						}
-						timestamp = new_timestamp
-						time.sleep_ms(500)
-					}
-				}
-				else {
-					println(usage)
-				}
+				'-p' { println(json(file)) }
+				'-w' { gen(file, false) }
+				'-c' { gen(file, true) }
+				else { println(usage) }
 			}
 		}
 		else {
 			println(usage)
 		}
+	}
+}
+
+// generate ast json file and c source code file
+fn gen(file string, is_genc bool) {
+	println('start watching...')
+	mut timestamp := 0
+	for {
+		new_timestamp := os.file_last_mod_unix(file)
+		if timestamp != new_timestamp {
+			res := json_file(file)
+			println('$time.now() : AST written to: ' + res)
+			if is_genc {
+				file_name := file[0..(file.len - os.file_ext(file).len)]
+				os.system('v -o ${file_name}.c $file')
+			}
+		}
+		timestamp = new_timestamp
+		time.sleep_ms(500)
 	}
 }
 
