@@ -229,6 +229,7 @@ fn (t Tree) mod(node ast.Module) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('Module'))
 	to_object(obj, 'name', t.string_node(node.name))
+	to_object(obj, 'short_name', t.string_node(node.short_name))
 	to_object(obj, 'is_skipped', t.bool_node(node.is_skipped))
 	a_arr := create_array()
 	for a in node.attrs {
@@ -269,6 +270,7 @@ fn (t Tree) scope_struct_field(node ast.ScopeStructField) &C.cJSON {
 	to_object(obj, 'struct_type', t.type_node(node.struct_type))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'typ', t.type_node(node.typ))
+	to_object(obj, 'orig_type', t.type_node(node.orig_type))
 	to_object(obj, 'pos', t.position(node.pos))
 	type_array := create_array()
 	for typ in node.sum_type_casts {
@@ -467,7 +469,6 @@ fn (t Tree) fn_decl(node ast.FnDecl) &C.cJSON {
 	to_object(obj, 'language', t.enum_node(node.language))
 	to_object(obj, 'no_body', t.bool_node(node.no_body))
 	to_object(obj, 'is_builtin', t.bool_node(node.is_builtin))
-	to_object(obj, 'is_generic', t.bool_node(node.is_generic))
 	to_object(obj, 'is_direct_arr', t.bool_node(node.is_direct_arr))
 	to_object(obj, 'pos', t.position(node.pos))
 	to_object(obj, 'body_pos', t.position(node.body_pos))
@@ -480,26 +481,43 @@ fn (t Tree) fn_decl(node ast.FnDecl) &C.cJSON {
 		to_array(a_arr, t.attr(a))
 	}
 	to_object(obj, 'attrs', a_arr)
+
 	params_array := create_array()
 	for a in node.params {
 		to_array(params_array, t.arg(a))
 	}
 	to_object(obj, 'params', params_array)
+
+	generic_array := create_array()
+	for g in node.generic_params {
+		to_array(generic_array, t.generic_param(g))
+	}
+	to_object(obj, 'generic_params', generic_array)
+
 	stmt_array := create_array()
 	for s in node.stmts {
 		to_array(stmt_array, t.stmt(s))
 	}
 	to_object(obj, 'stmts', stmt_array)
+
 	comment_array := create_array()
 	for c in node.comments {
 		to_array(comment_array, t.comment(c))
 	}
 	to_object(obj, 'comments', comment_array)
+
 	next_comment_array := create_array()
 	for c in node.next_comments {
 		to_array(next_comment_array, t.comment(c))
 	}
 	to_object(obj, 'next_comments', next_comment_array)
+
+	return obj
+}
+
+fn (t Tree) generic_param(node ast.GenericParam) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'name', t.string_node(node.name))
 	return obj
 }
 
@@ -519,6 +537,7 @@ fn (t Tree) struct_decl(node ast.StructDecl) &C.cJSON {
 	to_object(obj, 'pub_pos', t.number_node(node.pub_pos))
 	to_object(obj, 'mut_pos', t.number_node(node.mut_pos))
 	to_object(obj, 'pub_mut_pos', t.number_node(node.pub_mut_pos))
+	to_object(obj, 'module_pos', t.number_node(node.module_pos))
 	to_object(obj, 'language', t.enum_node(node.language))
 	to_object(obj, 'is_union', t.bool_node(node.is_union))
 	to_object(obj, 'pos', t.position(node.pos))
@@ -877,6 +896,7 @@ fn (t Tree) var(node ast.Var) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('Var'))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'typ', t.type_node(node.typ))
+	to_object(obj, 'orig_type', t.type_node(node.orig_type))
 	to_object(obj, 'expr', t.expr(node.expr))
 	to_object(obj, 'is_arg', t.bool_node(node.is_arg))
 	to_object(obj, 'is_mut', t.bool_node(node.is_mut))
@@ -1557,17 +1577,23 @@ fn (t Tree) call_expr(node ast.CallExpr) &C.cJSON {
 		to_array(arg_arr, t.call_arg(e))
 	}
 	to_object(obj, 'args', arg_arr)
+
 	t_arr := create_array()
 	for e in node.expected_arg_types {
 		to_array(t_arr, t.type_node(e))
 	}
+	generic_array := create_array()
+	for g in node.generic_types {
+		to_array(generic_array, t.type_node(g))
+	}
+	to_object(obj, 'generic_types', generic_array)
+
 	to_object(obj, 'expected_arg_types', t_arr)
 	to_object(obj, 'or_block', t.or_expr(node.or_block))
 	to_object(obj, 'left_type', t.type_node(node.left_type))
 	to_object(obj, 'receiver_type', t.type_node(node.receiver_type))
 	to_object(obj, 'return_type', t.type_node(node.return_type))
 	to_object(obj, 'should_be_skipped', t.bool_node(node.should_be_skipped))
-	to_object(obj, 'generic_type', t.type_node(node.generic_type))
 	to_object(obj, 'generic_list_pos', t.position(node.generic_list_pos))
 	to_object(obj, 'free_receiver', t.bool_node(node.free_receiver))
 	to_object(obj, 'from_embed_type', t.type_node(node.from_embed_type))
@@ -1861,7 +1887,7 @@ fn (t Tree) sql_expr(node ast.SqlExpr) &C.cJSON {
 	to_object(obj, 'type', t.type_node(node.typ))
 	to_object(obj, 'is_count', t.bool_node(node.is_count))
 	to_object(obj, 'db_expr', t.expr(node.db_expr))
-	to_object(obj, 'table_name', t.string_node(node.table_name))
+	to_object(obj, 'table_expr', t.type_expr(node.table_expr))
 	to_object(obj, 'has_where', t.bool_node(node.has_where))
 	to_object(obj, 'where_expr', t.expr(node.where_expr))
 	to_object(obj, 'has_order', t.bool_node(node.has_order))
@@ -1869,7 +1895,6 @@ fn (t Tree) sql_expr(node ast.SqlExpr) &C.cJSON {
 	to_object(obj, 'has_desc', t.bool_node(node.has_desc))
 	to_object(obj, 'is_array', t.bool_node(node.is_array))
 	to_object(obj, 'pos', t.position(node.pos))
-	to_object(obj, 'table_type', t.type_node(node.table_type))
 	to_object(obj, 'has_limit', t.bool_node(node.has_limit))
 	to_object(obj, 'limit_expr', t.expr(node.limit_expr))
 	to_object(obj, 'has_offset', t.bool_node(node.has_offset))
@@ -1905,29 +1930,28 @@ fn (t Tree) sql_stmt(node ast.SqlStmt) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('SqlStmt'))
 	to_object(obj, 'kind', t.enum_node(node.kind))
 	to_object(obj, 'db_expr', t.expr(node.db_expr))
-	to_object(obj, 'table_name', t.string_node(node.table_name))
+	to_object(obj, 'table_expr', t.type_expr(node.table_expr))
 	to_object(obj, 'object_var_name', t.string_node(node.object_var_name))
-	to_object(obj, 'table_type', t.type_node(node.table_type))
 	to_object(obj, 'where_expr', t.expr(node.where_expr))
-	//
+
 	field_array := create_array()
 	for f in node.fields {
 		to_array(field_array, t.table_field(f))
 	}
 	to_object(obj, 'fields', field_array)
-	//
+
 	column_array := create_array()
 	for c in node.updated_columns {
 		to_array(column_array, t.string_node(c))
 	}
 	to_object(obj, 'updated_columns', column_array)
-	//
+
 	expr_array := create_array()
 	for e in node.update_exprs {
 		to_array(expr_array, t.expr(e))
 	}
 	to_object(obj, 'update_exprs', expr_array)
-	//
+
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
