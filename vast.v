@@ -627,21 +627,30 @@ fn (t Tree) interface_decl(node ast.InterfaceDecl) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('InterfaceDecl'))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
-	str_arr := create_array()
+	str_array := create_array()
 	for s in node.field_names {
-		to_array(str_arr, t.string_node(s))
+		to_array(str_array, t.string_node(s))
 	}
-	to_object(obj, 'field_names', str_arr)
-	m_arr := create_array()
+	to_object(obj, 'field_names', str_array)
+
+	m_array := create_array()
 	for m in node.methods {
-		to_array(m_arr, t.fn_decl(m))
+		to_array(m_array, t.fn_decl(m))
 	}
-	to_object(obj, 'methods', m_arr)
+	to_object(obj, 'methods', m_array)
+
+	f_array := create_array()
+	for f in node.fields {
+		to_array(f_array,t.struct_field(f))
+	}
+	to_object(obj,'fields',f_array)
+
 	comment_array := create_array()
 	for c in node.pre_comments {
 		to_array(comment_array, t.comment(c))
 	}
 	to_object(obj, 'pre_comments', comment_array)
+
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -665,6 +674,7 @@ fn (t Tree) hash_stmt(node ast.HashStmt) &C.cJSON {
 	to_object(obj, 'kind', t.string_node(node.kind))
 	to_object(obj, 'main', t.string_node(node.main))
 	to_object(obj, 'msg', t.string_node(node.msg))
+	to_object(obj, 'source_file', t.string_node(node.source_file))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
