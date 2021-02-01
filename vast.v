@@ -98,7 +98,7 @@ fn json_file(file string) string {
 	// support .v and .vsh file
 	file_name := file[0..(file.len - os.file_ext(file).len)]
 	json_file := file_name + '.json'
-	os.write_file(json_file, ast_json)
+	os.write_file(json_file, ast_json) or { panic(err) }
 	return json_file
 }
 
@@ -641,9 +641,9 @@ fn (t Tree) interface_decl(node ast.InterfaceDecl) &C.cJSON {
 
 	f_array := create_array()
 	for f in node.fields {
-		to_array(f_array,t.struct_field(f))
+		to_array(f_array, t.struct_field(f))
 	}
-	to_object(obj,'fields',f_array)
+	to_object(obj, 'fields', f_array)
 
 	comment_array := create_array()
 	for c in node.pre_comments {
@@ -1052,6 +1052,11 @@ fn (t Tree) comptime_call(node ast.ComptimeCall) &C.cJSON {
 	to_object(obj, 'has_parens', t.bool_node(node.has_parens))
 	to_object(obj, 'is_embed', t.bool_node(node.is_embed))
 	to_object(obj, 'embed_file', t.embed_file(node.embed_file))
+	to_object(obj, 'method_pos', t.position(node.method_pos))
+	to_object(obj, 'result_type', t.type_node(node.result_type))
+	to_object(obj, 'scope', t.scope(node.scope))
+	to_object(obj, 'env_value', t.string_node(node.env_value))
+
 	return obj
 }
 
@@ -1215,6 +1220,9 @@ fn (t Tree) expr(expr ast.Expr) &C.cJSON {
 		}
 		ast.GoExpr {
 			return t.go_expr(expr)
+		}
+		ast.OffsetOf {
+			return t.offset_of(expr)
 		}
 		else {
 			// println('unknown expr')
@@ -1745,8 +1753,8 @@ fn (t Tree) array_init(node ast.ArrayInit) &C.cJSON {
 	to_object(obj, 'has_len', t.bool_node(node.has_len))
 	to_object(obj, 'has_cap', t.bool_node(node.has_cap))
 	to_object(obj, 'has_default', t.bool_node(node.has_default))
-	to_object(obj, 'is_interface', t.bool_node(node.is_interface))
-	to_object(obj, 'interface_type', t.type_node(node.interface_type))
+	// to_object(obj, 'is_interface', t.bool_node(node.is_interface))
+	// to_object(obj, 'interface_type', t.type_node(node.interface_type))
 	expr_array := create_array()
 	for e in node.expr_types {
 		to_array(expr_array, t.type_node(e))
@@ -1818,6 +1826,12 @@ fn (t Tree) match_expr(node ast.MatchExpr) &C.cJSON {
 		to_array(branch_array, t.match_branch(b))
 	}
 	to_object(obj, 'branches', branch_array)
+
+	comment_array := create_array()
+	for c in node.comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'comments', comment_array)
 	return obj
 }
 
@@ -1846,11 +1860,7 @@ fn (t Tree) match_branch(node ast.MatchBranch) &C.cJSON {
 	to_object(obj, 'stmts', stmt_arr)
 	to_object(obj, 'is_else', t.bool_node(node.is_else))
 	to_object(obj, 'pos', t.position(node.pos))
-	comment_array := create_array()
-	for c in node.comments {
-		to_array(comment_array, t.comment(c))
-	}
-	to_object(obj, 'comments', comment_array)
+
 	c_array := create_array()
 	for c in node.post_comments {
 		to_array(c_array, t.comment(c))
@@ -2056,6 +2066,15 @@ fn (t Tree) go_expr(expr ast.GoExpr) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('GoExpr'))
 	to_object(obj, 'go_stmt', t.go_stmt(expr.go_stmt))
 	// to_object(obj, 'return_type', t.type_node(expr.return_type))
+	to_object(obj, 'pos', t.position(expr.pos))
+	return obj
+}
+
+fn (t Tree) offset_of(expr ast.OffsetOf) &C.cJSON {
+	obj := create_object()
+	to_object(obj, 'ast_type', t.string_node('OffsetOf'))
+	to_object(obj, 'struct_type', t.type_node(expr.struct_type))
+	to_object(obj, 'field', t.string_node('field'))
 	to_object(obj, 'pos', t.position(expr.pos))
 	return obj
 }

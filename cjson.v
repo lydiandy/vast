@@ -113,4 +113,6 @@ fn add_item_to_array(obj &C.cJSON, item &C.cJSON) {
 fn json_print(json &C.cJSON) string {
 	s := C.cJSON_Print(json)
 	return tos3(s)
+	// s := C.cJSON_PrintUnformatted(json)
+	// return unsafe { tos(s, C.strlen(s)) }
 }
