@@ -384,6 +384,13 @@ fn (t Tree) import_module(node ast.Import) &C.cJSON {
 		to_array(syms, t.import_symbol(s))
 	}
 	to_object(obj, 'syms', syms)
+
+	comment_array := create_array()
+	for c in node.comments {
+		to_array(comment_array, t.comment(c))
+	}
+	to_object(obj, 'comments', comment_array)
+
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
