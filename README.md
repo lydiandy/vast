@@ -1686,6 +1686,37 @@ fn main() {
 }
 ```
 
+### OffsetOf
+
+AST struct
+
+```v
+OffsetOf
+```
+
+example code
+
+```v
+module main
+
+struct User {
+	name [50]byte
+	age int
+	desc string
+}
+
+fn main() {
+	offset_name:=__offsetof(User,name)
+	offset_age:=__offsetof(User,age)
+	offset_desc:=__offsetof(User,desc)
+	println(offset_name)
+	println(offset_age)
+	println(offset_desc)
+}
+```
+
+
+
 ## Comment
 
 AST struct
