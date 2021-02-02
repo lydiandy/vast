@@ -86,7 +86,7 @@ fn check_file(file string) {
 
 struct Tree {
 	table        &table.Table
-	pref         pref.Preferences
+	pref         &pref.Preferences
 	global_scope &ast.Scope
 mut:
 	root &C.cJSON // the root of tree
@@ -103,8 +103,8 @@ fn json_file(file string) string {
 }
 
 // for enable_globals
-fn new_preferences() pref.Preferences {
-	mut p := pref.Preferences{}
+fn new_preferences() &pref.Preferences {
+	mut p := &pref.Preferences{}
 	p.fill_with_defaults()
 	p.enable_globals = true
 	return p
