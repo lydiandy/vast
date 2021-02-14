@@ -154,6 +154,55 @@ fn (t Tree) null_node() &C.cJSON {
 	return create_null()
 }
 
+//todo:try to simplify the array node
+//array type node
+fn (t Tree) array_node<T>(node []T) &C.cJSON {
+	mut arr:=create_array()
+	// mut nn:=ast.Node{}
+	// for n in node {
+	// 	nn=n
+	// 	match nn  {
+	// 		ast.Stmt {
+	// 			to_array(arr,t.stmt(nn))
+	// 		}
+	// 		ast.Expr {
+	// 			to_array(arr,t.expr(nn))
+	// 		}
+	// 		ast.StructField {
+	// 			to_array(arr,t.struct_field(nn))
+	// 		}
+	// 		ast.StructInitField {
+	// 			to_array(arr,t.struct_init_field(nn))
+	// 		}
+	// 		ast.EnumField {
+	// 			to_array(arr,t.enum_field(nn))
+	// 		}
+	// 		ast.Field {
+	// 			to_array(arr,t.field(nn))
+	// 		}
+	// 		ast.IfBranch {
+	// 			to_array(arr,t.if_branch(nn))
+	// 		}
+	// 		ast.MatchBranch {
+	// 			to_array(arr,t.match_branch(nn))
+	// 		}
+	// 		ast.SelectBranch {
+	// 			to_array(arr,t.select_branch(nn))
+	// 		}
+	// 		ast.ScopeObject {
+	// 			to_array(arr,t.scope_object(nn))
+	// 		}
+	// 		table.Param {
+	// 			to_array(arr,t.arg(nn))
+	// 		}
+	// 		else {
+	// 			panic('node must be type of ast.Node')
+	// 		}
+	// 	}
+	// }
+	return arr
+}
+
 // type type node
 fn (t Tree) type_node(typ table.Type) &C.cJSON {
 	if typ == 0 {
@@ -384,11 +433,15 @@ fn (t Tree) import_module(node ast.Import) &C.cJSON {
 	}
 	to_object(obj, 'syms', syms)
 
+	
 	comment_array := create_array()
 	for c in node.comments {
 		to_array(comment_array, t.comment(c))
 	}
 	to_object(obj, 'comments', comment_array)
+
+	//todo:try to simplify the array node
+	// to_object(obj, 'comments', t.array_node(node.comments))
 
 	next_comment_array := create_array()
 	for c in node.next_comments {
