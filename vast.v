@@ -1691,22 +1691,32 @@ fn (t Tree) struct_init(node ast.StructInit) &C.cJSON {
 	to_object(obj, 'has_update_expr', t.bool_node(node.has_update_expr))
 	to_object(obj, 'update_expr', t.expr(node.update_expr))
 	to_object(obj, 'update_expr_type', t.type_node(node.update_expr_type))
+	to_object(obj, 'pos', t.position(node.pos))
+
+	update_comments := create_array()
+	for c in node.update_expr_comments {
+		to_array(update_comments, t.comment(c))
+	}
+	to_object(obj, 'update_expr_comments', update_comments)
+
 	field_array := create_array()
 	for f in node.fields {
 		to_array(field_array, t.struct_init_field(f))
 	}
 	to_object(obj, 'fields', field_array)
+
 	embed_array := create_array()
 	for e in node.embeds {
 		to_array(embed_array, t.struct_init_embed(e))
 	}
 	to_object(obj, 'embeds', embed_array)
+
 	comments := create_array()
 	for c in node.pre_comments {
 		to_array(comments, t.comment(c))
 	}
 	to_object(obj, 'pre_comments', comments)
-	to_object(obj, 'pos', t.position(node.pos))
+	
 	return obj
 }
 

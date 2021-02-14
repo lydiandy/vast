@@ -889,12 +889,43 @@ fn main(){
 }
 ```
 
-### Assoc
+example code with update expr
+
+```v
+struct City {
+	name       string
+	population int
+}
+
+struct Country {
+	name    string
+	capital City
+}
+
+fn main() {
+	ccc := Country{
+		name: 'test'
+		capital: City{
+			name: 'city'
+		}
+	}
+	c2 := Country{
+		...ccc  //update_expr
+		capital: City{
+			name: 'city2'
+			population: 200
+		}
+	}
+	println(c2)
+}
+```
+
+### Assoc(deprecated)
 
 AST struct
 
 ```v
-Assoc
+Assoc(deprecated, use update_expr)
 ```
 
 example code
