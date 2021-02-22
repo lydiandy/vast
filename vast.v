@@ -58,7 +58,7 @@ fn gen(file string, is_genc bool) {
 			}
 		}
 		timestamp = new_timestamp
-		time.sleep_ms(500)
+		time.wait(500*time.millisecond)
 	}
 }
 
@@ -156,50 +156,48 @@ fn (t Tree) null_node() &C.cJSON {
 
 //todo:try to simplify the array node
 //array type node
-fn (t Tree) array_node<T>(node []T) &C.cJSON {
+fn (t Tree) array_node(nodes []ast.Node) &C.cJSON {
 	mut arr:=create_array()
-	// mut nn:=ast.Node{}
-	// for n in node {
-	// 	nn=n
-	// 	match nn  {
-	// 		ast.Stmt {
-	// 			to_array(arr,t.stmt(nn))
-	// 		}
-	// 		ast.Expr {
-	// 			to_array(arr,t.expr(nn))
-	// 		}
-	// 		ast.StructField {
-	// 			to_array(arr,t.struct_field(nn))
-	// 		}
-	// 		ast.StructInitField {
-	// 			to_array(arr,t.struct_init_field(nn))
-	// 		}
-	// 		ast.EnumField {
-	// 			to_array(arr,t.enum_field(nn))
-	// 		}
-	// 		ast.Field {
-	// 			to_array(arr,t.field(nn))
-	// 		}
-	// 		ast.IfBranch {
-	// 			to_array(arr,t.if_branch(nn))
-	// 		}
-	// 		ast.MatchBranch {
-	// 			to_array(arr,t.match_branch(nn))
-	// 		}
-	// 		ast.SelectBranch {
-	// 			to_array(arr,t.select_branch(nn))
-	// 		}
-	// 		ast.ScopeObject {
-	// 			to_array(arr,t.scope_object(nn))
-	// 		}
-	// 		table.Param {
-	// 			to_array(arr,t.arg(nn))
-	// 		}
-	// 		else {
-	// 			panic('node must be type of ast.Node')
-	// 		}
-	// 	}
-	// }
+	for n in nodes {
+		match n  {
+			ast.Stmt {
+				to_array(arr,t.stmt(n))
+			}
+			ast.Expr {
+				to_array(arr,t.expr(n))
+			}
+			ast.StructField {
+				to_array(arr,t.struct_field(n))
+			}
+			ast.StructInitField {
+				to_array(arr,t.struct_init_field(n))
+			}
+			ast.EnumField {
+				to_array(arr,t.enum_field(n))
+			}
+			ast.Field {
+				to_array(arr,t.field(n))
+			}
+			ast.IfBranch {
+				to_array(arr,t.if_branch(n))
+			}
+			ast.MatchBranch {
+				to_array(arr,t.match_branch(n))
+			}
+			ast.SelectBranch {
+				to_array(arr,t.select_branch(n))
+			}
+			ast.ScopeObject {
+				to_array(arr,t.scope_object(n))
+			}
+			table.Param {
+				to_array(arr,t.arg(n))
+			}
+			else {
+				panic('node must be type of ast.Node')
+			}
+		}
+	}
 	return arr
 }
 
@@ -1835,6 +1833,13 @@ fn (t Tree) array_init(node ast.ArrayInit) &C.cJSON {
 		to_array(expr_comments, comment_array)
 	}
 	to_object(obj, 'ecmnts', expr_comments)
+	//
+	pre_comment_array := create_array()
+	for c in node.pre_cmnts {
+		to_array(pre_comment_array, t.comment(c))
+	}
+	to_object(obj, 'pre_cmnts', pre_comment_array)
+
 	to_object(obj, 'elem_type_pos', t.position(node.elem_type_pos))
 	to_object(obj, 'is_fixed', t.bool_node(node.is_fixed))
 	to_object(obj, 'has_val', t.bool_node(node.has_val))
@@ -1845,8 +1850,6 @@ fn (t Tree) array_init(node ast.ArrayInit) &C.cJSON {
 	to_object(obj, 'has_len', t.bool_node(node.has_len))
 	to_object(obj, 'has_cap', t.bool_node(node.has_cap))
 	to_object(obj, 'has_default', t.bool_node(node.has_default))
-	// to_object(obj, 'is_interface', t.bool_node(node.is_interface))
-	// to_object(obj, 'interface_type', t.type_node(node.interface_type))
 	expr_array := create_array()
 	for e in node.expr_types {
 		to_array(expr_array, t.type_node(e))
