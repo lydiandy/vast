@@ -603,6 +603,7 @@ fn (t Tree) anon_fn(node ast.AnonFn) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('AnonFn'))
 	to_object(obj, 'decl', t.fn_decl(node.decl))
 	to_object(obj, 'typ', t.type_node(node.typ))
+	to_object(obj, 'has_gen', t.bool_node(node.has_gen))
 	return obj
 }
 
@@ -764,6 +765,7 @@ fn (t Tree) comp_for(node ast.CompFor) &C.cJSON {
 	to_object(obj, 'typ', t.type_node(node.typ))
 	to_object(obj, 'kind', t.enum_node(node.kind))
 	to_object(obj, 'pos', t.position(node.pos))
+	to_object(obj, 'typ_pos', t.position(node.pos))
 	stmt_array := create_array()
 	for s in node.stmts {
 		to_array(stmt_array, t.stmt(s))
@@ -1030,6 +1032,7 @@ fn (t Tree) for_c_stmt(node ast.ForCStmt) &C.cJSON {
 	to_object(obj, 'has_cond', t.bool_node(node.has_cond))
 	to_object(obj, 'inc', t.stmt(node.inc))
 	to_object(obj, 'has_inc', t.bool_node(node.has_inc))
+	to_object(obj, 'is_multi', t.bool_node(node.is_multi))
 	to_object(obj, 'label', t.string_node(node.label))
 	to_object(obj, 'pos', t.position(node.pos))
 	to_object(obj, 'scope', t.number_node(int(node.scope)))
@@ -1870,11 +1873,30 @@ fn (t Tree) map_init(node ast.MapInit) &C.cJSON {
 		to_array(k_arr, t.expr(k))
 	}
 	to_object(obj, 'keys', k_arr)
+
 	v_arr := create_array()
 	for v in node.vals {
 		to_array(v_arr, t.expr(v))
 	}
 	to_object(obj, 'vals', v_arr)
+
+	// expr comments:[][]Comment
+	comments := create_array()
+	for c_array in node.comments {
+		comment_array := create_array()
+		for c in c_array {
+			to_array(comment_array, t.comment(c))
+		}
+		to_array(comments, comment_array)
+	}
+	to_object(obj, 'comments', comments)
+	//
+	pre_comment_array := create_array()
+	for c in node.pre_cmnts {
+		to_array(pre_comment_array, t.comment(c))
+	}
+	to_object(obj, 'pre_cmnts', pre_comment_array)
+
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
