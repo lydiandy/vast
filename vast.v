@@ -58,7 +58,7 @@ fn gen(file string, is_genc bool) {
 			}
 		}
 		timestamp = new_timestamp
-		time.wait(500*time.millisecond)
+		time.sleep(500*time.millisecond)
 	}
 }
 
