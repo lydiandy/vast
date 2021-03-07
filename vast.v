@@ -523,6 +523,8 @@ fn (t Tree) fn_decl(node ast.FnDecl) &C.cJSON {
 	to_object(obj, 'is_variadic', t.bool_node(node.is_variadic))
 	to_object(obj, 'is_anon', t.bool_node(node.is_anon))
 	to_object(obj, 'is_manualfree', t.bool_node(node.is_manualfree))
+	to_object(obj, 'is_main', t.bool_node(node.is_main))
+	to_object(obj, 'is_test', t.bool_node(node.is_test))
 	to_object(obj, 'receiver', t.field(node.receiver))
 	to_object(obj, 'receiver_pos', t.position(node.receiver_pos))
 	to_object(obj, 'is_method', t.bool_node(node.is_method))
@@ -706,6 +708,7 @@ fn (t Tree) interface_decl(node ast.InterfaceDecl) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('InterfaceDecl'))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
+	to_object(obj, 'mut_pos', t.number_node(node.mut_pos))
 	str_array := create_array()
 	for s in node.field_names {
 		to_array(str_array, t.string_node(s))
@@ -1138,7 +1141,7 @@ fn (t Tree) comptime_call(node ast.ComptimeCall) &C.cJSON {
 	to_object(obj, 'result_type', t.type_node(node.result_type))
 	to_object(obj, 'scope', t.scope(node.scope))
 	to_object(obj, 'env_value', t.string_node(node.env_value))
-
+	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
 
@@ -1150,6 +1153,7 @@ fn (t Tree) comptime_selector(node ast.ComptimeSelector) &C.cJSON {
 	to_object(obj, 'field_expr', t.expr(node.field_expr))
 	to_object(obj, 'left_type', t.type_node(node.left_type))
 	to_object(obj, 'typ', t.type_node(node.typ))
+	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
 
@@ -1305,6 +1309,9 @@ fn (t Tree) expr(expr ast.Expr) &C.cJSON {
 		}
 		ast.OffsetOf {
 			return t.offset_of(expr)
+		}
+		ast.DumpExpr {
+			return t.dump_expr(expr)
 		}
 		else {
 			// println('unknown expr')
@@ -1511,6 +1518,7 @@ fn (t Tree) prefix_expr(node ast.PrefixExpr) &C.cJSON {
 	to_object(obj, 'right', t.expr(node.right))
 	to_object(obj, 'right_type', t.type_node(node.right_type))
 	to_object(obj, 'or_block', t.or_expr(node.or_block))
+	to_object(obj, 'is_option', t.bool_node(node.is_option))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -2202,7 +2210,6 @@ fn (t Tree) go_expr(expr ast.GoExpr) &C.cJSON {
 	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('GoExpr'))
 	to_object(obj, 'go_stmt', t.go_stmt(expr.go_stmt))
-	// to_object(obj, 'return_type', t.type_node(expr.return_type))
 	to_object(obj, 'pos', t.position(expr.pos))
 	return obj
 }
@@ -2212,6 +2219,15 @@ fn (t Tree) offset_of(expr ast.OffsetOf) &C.cJSON {
 	to_object(obj, 'ast_type', t.string_node('OffsetOf'))
 	to_object(obj, 'struct_type', t.type_node(expr.struct_type))
 	to_object(obj, 'field', t.string_node('field'))
+	to_object(obj, 'pos', t.position(expr.pos))
+	return obj
+}
+
+fn (t Tree) dump_expr(expr ast.DumpExpr) &C.cJSON {
+	obj:=create_object()
+	to_object(obj, 'ast_type', t.string_node('DumpExpr'))
+	to_object(obj, 'expr', t.expr(expr.expr))
+	to_object(obj, 'expr_type', t.type_node(expr.expr_type))
 	to_object(obj, 'pos', t.position(expr.pos))
 	return obj
 }
