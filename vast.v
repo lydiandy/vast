@@ -525,6 +525,7 @@ fn (t Tree) fn_decl(node ast.FnDecl) &C.cJSON {
 	to_object(obj, 'is_manualfree', t.bool_node(node.is_manualfree))
 	to_object(obj, 'is_main', t.bool_node(node.is_main))
 	to_object(obj, 'is_test', t.bool_node(node.is_test))
+	to_object(obj, 'is_conditional', t.bool_node(node.is_conditional))
 	to_object(obj, 'receiver', t.field(node.receiver))
 	to_object(obj, 'receiver_pos', t.position(node.receiver_pos))
 	to_object(obj, 'is_method', t.bool_node(node.is_method))
@@ -852,6 +853,7 @@ fn (t Tree) sum_type_decl(node ast.SumTypeDecl) &C.cJSON {
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'is_pub', t.bool_node(node.is_pub))
 	to_object(obj, 'pos', t.position(node.pos))
+	to_object(obj, 'typ', t.type_node(node.typ))
 	// comments
 	comment_array := create_array()
 	for c in node.comments {
@@ -1142,6 +1144,12 @@ fn (t Tree) comptime_call(node ast.ComptimeCall) &C.cJSON {
 	to_object(obj, 'scope', t.scope(node.scope))
 	to_object(obj, 'env_value', t.string_node(node.env_value))
 	to_object(obj, 'pos', t.position(node.pos))
+	arg_array := create_array()
+	for e in node.args {
+		to_array(arg_array, t.call_arg(e))
+	}
+	to_object(obj, 'args', arg_array)
+	
 	return obj
 }
 
