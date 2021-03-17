@@ -62,7 +62,7 @@ it will generate array.json file, ~22000 lines json code.
 
 # Vlang AST struct diagram
 
-![](./ast_struct_diagram.jpg)
+![](./ast_struct_diagram.png)
 
 # Vlang  AST struct introduction
 
@@ -1486,6 +1486,44 @@ fn main() {
 	p := unsafe { &a[2] } // unsafe expr
 	println(p)
 }
+```
+
+## ASM
+
+AST struct
+
+```v
+AsmStmt
+
+AsmTemplate
+AsmClobbered
+AsmIO
+AsmArg
+AsmAddressing
+AsmAlias
+AsmRegister
+```
+
+example code
+
+```v
+fn main() {
+	a := 100
+	b := 20
+	mut c := 0
+	asm amd64 {
+		mov eax, a
+		add eax, b
+		mov c, eax
+		; =r (c) // output 
+		; r (a) // input 
+		  r (b)
+	}
+	println('a: $a') // 100
+	println('b: $b') // 20
+	println('c: $c') // 120
+}
+
 ```
 
 ## SQL
