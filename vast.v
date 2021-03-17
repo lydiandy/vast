@@ -340,6 +340,7 @@ fn (t Tree) scope_object(node ast.ScopeObject) &C.cJSON {
 		ast.ConstField { t.const_field(node) }
 		ast.GlobalField { t.global_field(node) }
 		ast.Var { t.var(node) }
+		ast.AsmRegister { t.asm_register(node) }
 	}
 	return obj
 }
@@ -415,6 +416,7 @@ fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		ast.GoStmt { return t.go_stmt(node) }
 		ast.Block { return t.block(node) }
 		ast.SqlStmt { return t.sql_stmt(node) }
+		ast.AsmStmt {return t.asm_stmt(node)}
 	}
 	// fixed ForCStmt without init stmt
 	return t.null_node()
@@ -1541,6 +1543,7 @@ fn (t Tree) infix_expr(node ast.InfixExpr) &C.cJSON {
 	to_object(obj, 'right_type', t.type_node(node.right_type))
 	to_object(obj, 'auto_locked', t.string_node(node.auto_locked))
 	to_object(obj, 'or_block', t.or_expr(node.or_block))
+	to_object(obj, 'is_stmt', t.bool_node(node.is_stmt))
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
@@ -2237,6 +2240,20 @@ fn (t Tree) dump_expr(expr ast.DumpExpr) &C.cJSON {
 	to_object(obj, 'expr', t.expr(expr.expr))
 	to_object(obj, 'expr_type', t.type_node(expr.expr_type))
 	to_object(obj, 'pos', t.position(expr.pos))
+	return obj
+}
+
+fn (t Tree) asm_stmt(node ast.AsmStmt) &C.cJSON {
+	obj:=create_object()
+	to_object(obj, 'ast_type', t.string_node('AsmStmt'))
+	//TODO
+	return obj
+}
+
+fn (t Tree) asm_register(node ast.AsmRegister) &C.cJSON {
+	obj:=create_object()
+	to_object(obj, 'ast_type', t.string_node('AsmRegister'))
+	//TODO
 	return obj
 }
 
