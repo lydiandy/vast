@@ -2246,16 +2246,170 @@ fn (t Tree) dump_expr(expr ast.DumpExpr) &C.cJSON {
 fn (t Tree) asm_stmt(node ast.AsmStmt) &C.cJSON {
 	obj:=create_object()
 	to_object(obj, 'ast_type', t.string_node('AsmStmt'))
-	//TODO
+	to_object(obj, 'arch', t.enum_node(node.arch))
+	to_object(obj, 'is_top_level', t.bool_node(node.is_top_level))
+	to_object(obj, 'is_volatile', t.bool_node(node.is_volatile))
+	to_object(obj, 'is_goto', t.bool_node(node.is_goto))
+	to_object(obj, 'scope', t.scope(node.scope))
+	// to_object(obj, 'scope', t.number_node(int(node.scope)))
+	to_object(obj, 'pos', t.position(node.pos))
+
+	clobbered_array:=create_array()
+	for c in node.clobbered {
+		to_array(clobbered_array,t.asm_clobbered(c))
+	}
+	to_object(obj,'clobbered',clobbered_array)
+
+	template_array:=create_array()
+	for template in node.templates {
+		to_array(template_array,t.asm_template(template))
+	}
+	to_object(obj,'templates',template_array)
+
+	output_array:=create_array()
+	for o in node.output {
+		to_array(output_array,t.asm_io(o))
+	}
+	to_object(obj,'output',output_array)
+
+	input_array:=create_array()
+	for i in node.input {
+		to_array(input_array,t.asm_io(i))
+	}
+	to_object(obj,'input',input_array)
+
+	global_array:=create_array()
+	for g in node.global_labels {
+		to_array(global_array,t.string_node(g))
+	}
+	to_object(obj,'global_labels',global_array)
+
+	local_array:=create_array()
+	for l in node.local_labels {
+		to_array(local_array,t.string_node(l))
+	}
+	to_object(obj,'local_labels',local_array)
+
+	symbol_array:=create_array()
+	for s in node.exported_symbols {
+		to_array(symbol_array,t.string_node(s))
+	}
+	to_object(obj,'exported_symbols',symbol_array)
+
 	return obj
 }
 
 fn (t Tree) asm_register(node ast.AsmRegister) &C.cJSON {
 	obj:=create_object()
 	to_object(obj, 'ast_type', t.string_node('AsmRegister'))
-	//TODO
+	to_object(obj, 'name', t.string_node(node.name))
+	// to_object(obj, 'typ', t.type_node(node.typ))
+	// to_object(obj, 'size', t.number_node(node.size))
 	return obj
 }
+
+fn (t Tree) asm_template(node ast.AsmTemplate) &C.cJSON {
+	obj:=create_object()
+	to_object(obj, 'ast_type', t.string_node('AsmTemplate'))
+	to_object(obj, 'name', t.string_node(node.name))
+	to_object(obj, 'is_label', t.bool_node(node.is_label))
+	to_object(obj, 'is_directive', t.bool_node(node.is_directive))
+
+	arg_array:=create_array()
+	for arg in node.args {
+		to_array(arg_array,t.asm_arg(arg))
+	}
+	to_object(obj,'args',arg_array)
+
+	comment_array:=create_array()
+	for c in node.comments {
+		to_array(comment_array,t.comment(c))
+	}
+	to_object(obj,'comments',comment_array)
+	to_object(obj, 'pos', t.position(node.pos))
+	return obj
+}
+
+fn (t Tree) asm_addressing(node ast.AsmAddressing) &C.cJSON {
+	obj:=create_object()
+	to_object(obj, 'ast_type', t.string_node('AsmAddressing'))
+	to_object(obj, 'displacement', t.number_node(int(node.displacement)))
+	to_object(obj, 'scale', t.number_node(node.scale))
+	to_object(obj, 'mode', t.enum_node(node.mode))
+	to_object(obj, 'base', t.asm_arg(node.base))
+	to_object(obj, 'index', t.asm_arg(node.index))
+	to_object(obj, 'pos', t.position(node.pos))
+	return obj
+}
+
+fn (t Tree) asm_arg(node ast.AsmArg) &C.cJSON {
+	match node {
+		ast.AsmAddressing {
+			return t.asm_addressing(node)
+		}
+		ast.AsmAlias {
+			return t.asm_alias(node)
+		}
+		ast.AsmRegister {
+			return t.asm_register(node)
+		}
+		ast.BoolLiteral {
+			return t.bool_literal(node)
+		}
+		ast.CharLiteral {
+			return t.char_literal(node)
+		}
+		string {
+			return t.string_node(node)
+		}
+		ast.FloatLiteral {
+			return t.float_literal(node)
+		}
+		ast.IntegerLiteral {
+			return t.integer_literal(node)
+		}
+	}
+}
+
+fn (t Tree) asm_alias(node ast.AsmAlias) &C.cJSON {
+	obj:=create_object()
+	to_object(obj, 'ast_type', t.string_node('AsmAlias'))
+	to_object(obj, 'name', t.string_node(node.name))
+	to_object(obj, 'pos', t.position(node.pos))
+	return obj
+}
+
+fn (t Tree) asm_clobbered(node ast.AsmClobbered) &C.cJSON {
+	obj:=create_object()
+	to_object(obj, 'ast_type', t.string_node('AsmClobbered'))
+	to_object(obj, 'reg', t.asm_register(node.reg))
+	
+	comment_array:=create_array()
+	for c in node.comments {
+		to_array(comment_array,t.comment(c))
+	}
+	to_object(obj,'comments',comment_array)
+	return obj
+}
+
+fn (t Tree) asm_io(node ast.AsmIO) &C.cJSON {
+	obj:=create_object()
+	to_object(obj, 'ast_type', t.string_node('AsmIO'))
+	to_object(obj, 'alias', t.string_node(node.alias))
+	to_object(obj, 'constraint', t.string_node(node.constraint))
+	to_object(obj, 'expr', t.expr(node.expr))
+	to_object(obj, 'typ', t.type_node(node.typ))
+
+	comment_array:=create_array()
+	for c in node.comments {
+		to_array(comment_array,t.comment(c))
+	}
+	to_object(obj,'comments',comment_array)
+
+	to_object(obj, 'pos', t.position(node.pos))
+	return obj
+}
+
 
 [inline]
 fn to_object(node &C.cJSON, key string, child &C.cJSON) {
