@@ -9,9 +9,10 @@ import v.errors
 import os
 import time
 
-const version = '0.2.2' // the version of vast will follow vlang
+// the version of vast will follow vlang
+const version = '0.2.2'
 
-const usage   = '
+const usage = '
 usage:
   1.vast demo.v 	 generate demo.json file.
   2.vast -w demo.v 	 generate demo.json file, and watch.
@@ -58,7 +59,7 @@ fn gen(file string, is_genc bool) {
 			}
 		}
 		timestamp = new_timestamp
-		time.sleep(500*time.millisecond)
+		time.sleep(500 * time.millisecond)
 	}
 }
 
@@ -122,8 +123,6 @@ fn json(file string) string {
 	}
 	// parse file with comment
 	ast_file := parser.parse_file(file, t.table, .parse_comments, t.pref, t.global_scope)
-	// parse file without comment
-	// ast_file := parser.parse_file(file, t.table, .skip_comments, t.pref, t.global_scope)
 	t.root = t.ast_file(ast_file)
 	// generate the ast string
 	s := json_print(t.root)
@@ -154,50 +153,70 @@ fn (t Tree) null_node() &C.cJSON {
 	return create_null()
 }
 
-//todo:try to simplify the array node
-//array type node
-fn (t Tree) array_node(nodes []ast.Node) &C.cJSON {
+pub type Node = string | ast.ConstField | ast.Comment
+
+// array type node
+
+//do not support yet by vlang
+fn (t Tree) array_node(nodes []Node) &C.cJSON {
+	mut arr := create_array()
+
+	for node in nodes {
+		match node {
+			string {
+				to_array(arr,t.string_node(node))
+			}
+			ast.Comment {
+				to_array(arr,t.comment(node))
+			}
+			ast.ConstField {
+				to_array(arr,t.const_field(node))
+			}
+			// else {
+			// 	panic('unknown array type')
+			// }
+		}
+	}
+
+	return arr
+}
+
+//do not support yet by vlang
+fn (t Tree) array_node2<T>(nodes []T,method_name string) &C.cJSON {
 	mut arr:=create_array()
-	for n in nodes {
-		match n  {
-			ast.Stmt {
-				to_array(arr,t.stmt(n))
+
+	$for method in Tree.methods {
+		if method.name==method_name {
+			for node in nodes {
+				to_array(arr,t.$method(node))
 			}
-			ast.Expr {
-				to_array(arr,t.expr(n))
+		}	
+	}
+
+	return arr
+}
+
+//do not support yet by vlang
+fn (t Tree) array_node3<T>(nodes []T) &C.cJSON {
+	mut arr:=create_array()
+
+	for node in nodes {
+		match node {
+			string {
+				to_array(arr,t.string_node(node))
 			}
-			ast.StructField {
-				to_array(arr,t.struct_field(n))
+			ast.Comment {
+				to_array(arr,t.comment(node))
 			}
-			ast.StructInitField {
-				to_array(arr,t.struct_init_field(n))
-			}
-			ast.EnumField {
-				to_array(arr,t.enum_field(n))
-			}
-			ast.Field {
-				to_array(arr,t.field(n))
-			}
-			ast.IfBranch {
-				to_array(arr,t.if_branch(n))
-			}
-			ast.MatchBranch {
-				to_array(arr,t.match_branch(n))
-			}
-			ast.SelectBranch {
-				to_array(arr,t.select_branch(n))
-			}
-			ast.ScopeObject {
-				to_array(arr,t.scope_object(n))
-			}
-			table.Param {
-				to_array(arr,t.arg(n))
+			ast.ConstField {
+				to_array(arr,t.const_field(node))
 			}
 			else {
-				panic('node must be type of ast.Node')
+				panic('unknown array type')
 			}
 		}
 	}
+
 	return arr
 }
 
@@ -416,7 +435,7 @@ fn (t Tree) stmt(node ast.Stmt) &C.cJSON {
 		ast.GoStmt { return t.go_stmt(node) }
 		ast.Block { return t.block(node) }
 		ast.SqlStmt { return t.sql_stmt(node) }
-		ast.AsmStmt {return t.asm_stmt(node)}
+		ast.AsmStmt { return t.asm_stmt(node) }
 	}
 	// fixed ForCStmt without init stmt
 	return t.null_node()
@@ -433,14 +452,13 @@ fn (t Tree) import_module(node ast.Import) &C.cJSON {
 	}
 	to_object(obj, 'syms', syms)
 
-	
 	comment_array := create_array()
 	for c in node.comments {
 		to_array(comment_array, t.comment(c))
 	}
 	to_object(obj, 'comments', comment_array)
 
-	//todo:try to simplify the array node
+	// todo:try to simplify the array node
 	// to_object(obj, 'comments', t.array_node(node.comments))
 
 	next_comment_array := create_array()
@@ -488,6 +506,8 @@ fn (t Tree) const_decl(node ast.ConstDecl) &C.cJSON {
 		to_array(field_array, t.const_field(f))
 	}
 	to_object(obj, 'fields', field_array)
+	// to_object(obj,'fields',t.array_node(node.fields))
+	
 	to_object(obj, 'pos', t.position(node.pos))
 	comment_array := create_array()
 	for c in node.end_comments {
@@ -1151,7 +1171,7 @@ fn (t Tree) comptime_call(node ast.ComptimeCall) &C.cJSON {
 		to_array(arg_array, t.call_arg(e))
 	}
 	to_object(obj, 'args', arg_array)
-	
+
 	return obj
 }
 
@@ -1789,7 +1809,7 @@ fn (t Tree) struct_init(node ast.StructInit) &C.cJSON {
 		to_array(comments, t.comment(c))
 	}
 	to_object(obj, 'pre_comments', comments)
-	
+
 	return obj
 }
 
@@ -2235,7 +2255,7 @@ fn (t Tree) offset_of(expr ast.OffsetOf) &C.cJSON {
 }
 
 fn (t Tree) dump_expr(expr ast.DumpExpr) &C.cJSON {
-	obj:=create_object()
+	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('DumpExpr'))
 	to_object(obj, 'expr', t.expr(expr.expr))
 	to_object(obj, 'expr_type', t.type_node(expr.expr_type))
@@ -2244,7 +2264,7 @@ fn (t Tree) dump_expr(expr ast.DumpExpr) &C.cJSON {
 }
 
 fn (t Tree) asm_stmt(node ast.AsmStmt) &C.cJSON {
-	obj:=create_object()
+	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('AsmStmt'))
 	to_object(obj, 'arch', t.enum_node(node.arch))
 	to_object(obj, 'is_top_level', t.bool_node(node.is_top_level))
@@ -2254,53 +2274,53 @@ fn (t Tree) asm_stmt(node ast.AsmStmt) &C.cJSON {
 	// to_object(obj, 'scope', t.number_node(int(node.scope)))
 	to_object(obj, 'pos', t.position(node.pos))
 
-	clobbered_array:=create_array()
+	clobbered_array := create_array()
 	for c in node.clobbered {
-		to_array(clobbered_array,t.asm_clobbered(c))
+		to_array(clobbered_array, t.asm_clobbered(c))
 	}
-	to_object(obj,'clobbered',clobbered_array)
+	to_object(obj, 'clobbered', clobbered_array)
 
-	template_array:=create_array()
+	template_array := create_array()
 	for template in node.templates {
-		to_array(template_array,t.asm_template(template))
+		to_array(template_array, t.asm_template(template))
 	}
-	to_object(obj,'templates',template_array)
+	to_object(obj, 'templates', template_array)
 
-	output_array:=create_array()
+	output_array := create_array()
 	for o in node.output {
-		to_array(output_array,t.asm_io(o))
+		to_array(output_array, t.asm_io(o))
 	}
-	to_object(obj,'output',output_array)
+	to_object(obj, 'output', output_array)
 
-	input_array:=create_array()
+	input_array := create_array()
 	for i in node.input {
-		to_array(input_array,t.asm_io(i))
+		to_array(input_array, t.asm_io(i))
 	}
-	to_object(obj,'input',input_array)
+	to_object(obj, 'input', input_array)
 
-	global_array:=create_array()
+	global_array := create_array()
 	for g in node.global_labels {
-		to_array(global_array,t.string_node(g))
+		to_array(global_array, t.string_node(g))
 	}
-	to_object(obj,'global_labels',global_array)
+	to_object(obj, 'global_labels', global_array)
 
-	local_array:=create_array()
+	local_array := create_array()
 	for l in node.local_labels {
-		to_array(local_array,t.string_node(l))
+		to_array(local_array, t.string_node(l))
 	}
-	to_object(obj,'local_labels',local_array)
+	to_object(obj, 'local_labels', local_array)
 
-	symbol_array:=create_array()
+	symbol_array := create_array()
 	for s in node.exported_symbols {
-		to_array(symbol_array,t.string_node(s))
+		to_array(symbol_array, t.string_node(s))
 	}
-	to_object(obj,'exported_symbols',symbol_array)
+	to_object(obj, 'exported_symbols', symbol_array)
 
 	return obj
 }
 
 fn (t Tree) asm_register(node ast.AsmRegister) &C.cJSON {
-	obj:=create_object()
+	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('AsmRegister'))
 	to_object(obj, 'name', t.string_node(node.name))
 	// to_object(obj, 'typ', t.type_node(node.typ))
@@ -2309,29 +2329,29 @@ fn (t Tree) asm_register(node ast.AsmRegister) &C.cJSON {
 }
 
 fn (t Tree) asm_template(node ast.AsmTemplate) &C.cJSON {
-	obj:=create_object()
+	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('AsmTemplate'))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'is_label', t.bool_node(node.is_label))
 	to_object(obj, 'is_directive', t.bool_node(node.is_directive))
 
-	arg_array:=create_array()
+	arg_array := create_array()
 	for arg in node.args {
-		to_array(arg_array,t.asm_arg(arg))
+		to_array(arg_array, t.asm_arg(arg))
 	}
-	to_object(obj,'args',arg_array)
+	to_object(obj, 'args', arg_array)
 
-	comment_array:=create_array()
+	comment_array := create_array()
 	for c in node.comments {
-		to_array(comment_array,t.comment(c))
+		to_array(comment_array, t.comment(c))
 	}
-	to_object(obj,'comments',comment_array)
+	to_object(obj, 'comments', comment_array)
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
 
 fn (t Tree) asm_addressing(node ast.AsmAddressing) &C.cJSON {
-	obj:=create_object()
+	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('AsmAddressing'))
 	to_object(obj, 'displacement', t.number_node(int(node.displacement)))
 	to_object(obj, 'scale', t.number_node(node.scale))
@@ -2372,7 +2392,7 @@ fn (t Tree) asm_arg(node ast.AsmArg) &C.cJSON {
 }
 
 fn (t Tree) asm_alias(node ast.AsmAlias) &C.cJSON {
-	obj:=create_object()
+	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('AsmAlias'))
 	to_object(obj, 'name', t.string_node(node.name))
 	to_object(obj, 'pos', t.position(node.pos))
@@ -2380,36 +2400,35 @@ fn (t Tree) asm_alias(node ast.AsmAlias) &C.cJSON {
 }
 
 fn (t Tree) asm_clobbered(node ast.AsmClobbered) &C.cJSON {
-	obj:=create_object()
+	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('AsmClobbered'))
 	to_object(obj, 'reg', t.asm_register(node.reg))
-	
-	comment_array:=create_array()
+
+	comment_array := create_array()
 	for c in node.comments {
-		to_array(comment_array,t.comment(c))
+		to_array(comment_array, t.comment(c))
 	}
-	to_object(obj,'comments',comment_array)
+	to_object(obj, 'comments', comment_array)
 	return obj
 }
 
 fn (t Tree) asm_io(node ast.AsmIO) &C.cJSON {
-	obj:=create_object()
+	obj := create_object()
 	to_object(obj, 'ast_type', t.string_node('AsmIO'))
 	to_object(obj, 'alias', t.string_node(node.alias))
 	to_object(obj, 'constraint', t.string_node(node.constraint))
 	to_object(obj, 'expr', t.expr(node.expr))
 	to_object(obj, 'typ', t.type_node(node.typ))
 
-	comment_array:=create_array()
+	comment_array := create_array()
 	for c in node.comments {
-		to_array(comment_array,t.comment(c))
+		to_array(comment_array, t.comment(c))
 	}
-	to_object(obj,'comments',comment_array)
+	to_object(obj, 'comments', comment_array)
 
 	to_object(obj, 'pos', t.position(node.pos))
 	return obj
 }
-
 
 [inline]
 fn to_object(node &C.cJSON, key string, child &C.cJSON) {
