@@ -188,9 +188,7 @@ fn (t Tree) array_node<T>(nodes []T,method_name string) &Node {
 		if method.name == method_name {
 			for node in nodes {
 				res:=t.$method(node)
-				println(res)
-				// arr.add_item(res)
-				arr.add_item(&Node{})
+				arr.add_item(res) //TODO,waiting for bug fixed
 			}
 		}	
 	}
@@ -1581,11 +1579,7 @@ fn (t Tree) match_expr(node ast.MatchExpr) &Node {
 fn (t Tree) match_branch(node ast.MatchBranch) &Node {
 	obj := new_object()
 	obj.add('ast_type', t.string_node('MatchBranch'))
-	expr_arr := new_array()
-	for e in node.exprs {
-		expr_arr.add_item(t.expr(e))
-	}
-	obj.add('exprs', expr_arr)
+	obj.add('exprs', t.array_node(node.exprs,'expr'))
 	obj.add('ecmnts', t.two_dimension_comment(node.ecmnts))
 	obj.add('stmts', t.array_node(node.stmts,'stmt'))
 	obj.add('is_else', t.bool_node(node.is_else))
