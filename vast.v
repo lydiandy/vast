@@ -184,6 +184,13 @@ pub type AstNode = ast.Comment | ast.ConstField | string
 fn (t Tree) array_node<T>(nodes []T, method_name string) &Node {
 	mut arr := new_array()
 
+	//call method dynamically, V do not support yet
+	//error: todo: not a string literal
+	// for node in nodes {
+	// 	arr.add_item(t.$method_name(node))
+	// }
+
+	//temp
 	$for method in Tree.methods {
 		if method.name == method_name {
 			for node in nodes {
@@ -192,6 +199,7 @@ fn (t Tree) array_node<T>(nodes []T, method_name string) &Node {
 			}
 		}
 	}
+
 	return arr
 }
 
