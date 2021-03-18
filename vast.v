@@ -129,6 +129,7 @@ fn json(file string) string {
 	return s
 }
 
+//tree node
 pub type Node = C.cJSON
 
 [inline]
@@ -186,7 +187,10 @@ fn (t Tree) array_node<T>(nodes []T,method_name string) &Node {
 	$for method in Tree.methods {
 		if method.name == method_name {
 			for node in nodes {
-				arr.add_item(t.$method(node))
+				res:=t.$method(node)
+				println(res)
+				// arr.add_item(res)
+				arr.add_item(&Node{})
 			}
 		}	
 	}
@@ -260,6 +264,19 @@ fn (t Tree) token_node(tok_kind token.Kind) &Node {
 // enum type node
 fn (t Tree) enum_node<T>(value T) &Node {
 	return t.string_node('enum:${int(value)}($value)')
+}
+
+// for [][]comment
+fn (t Tree) two_dimension_comment(node [][]ast.Comment) &Node {
+	comments := new_array()
+	for n in node {
+		comment_array := new_array()
+		for c in n {
+			comment_array.add_item(t.comment(c))
+		}
+		comments.add_item(comment_array)
+	}
+	return comments
 }
 
 // ast file root node
@@ -1488,16 +1505,7 @@ fn (t Tree) array_init(node ast.ArrayInit) &Node {
 	obj.add('typ', t.type_node(node.typ))
 	obj.add('elem_type', t.type_node(node.elem_type))
 	obj.add('exprs', t.array_node(node.exprs,'expr'))
-	// expr comments:[][]Comment
-	expr_comments := new_array()
-	for c_array in node.ecmnts {
-		comment_array := new_array()
-		for c in c_array {
-			comment_array.add_item(t.comment(c))
-		}
-		expr_comments.add_item(comment_array)
-	}
-	obj.add('ecmnts', expr_comments)
+	obj.add('ecmnts', t.two_dimension_comment(node.ecmnts))
 	obj.add('pre_cmnts', t.array_node(node.pre_cmnts,'comment'))
 	obj.add('elem_type_pos', t.position(node.elem_type_pos))
 	obj.add('is_fixed', t.bool_node(node.is_fixed))
@@ -1522,17 +1530,7 @@ fn (t Tree) map_init(node ast.MapInit) &Node {
 	obj.add('value_type', t.type_node(node.value_type))
 	obj.add('keys', t.array_node(node.keys,'expr'))
 	obj.add('vals', t.array_node(node.vals,'expr'))
-
-	// expr comments:[][]Comment
-	comments := new_array()
-	for c_array in node.comments {
-		comment_array := new_array()
-		for c in c_array {
-			comment_array.add_item(t.comment(c))
-		}
-		comments.add_item(comment_array)
-	}
-	obj.add('comments', comments)
+	obj.add('comments', t.two_dimension_comment(node.comments))
 	obj.add('pre_cmnts', t.array_node(node.pre_cmnts,'comment'))
 	obj.add('pos', t.position(node.pos))
 	return obj
@@ -1588,16 +1586,7 @@ fn (t Tree) match_branch(node ast.MatchBranch) &Node {
 		expr_arr.add_item(t.expr(e))
 	}
 	obj.add('exprs', expr_arr)
-	// expr comments:[][]Comment
-	expr_comments := new_array()
-	for c_array in node.ecmnts {
-		comment_array := new_array()
-		for c in c_array {
-			comment_array.add_item(t.comment(c))
-		}
-		expr_comments.add_item(comment_array)
-	}
-	obj.add('ecmnts', expr_comments)
+	obj.add('ecmnts', t.two_dimension_comment(node.ecmnts))
 	obj.add('stmts', t.array_node(node.stmts,'stmt'))
 	obj.add('is_else', t.bool_node(node.is_else))
 	obj.add('pos', t.position(node.pos))
