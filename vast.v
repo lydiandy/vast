@@ -221,6 +221,7 @@ fn (t Tree) ast_file(node ast.File) &Node {
 	obj.add('scope', t.scope(node.scope))
 	obj.add('errors', t.errors(node.errors))
 	obj.add('warnings', t.warnings(node.warnings))
+	obj.add('notices', t.notices(node.notices))
 	obj.add('auto_imports', t.array_node_string(node.auto_imports))
 	//
 	symbol_obj := new_object()
@@ -340,6 +341,19 @@ fn (t Tree) warnings(warnings []errors.Warning) &Node {
 		warns.add_item(obj)
 	}
 	return warns
+}
+
+fn (t Tree) notices(notices []errors.Notice) &Node {
+	notice_array := new_array()
+	for n in notices {
+		obj := new_object()
+		obj.add('message', t.string_node(n.message))
+		obj.add('file_path', t.string_node(n.file_path))
+		obj.add('pos', t.position(n.pos))
+		obj.add('reporter', t.enum_node(n.reporter))
+		notice_array.add_item(obj)
+	}
+	return notice_array
 }
 
 // stmt node
