@@ -393,6 +393,7 @@ fn (t Tree) stmt(node ast.Stmt) &Node {
 		ast.Block { return t.block(node) }
 		ast.SqlStmt { return t.sql_stmt(node) }
 		ast.AsmStmt { return t.asm_stmt(node) }
+		ast.NodeError { return t.node_error(node) }
 	}
 	// fixed ForCStmt without init stmt
 	return t.null_node()
@@ -1066,6 +1067,9 @@ fn (t Tree) expr(expr ast.Expr) &Node {
 		ast.DumpExpr {
 			return t.dump_expr(expr)
 		}
+		ast.NodeError {
+			return t.node_error(expr)
+		}
 		else {
 			// println('unknown expr')
 			return t.null_node()
@@ -1373,6 +1377,7 @@ fn (t Tree) call_expr(node ast.CallExpr) &Node {
 	obj.add('from_embed_type', t.type_node(node.from_embed_type))
 	obj.add('comments', t.array_node_comment(node.comments))
 	obj.add('pos', t.position(node.pos))
+	obj.add('name_pos', t.position(node.name_pos))
 	return obj
 }
 
@@ -1408,6 +1413,7 @@ fn (t Tree) struct_init(node ast.StructInit) &Node {
 	obj.add('update_expr', t.expr(node.update_expr))
 	obj.add('update_expr_type', t.type_node(node.update_expr_type))
 	obj.add('pos', t.position(node.pos))
+	obj.add('name_pos', t.position(node.name_pos))
 	obj.add('update_expr_comments', t.array_node_comment(node.update_expr_comments))
 	obj.add('fields', t.array_node_struct_init_field(node.fields))
 	obj.add('embeds', t.array_node_struct_init_embed(node.embeds))
@@ -1425,6 +1431,7 @@ fn (t Tree) struct_init_field(node ast.StructInitField) &Node {
 	obj.add('comments', t.array_node_comment(node.comments))
 	obj.add('next_comments', t.array_node_comment(node.next_comments))
 	obj.add('pos', t.position(node.pos))
+	obj.add('name_pos', t.position(node.name_pos))
 	return obj
 }
 
@@ -1709,6 +1716,13 @@ fn (t Tree) dump_expr(expr ast.DumpExpr) &Node {
 	obj.add('ast_type', t.string_node('DumpExpr'))
 	obj.add('expr', t.expr(expr.expr))
 	obj.add('expr_type', t.type_node(expr.expr_type))
+	obj.add('pos', t.position(expr.pos))
+	return obj
+}
+
+fn (t Tree) node_error(expr ast.NodeError) &Node {
+	obj := new_object()
+	obj.add('idx', t.number_node(expr.idx))
 	obj.add('pos', t.position(expr.pos))
 	return obj
 }
