@@ -394,6 +394,8 @@ fn (t Tree) stmt(node ast.Stmt) &Node {
 		ast.SqlStmt { return t.sql_stmt(node) }
 		ast.AsmStmt { return t.asm_stmt(node) }
 		ast.NodeError { return t.node_error(node) }
+		ast.EmptyStmt { return t.empty_stmt(node)}
+
 	}
 	// fixed ForCStmt without init stmt
 	return t.null_node()
@@ -408,6 +410,9 @@ fn (t Tree) import_module(node ast.Import) &Node {
 	obj.add('comments', t.array_node_comment(node.comments))
 	obj.add('next_comments', t.array_node_comment(node.next_comments))
 	obj.add('pos', t.position(node.pos))
+	obj.add('mod_pos', t.position(node.mod_pos))
+	obj.add('alias_pos', t.position(node.alias_pos))
+	obj.add('syms_pos', t.position(node.syms_pos))
 	return obj
 }
 
@@ -1070,6 +1075,9 @@ fn (t Tree) expr(expr ast.Expr) &Node {
 		ast.NodeError {
 			return t.node_error(expr)
 		}
+		ast.EmptyExpr {
+			return t.empty_expr(expr)
+		}
 		else {
 			// println('unknown expr')
 			return t.null_node()
@@ -1722,8 +1730,23 @@ fn (t Tree) dump_expr(expr ast.DumpExpr) &Node {
 
 fn (t Tree) node_error(expr ast.NodeError) &Node {
 	obj := new_object()
+	obj.add('ast_type', t.string_node('NodeError'))
 	obj.add('idx', t.number_node(expr.idx))
 	obj.add('pos', t.position(expr.pos))
+	return obj
+}
+
+fn (t Tree) empty_expr(expr ast.EmptyExpr) &Node {
+	obj := new_object()
+	obj.add('ast_type', t.string_node('EmptyExpr'))
+	// obj.add('x', t.number_node(expr.x))
+	return obj
+}
+
+fn (t Tree) empty_stmt(node ast.EmptyStmt) &Node {
+	obj:=new_object()
+	obj.add('ast_type', t.string_node('EmptyStmt'))
+	obj.add('pos', t.position(node.pos))
 	return obj
 }
 
