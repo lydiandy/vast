@@ -222,7 +222,7 @@ fn (t Tree) ast_file(node ast.File) &Node {
 	obj.add('warnings', t.warnings(node.warnings))
 	obj.add('notices', t.notices(node.notices))
 	obj.add('auto_imports', t.array_node_string(node.auto_imports))
-	//
+	
 	symbol_obj := new_object()
 	for key, val in node.imported_symbols {
 		symbol_obj.add(key, t.string_node(val))
@@ -231,6 +231,7 @@ fn (t Tree) ast_file(node ast.File) &Node {
 
 	obj.add('generic_fns', t.array_node_generic_fns(node.generic_fns))
 	obj.add('embedded_files', t.array_node_embed_file(node.embedded_files))
+	obj.add('global_labels', t.array_node_string(node.global_labels))
 	obj.add('stmts', t.stmts(node.stmts))
 	return obj
 }
