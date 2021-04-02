@@ -478,7 +478,7 @@ fn (t Tree) fn_decl(node ast.FnDecl) &Node {
 	obj.add('is_main', t.bool_node(node.is_main))
 	obj.add('is_test', t.bool_node(node.is_test))
 	obj.add('is_conditional', t.bool_node(node.is_conditional))
-	obj.add('receiver', t.field(node.receiver))
+	obj.add('receiver', t.struct_field(node.receiver))
 	obj.add('receiver_pos', t.position(node.receiver_pos))
 	obj.add('is_method', t.bool_node(node.is_method))
 	obj.add('method_idx', t.number_node(node.method_idx))
@@ -540,6 +540,24 @@ fn (t Tree) struct_decl(node ast.StructDecl) &Node {
 	obj.add('attrs', t.array_node_attr(node.attrs))
 	obj.add('end_comments', t.array_node_comment(node.end_comments))
 	obj.add('embeds', t.array_node_embed(node.embeds))
+	return obj
+}
+
+fn (t Tree) struct_field(node ast.StructField) &Node {
+	obj := new_object()
+	obj.add('ast_type', t.string_node('StructField'))
+	obj.add('name', t.string_node(node.name))
+	obj.add('typ', t.type_node(node.typ))
+	obj.add('type_pos', t.position(node.type_pos))
+	obj.add('has_default_expr', t.bool_node(node.has_default_expr))
+	obj.add('default_expr_typ', t.type_node(node.default_expr_typ))
+	obj.add('default_expr', t.expr(node.default_expr))
+	obj.add('is_pub', t.bool_node(node.is_pub))
+	obj.add('is_mut', t.bool_node(node.is_mut))
+	obj.add('is_global', t.bool_node(node.is_global))
+	obj.add('attrs', t.array_node_attr(node.attrs))
+	obj.add('comments', t.array_node_comment(node.comments))
+	obj.add('pos', t.position(node.pos))
 	return obj
 }
 
@@ -703,30 +721,6 @@ fn (t Tree) fn_type_decl(node ast.FnTypeDecl) &Node {
 	obj.add('typ', t.type_node(node.typ))
 	obj.add('pos', t.position(node.pos))
 	obj.add('comments', t.array_node_comment(node.comments))
-	return obj
-}
-
-// fn (t Tree) struct_field(node ast.StructField) &Node {
-// 	obj := new_object()
-// 	obj.add('ast_type', t.string_node('StructField'))
-// 	obj.add('name', t.string_node(node.name))
-// 	obj.add('typ', t.type_node(node.typ))
-// 	obj.add('is_pub', t.bool_node(node.is_pub))
-// 	obj.add('has_default_expr', t.bool_node(node.has_default_expr))
-// 	obj.add('default_expr', t.expr(node.default_expr))
-// 	obj.add('pos', t.position(node.pos))
-// 	obj.add('type_pos', t.position(node.type_pos))
-// 	obj.add('attrs', t.array_node_attr(node.attrs))
-// 	obj.add('comments', t.array_node_comment(node.comments))
-// 	return obj
-// }
-
-fn (t Tree) field(node ast.StructField) &Node {
-	obj := new_object()
-	obj.add('ast_type', t.string_node('Field'))
-	obj.add('name', t.string_node(node.name))
-	obj.add('typ', t.type_node(node.typ))
-	obj.add('pos', t.position(node.pos))
 	return obj
 }
 
@@ -1599,24 +1593,6 @@ fn (t Tree) sql_expr(node ast.SqlExpr) &Node {
 		sub_struct_map.add(key.str(), t.sql_expr(val))
 	}
 	obj.add('sub_structs', sub_struct_map)
-	return obj
-}
-
-fn (t Tree) struct_field(node ast.StructField) &Node {
-	obj := new_object()
-	obj.add('ast_type', t.string_node('StructField'))
-	obj.add('name', t.string_node(node.name))
-	obj.add('typ', t.type_node(node.typ))
-	obj.add('type_pos', t.position(node.type_pos))
-	obj.add('has_default_expr', t.bool_node(node.has_default_expr))
-	obj.add('default_expr_typ', t.type_node(node.default_expr_typ))
-	obj.add('default_expr', t.expr(node.default_expr))
-	obj.add('is_pub', t.bool_node(node.is_pub))
-	obj.add('is_mut', t.bool_node(node.is_mut))
-	obj.add('is_global', t.bool_node(node.is_global))
-	obj.add('attrs', t.array_node_attr(node.attrs))
-	obj.add('comments', t.array_node_comment(node.comments))
-	obj.add('pos', t.position(node.pos))
 	return obj
 }
 
