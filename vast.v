@@ -2,7 +2,6 @@ module main
 
 import v.token
 import v.parser
-import v.table
 import v.ast
 import v.pref
 import v.errors
@@ -85,7 +84,7 @@ fn check_file(file string) {
 }
 
 struct Tree {
-	table        &table.Table
+	table        &ast.Table
 	pref         &pref.Preferences
 	global_scope &ast.Scope
 mut:
@@ -114,7 +113,7 @@ fn new_preferences() &pref.Preferences {
 fn json(file string) string {
 	mut t := Tree{
 		root: new_object()
-		table: table.new_table()
+		table: ast.new_table()
 		pref: new_preferences()
 		global_scope: &ast.Scope{
 			start_pos: 0
@@ -177,7 +176,7 @@ fn (t Tree) null_node() &Node {
 }
 
 // type node
-fn (t Tree) type_node(typ table.Type) &Node {
+fn (t Tree) type_node(typ ast.Type) &Node {
 	if typ == 0 {
 		return create_null()
 	} else {
@@ -591,7 +590,7 @@ fn (t Tree) interface_decl(node ast.InterfaceDecl) &Node {
 	return obj
 }
 
-fn (t Tree) attr(node table.Attr) &Node {
+fn (t Tree) attr(node ast.Attr) &Node {
 	obj := new_object()
 	obj.add('ast_type', t.string_node('Attr'))
 	obj.add('name', t.string_node(node.name))
@@ -707,22 +706,22 @@ fn (t Tree) fn_type_decl(node ast.FnTypeDecl) &Node {
 	return obj
 }
 
-fn (t Tree) struct_field(node ast.StructField) &Node {
-	obj := new_object()
-	obj.add('ast_type', t.string_node('StructField'))
-	obj.add('name', t.string_node(node.name))
-	obj.add('typ', t.type_node(node.typ))
-	obj.add('is_public', t.bool_node(node.is_public))
-	obj.add('has_default_expr', t.bool_node(node.has_default_expr))
-	obj.add('default_expr', t.expr(node.default_expr))
-	obj.add('pos', t.position(node.pos))
-	obj.add('type_pos', t.position(node.type_pos))
-	obj.add('attrs', t.array_node_attr(node.attrs))
-	obj.add('comments', t.array_node_comment(node.comments))
-	return obj
-}
+// fn (t Tree) struct_field(node ast.StructField) &Node {
+// 	obj := new_object()
+// 	obj.add('ast_type', t.string_node('StructField'))
+// 	obj.add('name', t.string_node(node.name))
+// 	obj.add('typ', t.type_node(node.typ))
+// 	obj.add('is_pub', t.bool_node(node.is_pub))
+// 	obj.add('has_default_expr', t.bool_node(node.has_default_expr))
+// 	obj.add('default_expr', t.expr(node.default_expr))
+// 	obj.add('pos', t.position(node.pos))
+// 	obj.add('type_pos', t.position(node.type_pos))
+// 	obj.add('attrs', t.array_node_attr(node.attrs))
+// 	obj.add('comments', t.array_node_comment(node.comments))
+// 	return obj
+// }
 
-fn (t Tree) field(node ast.Field) &Node {
+fn (t Tree) field(node ast.StructField) &Node {
 	obj := new_object()
 	obj.add('ast_type', t.string_node('Field'))
 	obj.add('name', t.string_node(node.name))
@@ -731,7 +730,7 @@ fn (t Tree) field(node ast.Field) &Node {
 	return obj
 }
 
-fn (t Tree) arg(node table.Param) &Node {
+fn (t Tree) arg(node ast.Param) &Node {
 	obj := new_object()
 	obj.add('ast_type', t.string_node('Param'))
 	obj.add('name', t.string_node(node.name))
@@ -967,7 +966,7 @@ fn (t Tree) expr(expr ast.Expr) &Node {
 		ast.AsCast {
 			return t.as_cast(expr)
 		}
-		ast.Type {
+		ast.TypeNode {
 			return t.type_expr(expr)
 		}
 		ast.SizeOf {
@@ -1201,10 +1200,11 @@ fn (t Tree) as_cast(node ast.AsCast) &Node {
 	return obj
 }
 
-fn (t Tree) type_expr(node ast.Type) &Node {
+fn (t Tree) type_expr(node ast.TypeNode) &Node {
 	obj := new_object()
-	obj.add('ast_type', t.string_node('Type'))
+	obj.add('ast_type', t.string_node('TypeNode'))
 	obj.add('typ', t.type_node(node.typ))
+	obj.add('pos', t.position(node.pos))
 	return obj
 }
 
@@ -1593,7 +1593,7 @@ fn (t Tree) sql_expr(node ast.SqlExpr) &Node {
 	obj.add('limit_expr', t.expr(node.limit_expr))
 	obj.add('has_offset', t.bool_node(node.has_offset))
 	obj.add('offset_expr', t.expr(node.offset_expr))
-	obj.add('fields', t.array_node_table_field(node.fields))
+	obj.add('fields', t.array_node_struct_field(node.fields))
 	sub_struct_map := new_object()
 	for key, val in node.sub_structs {
 		sub_struct_map.add(key.str(), t.sql_expr(val))
@@ -1602,17 +1602,21 @@ fn (t Tree) sql_expr(node ast.SqlExpr) &Node {
 	return obj
 }
 
-fn (t Tree) table_field(node table.Field) &Node {
+fn (t Tree) struct_field(node ast.StructField) &Node {
 	obj := new_object()
-	obj.add('ast_type', t.string_node('TableField'))
+	obj.add('ast_type', t.string_node('StructField'))
 	obj.add('name', t.string_node(node.name))
-	obj.add('default_expr', t.expr(ast.fe2ex(node.default_expr)))
+	obj.add('typ', t.type_node(node.typ))
+	obj.add('type_pos', t.position(node.type_pos))
 	obj.add('has_default_expr', t.bool_node(node.has_default_expr))
-	obj.add('attrs', t.array_node_attr(node.attrs))
+	obj.add('default_expr_typ', t.type_node(node.default_expr_typ))
+	obj.add('default_expr', t.expr(node.default_expr))
 	obj.add('is_pub', t.bool_node(node.is_pub))
 	obj.add('is_mut', t.bool_node(node.is_mut))
 	obj.add('is_global', t.bool_node(node.is_global))
-	obj.add('typ', t.type_node(node.typ))
+	obj.add('attrs', t.array_node_attr(node.attrs))
+	obj.add('comments', t.array_node_comment(node.comments))
+	obj.add('pos', t.position(node.pos))
 	return obj
 }
 
@@ -1624,7 +1628,7 @@ fn (t Tree) sql_stmt(node ast.SqlStmt) &Node {
 	obj.add('table_expr', t.type_expr(node.table_expr))
 	obj.add('object_var_name', t.string_node(node.object_var_name))
 	obj.add('where_expr', t.expr(node.where_expr))
-	obj.add('fields', t.array_node_table_field(node.fields))
+	obj.add('fields', t.array_node_struct_field(node.fields))
 	obj.add('updated_columns', t.array_node_string(node.updated_columns))
 	obj.add('update_exprs', t.array_node_expr(node.update_exprs))
 
@@ -1766,7 +1770,6 @@ fn (t Tree) asm_stmt(node ast.AsmStmt) &Node {
 	obj.add('input', t.array_node_asm_io(node.input))
 	obj.add('global_labels', t.array_node_string(node.global_labels))
 	obj.add('local_labels', t.array_node_string(node.local_labels))
-	obj.add('exported_symbols', t.array_node_string(node.exported_symbols))
 	return obj
 }
 
@@ -1794,9 +1797,9 @@ fn (t Tree) asm_template(node ast.AsmTemplate) &Node {
 fn (t Tree) asm_addressing(node ast.AsmAddressing) &Node {
 	obj := new_object()
 	obj.add('ast_type', t.string_node('AsmAddressing'))
-	obj.add('displacement', t.number_node(int(node.displacement)))
 	obj.add('scale', t.number_node(node.scale))
 	obj.add('mode', t.enum_node(node.mode))
+	obj.add('displacement', t.asm_arg(node.displacement))
 	obj.add('base', t.asm_arg(node.base))
 	obj.add('index', t.asm_arg(node.index))
 	obj.add('pos', t.position(node.pos))
@@ -1811,6 +1814,9 @@ fn (t Tree) asm_arg(node ast.AsmArg) &Node {
 		ast.AsmAlias {
 			return t.asm_alias(node)
 		}
+		ast.AsmDisp {
+			return t.asm_disp(node)
+		}
 		ast.AsmRegister {
 			return t.asm_register(node)
 		}
@@ -1820,14 +1826,14 @@ fn (t Tree) asm_arg(node ast.AsmArg) &Node {
 		ast.CharLiteral {
 			return t.char_literal(node)
 		}
-		string {
-			return t.string_node(node)
-		}
 		ast.FloatLiteral {
 			return t.float_literal(node)
 		}
 		ast.IntegerLiteral {
 			return t.integer_literal(node)
+		}
+		string {
+			return t.string_node(node)
 		}
 	}
 }
@@ -1836,6 +1842,14 @@ fn (t Tree) asm_alias(node ast.AsmAlias) &Node {
 	obj := new_object()
 	obj.add('ast_type', t.string_node('AsmAlias'))
 	obj.add('name', t.string_node(node.name))
+	obj.add('pos', t.position(node.pos))
+	return obj
+}
+
+fn (t Tree)asm_disp(node ast.AsmDisp) &Node {
+	obj:=new_object()
+	obj.add('ast_type', t.string_node('AsmDisp'))
+	obj.add('val', t.string_node(node.val))
 	obj.add('pos', t.position(node.pos))
 	return obj
 }

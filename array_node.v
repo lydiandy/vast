@@ -1,7 +1,6 @@
 module main
 
 import v.token
-import v.table
 import v.ast
 
 // do not support yet by vlang
@@ -100,7 +99,7 @@ fn (t Tree) array_node_embed_file(nodes []ast.EmbeddedFile) &Node {
 	return arr
 }
 
-fn (t Tree) array_node_attr(nodes []table.Attr) &Node {
+fn (t Tree) array_node_attr(nodes []ast.Attr) &Node {
 	mut arr := new_array()
 	for node in nodes {
 		arr.add_item(t.attr(node))
@@ -116,7 +115,7 @@ fn (t Tree) array_node_scope_struct_field(nodes []ast.ScopeStructField) &Node {
 	return arr
 }
 
-fn (t Tree) array_node_type(nodes []table.Type) &Node {
+fn (t Tree) array_node_type(nodes []ast.Type) &Node {
 	mut arr := new_array()
 	for node in nodes {
 		arr.add_item(t.type_node(node))
@@ -148,7 +147,7 @@ fn (t Tree) array_node_const_field(nodes []ast.ConstField) &Node {
 	return arr
 }
 
-fn (t Tree) array_node_arg(nodes []table.Param) &Node {
+fn (t Tree) array_node_arg(nodes []ast.Param) &Node {
 	mut arr := new_array()
 	for node in nodes {
 		arr.add_item(t.arg(node))
@@ -272,14 +271,6 @@ fn (t Tree) array_node_match_branch(nodes []ast.MatchBranch) &Node {
 	mut arr := new_array()
 	for node in nodes {
 		arr.add_item(t.match_branch(node))
-	}
-	return arr
-}
-
-fn (t Tree) array_node_table_field(nodes []table.Field) &Node {
-	mut arr := new_array()
-	for node in nodes {
-		arr.add_item(t.table_field(node))
 	}
 	return arr
 }
