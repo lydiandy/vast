@@ -1431,6 +1431,7 @@ fn (t Tree) struct_init_field(node ast.StructInitField) &Node {
 	obj.add('expr', t.expr(node.expr))
 	obj.add('typ', t.type_node(node.typ))
 	obj.add('expected_type', t.type_node(node.expected_type))
+	obj.add('parent_type', t.type_node(node.parent_type))
 	obj.add('comments', t.array_node_comment(node.comments))
 	obj.add('next_comments', t.array_node_comment(node.next_comments))
 	obj.add('pos', t.position(node.pos))
@@ -1491,7 +1492,6 @@ fn (t Tree) map_init(node ast.MapInit) &Node {
 fn (t Tree) none_expr(node ast.None) &Node {
 	obj := new_object()
 	obj.add('ast_type', t.string_node('None'))
-	obj.add('foo', t.number_node(node.foo))
 	obj.add('pos', t.position(node.pos))
 	return obj
 }
