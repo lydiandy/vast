@@ -491,6 +491,7 @@ fn (t Tree) fn_decl(node ast.FnDecl) &Node {
 	obj.add('is_direct_arr', t.bool_node(node.is_direct_arr))
 	obj.add('pos', t.position(node.pos))
 	obj.add('body_pos', t.position(node.body_pos))
+	obj.add('return_type_pos', t.position(node.return_type_pos))
 	obj.add('file', t.string_node(node.file))
 	obj.add('has_return', t.bool_node(node.has_return))
 	obj.add('return_type', t.type_node(node.return_type))
@@ -605,6 +606,7 @@ fn (t Tree) interface_decl(node ast.InterfaceDecl) &Node {
 	obj.add('methods', t.array_node_fn_decl(node.methods))
 	obj.add('fields', t.array_node_struct_field(node.fields))
 	obj.add('pre_comments', t.array_node_comment(node.pre_comments))
+	obj.add('name_pos', t.position(node.name_pos))
 	obj.add('pos', t.position(node.pos))
 	return obj
 }
