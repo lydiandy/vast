@@ -214,6 +214,8 @@ fn (t Tree) ast_file(node ast.File) &Node {
 	obj.add('ast_type', t.string_node('ast.File'))
 	obj.add('path', t.string_node(node.path))
 	obj.add('path_base', t.string_node(node.path_base))
+	obj.add('lines', t.number_node(node.lines) )
+	obj.add('bytes', t.number_node(node.bytes) )
 	obj.add('mod', t.mod(node.mod))
 	obj.add('imports', t.imports(node.imports))
 	obj.add('global_scope', t.scope(node.global_scope))
