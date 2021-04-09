@@ -285,7 +285,7 @@ fn (t Tree) scope_struct_field(node ast.ScopeStructField) &Node {
 	obj.add('typ', t.type_node(node.typ))
 	obj.add('orig_type', t.type_node(node.orig_type))
 	obj.add('pos', t.position(node.pos))
-	obj.add('sum_type_casts', t.array_node_type(node.sum_type_casts))
+	obj.add('smartcasts', t.array_node_type(node.smartcasts))
 	return obj
 }
 
@@ -786,7 +786,7 @@ fn (t Tree) var(node ast.Var) &Node {
 	obj.add('is_auto_deref', t.bool_node(node.is_auto_deref))
 	obj.add('share', t.enum_node(node.share))
 	obj.add('pos', t.position(node.pos))
-	obj.add('sum_type_casts', t.array_node_type(node.sum_type_casts))
+	obj.add('smartcasts', t.array_node_type(node.smartcasts))
 	return obj
 }
 
@@ -1311,7 +1311,6 @@ fn (t Tree) if_branch(node ast.IfBranch) &Node {
 	obj.add('cond', t.expr(node.cond))
 	obj.add('pos', t.position(node.pos))
 	obj.add('body_pos', t.position(node.body_pos))
-	obj.add('smartcast', t.bool_node(node.smartcast))
 	obj.add('scope', t.number_node(int(node.scope)))
 	obj.add('stmts', t.array_node_stmt(node.stmts))
 	obj.add('comments', t.array_node_comment(node.comments))
