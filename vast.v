@@ -481,6 +481,7 @@ fn (t Tree) fn_decl(node ast.FnDecl) &Node {
 	obj.add('is_main', t.bool_node(node.is_main))
 	obj.add('is_test', t.bool_node(node.is_test))
 	obj.add('is_conditional', t.bool_node(node.is_conditional))
+	obj.add('is_keep_alive', t.bool_node(node.is_keep_alive))
 	obj.add('receiver', t.struct_field(node.receiver))
 	obj.add('receiver_pos', t.position(node.receiver_pos))
 	obj.add('is_method', t.bool_node(node.is_method))
@@ -502,7 +503,8 @@ fn (t Tree) fn_decl(node ast.FnDecl) &Node {
 	obj.add('skip_gen', t.bool_node(node.skip_gen))
 	obj.add('attrs', t.array_node_attr(node.attrs))
 	obj.add('params', t.array_node_arg(node.params))
-	obj.add('generic_params', t.array_node_generic_param(node.generic_params))
+	// obj.add('generic_params', t.array_node_generic_param(node.generic_params))
+	obj.add('generic_names', t.array_node_string(node.generic_names))
 	obj.add('stmts', t.array_node_stmt(node.stmts))
 	obj.add('comments', t.array_node_comment(node.comments))
 	obj.add('next_comments', t.array_node_comment(node.next_comments))
@@ -511,11 +513,11 @@ fn (t Tree) fn_decl(node ast.FnDecl) &Node {
 	return obj
 }
 
-fn (t Tree) generic_param(node ast.GenericParam) &Node {
-	obj := new_object()
-	obj.add('name', t.string_node(node.name))
-	return obj
-}
+// fn (t Tree) generic_param(node ast.GenericParam) &Node {
+// 	obj := new_object()
+// 	obj.add('name', t.string_node(node.name))
+// 	return obj
+// }
 
 fn (t Tree) anon_fn(node ast.AnonFn) &Node {
 	obj := new_object()
