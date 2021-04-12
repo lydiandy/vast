@@ -391,7 +391,6 @@ fn (t Tree) stmt(node ast.Stmt) &Node {
 		ast.BranchStmt { return t.branch_stmt(node) }
 		ast.AssertStmt { return t.assert_stmt(node) }
 		ast.ExprStmt { return t.expr_stmt(node) }
-		ast.GoStmt { return t.go_stmt(node) }
 		ast.Block { return t.block(node) }
 		ast.SqlStmt { return t.sql_stmt(node) }
 		ast.AsmStmt { return t.asm_stmt(node) }
@@ -865,14 +864,6 @@ fn (t Tree) assert_stmt(node ast.AssertStmt) &Node {
 	obj := new_object()
 	obj.add('ast_type', t.string_node('AssertStmt'))
 	obj.add('expr', t.expr(node.expr))
-	obj.add('pos', t.position(node.pos))
-	return obj
-}
-
-fn (t Tree) go_stmt(node ast.GoStmt) &Node {
-	obj := new_object()
-	obj.add('ast_type', t.string_node('GoStmt'))
-	obj.add('call_expr', t.call_expr(node.call_expr))
 	obj.add('pos', t.position(node.pos))
 	return obj
 }
@@ -1691,7 +1682,8 @@ fn (t Tree) array_decompose(expr ast.ArrayDecompose) &Node {
 fn (t Tree) go_expr(expr ast.GoExpr) &Node {
 	obj := new_object()
 	obj.add('ast_type', t.string_node('GoExpr'))
-	obj.add('go_stmt', t.go_stmt(expr.go_stmt))
+	obj.add('call_expr',t.call_expr(expr.call_expr))
+	obj.add('is_expr', t.bool_node(expr.is_expr))
 	obj.add('pos', t.position(expr.pos))
 	return obj
 }
