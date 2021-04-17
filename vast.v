@@ -234,6 +234,7 @@ fn (t Tree) ast_file(node ast.File) &Node {
 	obj.add('generic_fns', t.array_node_generic_fns(node.generic_fns))
 	obj.add('embedded_files', t.array_node_embed_file(node.embedded_files))
 	obj.add('global_labels', t.array_node_string(node.global_labels))
+	obj.add('is_test',t.bool_node(node.is_test))
 	obj.add('stmts', t.stmts(node.stmts))
 	return obj
 }
@@ -504,6 +505,7 @@ fn (t Tree) fn_decl(node ast.FnDecl) &Node {
 	obj.add('params', t.array_node_arg(node.params))
 	// obj.add('generic_params', t.array_node_generic_param(node.generic_params))
 	obj.add('generic_names', t.array_node_string(node.generic_names))
+	obj.add('cur_generic_types', t.array_node_type(node.cur_generic_types))
 	obj.add('stmts', t.array_node_stmt(node.stmts))
 	obj.add('comments', t.array_node_comment(node.comments))
 	obj.add('next_comments', t.array_node_comment(node.next_comments))
@@ -864,6 +866,7 @@ fn (t Tree) assert_stmt(node ast.AssertStmt) &Node {
 	obj := new_object()
 	obj.add('ast_type', t.string_node('AssertStmt'))
 	obj.add('expr', t.expr(node.expr))
+	obj.add('is_used',t.bool_node(node.is_used))
 	obj.add('pos', t.position(node.pos))
 	return obj
 }
