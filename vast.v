@@ -214,8 +214,8 @@ fn (t Tree) ast_file(node ast.File) &Node {
 	obj.add('ast_type', t.string_node('ast.File'))
 	obj.add('path', t.string_node(node.path))
 	obj.add('path_base', t.string_node(node.path_base))
-	obj.add('lines', t.number_node(node.lines) )
-	obj.add('bytes', t.number_node(node.bytes) )
+	obj.add('lines', t.number_node(node.lines))
+	obj.add('bytes', t.number_node(node.bytes))
 	obj.add('mod', t.mod(node.mod))
 	obj.add('imports', t.imports(node.imports))
 	obj.add('global_scope', t.scope(node.global_scope))
@@ -224,7 +224,7 @@ fn (t Tree) ast_file(node ast.File) &Node {
 	obj.add('warnings', t.warnings(node.warnings))
 	obj.add('notices', t.notices(node.notices))
 	obj.add('auto_imports', t.array_node_string(node.auto_imports))
-	
+
 	symbol_obj := new_object()
 	for key, val in node.imported_symbols {
 		symbol_obj.add(key, t.string_node(val))
@@ -234,7 +234,7 @@ fn (t Tree) ast_file(node ast.File) &Node {
 	obj.add('generic_fns', t.array_node_generic_fns(node.generic_fns))
 	obj.add('embedded_files', t.array_node_embed_file(node.embedded_files))
 	obj.add('global_labels', t.array_node_string(node.global_labels))
-	obj.add('is_test',t.bool_node(node.is_test))
+	obj.add('is_test', t.bool_node(node.is_test))
 	obj.add('stmts', t.stmts(node.stmts))
 	return obj
 }
@@ -396,8 +396,7 @@ fn (t Tree) stmt(node ast.Stmt) &Node {
 		ast.SqlStmt { return t.sql_stmt(node) }
 		ast.AsmStmt { return t.asm_stmt(node) }
 		ast.NodeError { return t.node_error(node) }
-		ast.EmptyStmt { return t.empty_stmt(node)}
-
+		ast.EmptyStmt { return t.empty_stmt(node) }
 	}
 	// fixed ForCStmt without init stmt
 	return t.null_node()
@@ -865,7 +864,7 @@ fn (t Tree) assert_stmt(node ast.AssertStmt) &Node {
 	obj := new_object()
 	obj.add('ast_type', t.string_node('AssertStmt'))
 	obj.add('expr', t.expr(node.expr))
-	obj.add('is_used',t.bool_node(node.is_used))
+	obj.add('is_used', t.bool_node(node.is_used))
 	obj.add('pos', t.position(node.pos))
 	return obj
 }
@@ -1684,7 +1683,7 @@ fn (t Tree) array_decompose(expr ast.ArrayDecompose) &Node {
 fn (t Tree) go_expr(expr ast.GoExpr) &Node {
 	obj := new_object()
 	obj.add('ast_type', t.string_node('GoExpr'))
-	obj.add('call_expr',t.call_expr(expr.call_expr))
+	obj.add('call_expr', t.call_expr(expr.call_expr))
 	obj.add('is_expr', t.bool_node(expr.is_expr))
 	obj.add('pos', t.position(expr.pos))
 	return obj
@@ -1724,7 +1723,7 @@ fn (t Tree) empty_expr(expr ast.EmptyExpr) &Node {
 }
 
 fn (t Tree) empty_stmt(node ast.EmptyStmt) &Node {
-	obj:=new_object()
+	obj := new_object()
 	obj.add('ast_type', t.string_node('EmptyStmt'))
 	obj.add('pos', t.position(node.pos))
 	return obj
@@ -1822,8 +1821,8 @@ fn (t Tree) asm_alias(node ast.AsmAlias) &Node {
 	return obj
 }
 
-fn (t Tree)asm_disp(node ast.AsmDisp) &Node {
-	obj:=new_object()
+fn (t Tree) asm_disp(node ast.AsmDisp) &Node {
+	obj := new_object()
 	obj.add('ast_type', t.string_node('AsmDisp'))
 	obj.add('val', t.string_node(node.val))
 	obj.add('pos', t.position(node.pos))
