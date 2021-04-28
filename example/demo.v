@@ -4,7 +4,7 @@ module main
 // import module
 import os
 import math
-import time { now, Time }
+import time { Time, now }
 
 // const decl
 const (
@@ -29,7 +29,7 @@ pub fn (p Point) get_x() int {
 	return p.x
 }
 
-// embed struct 
+// embed struct
 struct MyPoint {
 	Point
 	title string
@@ -100,7 +100,7 @@ fn g_fn<T>(p T) T {
 }
 
 // generic struct
-struct GenericStruct <T> {
+struct GenericStruct<T> {
 	point Point
 mut:
 	model T

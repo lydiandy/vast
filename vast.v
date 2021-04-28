@@ -655,7 +655,7 @@ fn (t Tree) global_decl(node ast.GlobalDecl) &Node {
 	obj := new_object()
 	obj.add('ast_type', t.string_node('GlobalDecl'))
 	obj.add('pos', t.position(node.pos))
-	obj.add('is_block' ,t.bool_node(node.is_block))
+	obj.add('is_block', t.bool_node(node.is_block))
 	obj.add('fields', t.array_node_global_field(node.fields))
 	obj.add('end_comments', t.array_node_comment(node.end_comments))
 	return obj
