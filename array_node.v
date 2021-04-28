@@ -322,3 +322,11 @@ fn (t Tree) array_node_asm_arg(nodes []ast.AsmArg) &Node {
 	}
 	return arr
 }
+
+fn (t Tree) array_node_sql_stmt_line(nodes []ast.SqlStmtLine) &Node {
+	mut arr := new_array()
+	for node in nodes {
+		arr.add_item(t.sql_stmt_line(node))
+	}
+	return arr
+}

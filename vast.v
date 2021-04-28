@@ -611,6 +611,7 @@ fn (t Tree) interface_decl(node ast.InterfaceDecl) &Node {
 	obj.add('fields', t.array_node_struct_field(node.fields))
 	obj.add('pre_comments', t.array_node_comment(node.pre_comments))
 	obj.add('name_pos', t.position(node.name_pos))
+	obj.add('language', t.enum_node(node.language))
 	obj.add('pos', t.position(node.pos))
 	return obj
 }
@@ -654,6 +655,7 @@ fn (t Tree) global_decl(node ast.GlobalDecl) &Node {
 	obj := new_object()
 	obj.add('ast_type', t.string_node('GlobalDecl'))
 	obj.add('pos', t.position(node.pos))
+	obj.add('is_block' ,t.bool_node(node.is_block))
 	obj.add('fields', t.array_node_global_field(node.fields))
 	obj.add('end_comments', t.array_node_comment(node.end_comments))
 	return obj
@@ -668,6 +670,7 @@ fn (t Tree) global_field(node ast.GlobalField) &Node {
 	obj.add('has_expr', t.bool_node(node.has_expr))
 	obj.add('comments', t.array_node_comment(node.comments))
 	obj.add('pos', t.position(node.pos))
+	obj.add('typ_pos', t.position(node.typ_pos))
 	return obj
 }
 
@@ -787,6 +790,9 @@ fn (t Tree) var(node ast.Var) &Node {
 	obj.add('is_tmp', t.bool_node(node.is_tmp))
 	obj.add('is_autofree_tmp', t.bool_node(node.is_autofree_tmp))
 	obj.add('is_auto_deref', t.bool_node(node.is_auto_deref))
+	obj.add('is_auto_heap', t.bool_node(node.is_auto_heap))
+	obj.add('is_heap_ref', t.bool_node(node.is_heap_ref))
+	obj.add('is_stack_obj', t.bool_node(node.is_stack_obj))
 	obj.add('share', t.enum_node(node.share))
 	obj.add('pos', t.position(node.pos))
 	obj.add('smartcasts', t.array_node_type(node.smartcasts))
@@ -1597,21 +1603,29 @@ fn (t Tree) sql_expr(node ast.SqlExpr) &Node {
 fn (t Tree) sql_stmt(node ast.SqlStmt) &Node {
 	obj := new_object()
 	obj.add('ast_type', t.string_node('SqlStmt'))
-	obj.add('kind', t.enum_node(node.kind))
 	obj.add('db_expr', t.expr(node.db_expr))
+	obj.add('pos', t.position(node.pos))
+	obj.add('lines', t.array_node_sql_stmt_line(node.lines))
+	return obj
+}
+
+fn (t Tree) sql_stmt_line(node ast.SqlStmtLine) &Node {
+	obj := new_object()
+	obj.add('ast_type', t.string_node('SqlStmtLine'))
+	obj.add('kind', t.enum_node(node.kind))
 	obj.add('table_expr', t.type_expr(node.table_expr))
 	obj.add('object_var_name', t.string_node(node.object_var_name))
 	obj.add('where_expr', t.expr(node.where_expr))
 	obj.add('fields', t.array_node_struct_field(node.fields))
 	obj.add('updated_columns', t.array_node_string(node.updated_columns))
 	obj.add('update_exprs', t.array_node_expr(node.update_exprs))
+	obj.add('pos', t.position(node.pos))
 
 	sub_struct_map := new_object()
 	for key, val in node.sub_structs {
-		sub_struct_map.add(key.str(), t.sql_stmt(val))
+		sub_struct_map.add(key.str(), t.sql_stmt_line(val))
 	}
 	obj.add('sub_structs', sub_struct_map)
-	obj.add('pos', t.position(node.pos))
 	return obj
 }
 
