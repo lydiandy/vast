@@ -330,3 +330,11 @@ fn (t Tree) array_node_sql_stmt_line(nodes []ast.SqlStmtLine) &Node {
 	}
 	return arr
 }
+
+fn (t Tree) array_node_interface_embedding(nodes []ast.InterfaceEmbedding) &Node {
+	mut arr := new_array()
+	for node in nodes {
+		arr.add_item(t.interface_embedding(node))
+	}
+	return arr
+}

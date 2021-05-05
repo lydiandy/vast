@@ -604,6 +604,7 @@ fn (t Tree) interface_decl(node ast.InterfaceDecl) &Node {
 	obj := new_object()
 	obj.add('ast_type', t.string_node('InterfaceDecl'))
 	obj.add('name', t.string_node(node.name))
+	obj.add('typ', t.type_node(node.typ))
 	obj.add('is_pub', t.bool_node(node.is_pub))
 	obj.add('mut_pos', t.number_node(node.mut_pos))
 	obj.add('field_names', t.array_node_string(node.field_names))
@@ -613,6 +614,18 @@ fn (t Tree) interface_decl(node ast.InterfaceDecl) &Node {
 	obj.add('name_pos', t.position(node.name_pos))
 	obj.add('language', t.enum_node(node.language))
 	obj.add('pos', t.position(node.pos))
+	obj.add('are_ifaces_expanded', t.bool_node(node.are_ifaces_expanded))
+	obj.add('ifaces', t.array_node_interface_embedding(node.ifaces))
+	return obj
+}
+
+fn (t Tree) interface_embedding(node ast.InterfaceEmbedding) &Node {
+	obj := new_object()
+	obj.add('ast_type', t.string_node('InterfaceEmbedding'))
+	obj.add('name', t.string_node(node.name))
+	obj.add('typ', t.type_node(node.typ))
+	obj.add('pos', t.position(node.pos))
+	obj.add('comments', t.array_node_comment(node.comments))
 	return obj
 }
 
