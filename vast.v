@@ -804,7 +804,6 @@ fn (t Tree) var(node ast.Var) &Node {
 	obj.add('is_autofree_tmp', t.bool_node(node.is_autofree_tmp))
 	obj.add('is_auto_deref', t.bool_node(node.is_auto_deref))
 	obj.add('is_auto_heap', t.bool_node(node.is_auto_heap))
-	obj.add('is_heap_ref', t.bool_node(node.is_heap_ref))
 	obj.add('is_stack_obj', t.bool_node(node.is_stack_obj))
 	obj.add('share', t.enum_node(node.share))
 	obj.add('pos', t.position(node.pos))
