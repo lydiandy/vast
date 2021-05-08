@@ -571,6 +571,7 @@ fn (t Tree) embed(node ast.Embed) &Node {
 	obj := new_object()
 	obj.add('typ', t.type_node(node.typ))
 	obj.add('pos', t.position(node.pos))
+	obj.add('comments', t.array_node_comment(node.comments))
 	return obj
 }
 
