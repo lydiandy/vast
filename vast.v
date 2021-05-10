@@ -502,9 +502,7 @@ fn (t Tree) fn_decl(node ast.FnDecl) &Node {
 	obj.add('skip_gen', t.bool_node(node.skip_gen))
 	obj.add('attrs', t.array_node_attr(node.attrs))
 	obj.add('params', t.array_node_arg(node.params))
-	// obj.add('generic_params', t.array_node_generic_param(node.generic_params))
 	obj.add('generic_names', t.array_node_string(node.generic_names))
-	obj.add('cur_generic_types', t.array_node_type(node.cur_concrete_types))
 	obj.add('stmts', t.array_node_stmt(node.stmts))
 	obj.add('comments', t.array_node_comment(node.comments))
 	obj.add('next_comments', t.array_node_comment(node.next_comments))
@@ -512,12 +510,6 @@ fn (t Tree) fn_decl(node ast.FnDecl) &Node {
 	obj.add('defer_stmts', t.array_node_defer_stmt(node.defer_stmts))
 	return obj
 }
-
-// fn (t Tree) generic_param(node ast.GenericParam) &Node {
-// 	obj := new_object()
-// 	obj.add('name', t.string_node(node.name))
-// 	return obj
-// }
 
 fn (t Tree) anon_fn(node ast.AnonFn) &Node {
 	obj := new_object()

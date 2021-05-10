@@ -155,14 +155,6 @@ fn (t Tree) array_node_arg(nodes []ast.Param) &Node {
 	return arr
 }
 
-// fn (t Tree) array_node_generic_param(nodes []ast.GenericParam) &Node {
-// 	mut arr := new_array()
-// 	for node in nodes {
-// 		arr.add_item(t.generic_param(node))
-// 	}
-// 	return arr
-// }
-
 fn (t Tree) array_node_stmt(nodes []ast.Stmt) &Node {
 	mut arr := new_array()
 	for node in nodes {
