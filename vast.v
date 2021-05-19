@@ -1641,7 +1641,7 @@ fn (t Tree) lock_expr(node ast.LockExpr) &Node {
 	obj.add('typ', t.type_node(node.typ))
 	obj.add('pos', t.position(node.pos))
 	obj.add('stmts', t.array_node_stmt(node.stmts))
-	obj.add('lockeds', t.array_node_ident(node.lockeds))
+	obj.add('lockeds', t.array_node_expr(node.lockeds))
 	obj.add('r_lock', t.array_node_bool(node.is_rlock))
 	return obj
 }
