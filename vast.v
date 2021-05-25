@@ -480,6 +480,7 @@ fn (t Tree) fn_decl(node ast.FnDecl) &Node {
 	obj.add('is_main', t.bool_node(node.is_main))
 	obj.add('is_test', t.bool_node(node.is_test))
 	obj.add('is_conditional', t.bool_node(node.is_conditional))
+	obj.add('is_exported', t.bool_node(node.is_exported))
 	obj.add('is_keep_alive', t.bool_node(node.is_keep_alive))
 	obj.add('receiver', t.struct_field(node.receiver))
 	obj.add('receiver_pos', t.position(node.receiver_pos))
