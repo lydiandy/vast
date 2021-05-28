@@ -13,10 +13,10 @@ const version = '0.2.2'
 
 const usage = '
 usage:
-  1.vast demo.v 	 generate demo.json file.
-  2.vast -w demo.v 	 generate demo.json file, and watch.
-  3.vast -c domo.v 	 generate deom.json and demo.c file, and watch.
-  4.vast -p demo.v 	 print the json string to termial.'
+  1. vast demo.v 	 	 generate demo.json file.
+  2. vast -w demo.v 	 generate demo.json file, and watch for changes.
+  3. vast -c demo.v 	 generate demo.json and demo.c file, and watch for changes.
+  4. vast -p demo.v 	 print the generated json string to stdout, instead of saving it to a file.'
 
 fn main() {
 	args := os.args.clone()
