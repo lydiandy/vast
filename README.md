@@ -1,5 +1,18 @@
 # vast
 
+**NOTE:**
+
+vast tool has been merged to [v project](https://github.com/vlang/v). please use:
+
+```shell
+v ast demo.v 	 	 generate demo.json file.
+v ast -w demo.v 	 generate demo.json file, and watch for changes.
+v ast -c demo.v 	 generate demo.json and demo.c file, and watch for changes.
+v ast -p demo.v 	 print the json string to stdout, instead of saving it to a file.
+```
+
+
+
 A simple tool for vlang, generate v source file to  AST json file.
 
 It will generate example code to AST json file, which can help you understand the AST better.
