@@ -17,9 +17,6 @@ A simple tool for vlang, generate v source file to  AST json file.
 
 It will generate example code to AST json file, which can help you understand the AST better.
 
-**NOTE:**
-
-**vast will follow the newest version of V. If you run into an error, please update your version of V by running `v up`.**
 
 # Installation
 
